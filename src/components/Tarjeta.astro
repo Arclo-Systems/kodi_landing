@@ -1,0 +1,26 @@
+---
+import Icono, { type IconoName } from './Icono.astro';
+
+interface Props {
+  icono: IconoName;
+  rotulo: string;
+  nombre: string;
+  href?: string;
+  acento?: 'tiktok' | 'instagram' | 'facebook';
+}
+
+const { icono, rotulo, nombre, href, acento } = Astro.props;
+
+const Etiqueta = href ? 'a' : 'span';
+const clase = acento ? `tarjeta tarjeta--${acento}` : 'tarjeta';
+const enlace = href ? { href, target: '_blank', rel: 'noopener noreferrer' } : {};
+---
+
+<Etiqueta class={clase} {...enlace}>
+  <Icono name={icono} />
+  <span class="tarjeta__texto">
+    <span class="tarjeta__rotulo">{rotulo}</span>
+    <span class="tarjeta__nombre">{nombre}</span>
+  </span>
+  {href && <span class="oculto">(se abre en una pestaña nueva)</span>}
+</Etiqueta>

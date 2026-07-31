@@ -1,0 +1,56 @@
+---
+import nunitoLatin from '@fontsource-variable/nunito/files/nunito-latin-wght-normal.woff2?url';
+import '@fontsource-variable/nunito/wght.css';
+import '../styles/global.css';
+
+interface Props {
+  title: string;
+  description: string;
+}
+
+const { title, description } = Astro.props;
+
+const canonical = Astro.site ? new URL(Astro.url.pathname, Astro.site).href : undefined;
+const imagen = Astro.site ? new URL('/og.png', Astro.site).href : '/og.png';
+
+const datosEstructurados = {
+  '@context': 'https://schema.org',
+  '@type': 'MobileApplication',
+  name: 'Kodi',
+  applicationCategory: 'EducationalApplication',
+  operatingSystem: 'iOS, Android',
+  description,
+  inLanguage: 'es-CR',
+  areaServed: 'CR',
+};
+---
+
+<!doctype html>
+<html lang="es-CR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="preload" as="font" type="font/woff2" href={nunitoLatin} crossorigin />
+    {canonical && <link rel="canonical" href={canonical} />}
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta name="theme-color" content="#fafafa" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Kodi" />
+    <meta property="og:locale" content="es_CR" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={imagen} />
+    {canonical && <meta property="og:url" content={canonical} />}
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={imagen} />
+    <meta name="generator" content={Astro.generator} />
+    <script is:inline type="application/ld+json" set:html={JSON.stringify(datosEstructurados)} />
+  </head>
+  <body>
+    <slot />
+  </body>
+</html>

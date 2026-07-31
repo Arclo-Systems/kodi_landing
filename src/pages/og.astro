@@ -1,0 +1,53 @@
+---
+import '@fontsource-variable/nunito/wght.css';
+import '../styles/global.css';
+import Wordmark from '../components/Wordmark.astro';
+import { COPY } from '../data/copy';
+---
+
+<!doctype html>
+<html lang="es-CR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="robots" content="noindex" />
+    <title>OG</title>
+    <style is:global>
+      body {
+        display: flex;
+        width: 1200px;
+        height: 630px;
+        flex-direction: column;
+        justify-content: center;
+        gap: 1.5rem;
+        padding: 5rem;
+        background: var(--superficie);
+      }
+
+      .og-marca svg {
+        display: block;
+        width: 8rem;
+        height: auto;
+        color: var(--teal);
+      }
+
+      .og-titular {
+        color: var(--teal);
+        font-size: 7rem;
+        font-weight: 900;
+        letter-spacing: -0.035em;
+        line-height: 0.9;
+      }
+
+      .og-bajada {
+        max-width: 40ch;
+        color: var(--tinta-suave);
+        font-size: 2rem;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="og-marca"><Wordmark /></div>
+    <p class="og-titular">{COPY.titular}</p>
+    <p class="og-bajada">{COPY.bajada}</p>
+  </body>
+</html>
