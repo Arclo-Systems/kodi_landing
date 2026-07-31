@@ -213,8 +213,12 @@ a.tarjeta:active {
 }
 
 @media (max-width: 30rem) {
+  :root {
+    --hero: clamp(2.5rem, 13vw, 4rem);
+  }
+
   .centro {
-    gap: 1.25rem;
+    gap: 1rem;
   }
 
   .tarjeta {
@@ -234,26 +238,8 @@ a.tarjeta:active {
 
   .bloque .fila {
     width: 100%;
-    flex-wrap: nowrap;
-  }
-
-  .tarjeta--tiktok,
-  .tarjeta--instagram,
-  .tarjeta--facebook {
-    min-width: 0;
-    flex: 1 1 0;
     flex-direction: column;
-    gap: 0.375rem;
-    padding: calc(0.75rem - 1px) calc(0.5rem - 1px);
-    text-align: center;
-  }
-
-  .bloque .tarjeta__texto {
-    align-items: center;
-  }
-
-  .bloque .tarjeta__rotulo {
-    display: none;
+    align-items: stretch;
   }
 }
 
