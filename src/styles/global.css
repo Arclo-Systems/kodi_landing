@@ -60,9 +60,7 @@ body {
 }
 
 .encabezado {
-  position: absolute;
-  top: clamp(2rem, 5vh, 3.5rem);
-  left: clamp(1.5rem, 5vw, 4rem);
+  margin-bottom: clamp(1.5rem, 4vh, 2.5rem);
 }
 
 .marca {
@@ -205,6 +203,33 @@ a.tarjeta:active {
 @media (hover: hover) and (pointer: fine) {
   a.tarjeta:hover {
     transform: translateY(-2px);
+  }
+}
+
+.pie {
+  color: var(--tinta-suave);
+  font-size: 0.8125rem;
+  text-align: center;
+}
+
+@media (max-width: 30rem) {
+  .centro {
+    gap: 1.25rem;
+  }
+
+  .tarjeta {
+    min-width: 9.5rem;
+    padding: calc(0.625rem - 1px) calc(0.875rem - 1px);
+    gap: 0.5rem;
+  }
+
+  .tarjeta svg {
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+
+  .fila {
+    gap: 0.625rem;
   }
 }
 
