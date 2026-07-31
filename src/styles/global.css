@@ -239,7 +239,11 @@ a.tarjeta:active {
   .bloque .fila {
     width: 100%;
     flex-direction: column;
-    align-items: stretch;
+    align-items: center;
+  }
+
+  .bloque .tarjeta {
+    width: min(100%, 14rem);
   }
 }
 
