@@ -1,0 +1,23 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import DocumentoLegal from '../components/DocumentoLegal.astro';
+import Wordmark from '../components/Wordmark.astro';
+import { PRIVACY_DOC } from '../data/legal';
+---
+
+<BaseLayout
+  title="Política de privacidad — Kodi"
+  description="Qué datos recopila Kodi, para qué los usa, con quién los comparte y cómo ejercer tus derechos."
+>
+  <div class="pantalla">
+    <header class="encabezado">
+      <a href="/" aria-label="Kodi, ir al inicio">
+        <Wordmark class="marca" />
+      </a>
+    </header>
+
+    <main>
+      <DocumentoLegal documento={PRIVACY_DOC} />
+    </main>
+  </div>
+</BaseLayout>

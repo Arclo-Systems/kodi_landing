@@ -1,0 +1,23 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import DocumentoLegal from '../components/DocumentoLegal.astro';
+import Wordmark from '../components/Wordmark.astro';
+import { TERMS_DOC } from '../data/legal';
+---
+
+<BaseLayout
+  title="Términos de uso — Kodi"
+  description="Las condiciones bajo las que podés usar Kodi: cuenta, conducta, suscripciones, propiedad intelectual y ley aplicable."
+>
+  <div class="pantalla">
+    <header class="encabezado">
+      <a href="/" aria-label="Kodi, ir al inicio">
+        <Wordmark class="marca" />
+      </a>
+    </header>
+
+    <main>
+      <DocumentoLegal documento={TERMS_DOC} />
+    </main>
+  </div>
+</BaseLayout>

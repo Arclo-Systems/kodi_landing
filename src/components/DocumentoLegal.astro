@@ -1,0 +1,76 @@
+---
+import type { LegalDocument } from '../data/legal';
+
+interface Props {
+  documento: LegalDocument;
+}
+
+const { documento } = Astro.props;
+---
+
+<article class="documento">
+  <h1 class="documento__titulo">{documento.title}</h1>
+  <p class="documento__fecha">Última actualización: {documento.lastUpdated}</p>
+
+  {
+    documento.sections.map((seccion) => (
+      <section class="documento__seccion">
+        <h2 class="documento__seccion-titulo">{seccion.title}</h2>
+        <p class="documento__seccion-cuerpo">{seccion.body}</p>
+      </section>
+    ))
+  }
+
+  <a class="documento__volver" href="/">Volver al inicio</a>
+</article>
+
+<style>
+  .documento {
+    width: min(100%, 44rem);
+    margin: 0 auto;
+    padding-bottom: clamp(2rem, 6vh, 4rem);
+  }
+
+  .documento__titulo {
+    color: var(--teal);
+    font-size: clamp(2rem, 6vw, 3rem);
+    font-weight: 900;
+    line-height: 1;
+    letter-spacing: -0.03em;
+    text-transform: lowercase;
+    text-wrap: balance;
+  }
+
+  .documento__fecha {
+    margin-top: 0.75rem;
+    color: var(--tinta-suave);
+    font-size: 0.8125rem;
+  }
+
+  .documento__seccion {
+    margin-top: 2rem;
+  }
+
+  .documento__seccion-titulo {
+    font-size: 1.0625rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+
+  .documento__seccion-cuerpo {
+    margin-top: 0.5rem;
+    color: var(--tinta-suave);
+    font-size: 1rem;
+    line-height: 1.65;
+    text-wrap: pretty;
+  }
+
+  .documento__volver {
+    display: inline-block;
+    margin-top: 3rem;
+    color: var(--teal);
+    font-size: 0.9375rem;
+    font-weight: 700;
+    text-underline-offset: 4px;
+  }
+</style>

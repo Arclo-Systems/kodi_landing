@@ -63,6 +63,11 @@ body {
   margin-bottom: clamp(1.5rem, 4vh, 2.5rem);
 }
 
+.encabezado a {
+  display: inline-block;
+  color: inherit;
+}
+
 .marca {
   display: block;
   width: clamp(4.5rem, 6vw, 6rem);
@@ -210,6 +215,28 @@ a.tarjeta:active {
   color: var(--tinta-suave);
   font-size: 0.8125rem;
   text-align: center;
+}
+
+.pie__enlaces {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem 1.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.pie__enlaces a {
+  color: var(--tinta-suave);
+  text-decoration-color: var(--borde);
+  text-underline-offset: 3px;
+  transition: color 160ms ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .pie__enlaces a:hover {
+    color: var(--teal);
+    text-decoration-color: currentColor;
+  }
 }
 
 @media (max-width: 30rem) {
