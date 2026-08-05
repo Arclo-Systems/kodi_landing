@@ -6,8 +6,12 @@
 //
 // Se puede sobreescribir con `PUBLIC_KODI_API_URL` al construir (preview,
 // staging). Sin variable, apunta a producción.
+//
+// `||` y no `??`: una variable declarada pero VACÍA (lo normal en un preview mal
+// configurado) es `''`, que `??` daría por buena y dejaría la URL en `/v1/...`
+// contra el propio dominio de la landing.
 export const API_BASE_URL = (
-  import.meta.env.PUBLIC_KODI_API_URL ?? 'https://api.holakodi.com'
+  import.meta.env.PUBLIC_KODI_API_URL || 'https://api.holakodi.com'
 ).replace(/\/$/, '');
 
 /** Términos o privacidad vigentes: `{ data: { doc, version, last_updated, sections } }`. */

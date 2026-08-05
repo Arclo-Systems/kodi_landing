@@ -43,8 +43,7 @@ const endpoint = legalDocumentUrl(doc);
 
 <script>
   // Trae el documento vigente del API público y reemplaza el horneado SOLO si es
-  // más nuevo. La versión es la fecha de publicación (`YYYY-MM-DD`), así que
-  // compararla como texto ya ordena bien.
+  // más nuevo.
   //
   // Falla en silencio a propósito: si el API no responde, la página ya está
   // completa con el texto del build. Un documento legal en blanco sería peor que
@@ -60,11 +59,42 @@ const endpoint = legalDocumentUrl(doc);
     sections: SeccionRemota[];
   }
 
+  // Cuánto se espera al API antes de quedarse con el texto del build. La página
+  // ya es legible sin esto: no vale la pena colgar la pestaña de un usuario con
+  // mala red esperando un refresco que casi siempre no cambia nada.
+  const TIMEOUT_MS = 5000;
+
+  // `timeZone: 'UTC'` porque `last_updated` es un instante ISO: sin fijarla, un
+  // documento publicado a medianoche UTC se muestra un día antes en Costa Rica
+  // (UTC-6) y la fecha no coincide con la que ve el panel.
   const FORMATO_FECHA = new Intl.DateTimeFormat('es-CR', {
     day: 'numeric',
     month: 'long',
     year: 'numeric',
+    timeZone: 'UTC',
   });
+
+  /**
+   * ¿La versión remota es posterior a la horneada? Conviven dos formatos: el
+   * viejo `YYYY-MM-DD` y el nuevo `YYYY-MM-DD.N`, que numera varias
+   * publicaciones del mismo día. Compararlas como texto ordenaría mal en cuanto
+   * el contador pase de 9 ('2026-08-04.10' < '2026-08-04.9'), así que la fecha
+   * se compara como texto (ISO ya ordena) y el sufijo como número.
+   *
+   * Una versión ilegible cuenta como no-más-nueva: se queda el texto del build.
+   */
+  function esMasNueva(remota: string, horneada: string): boolean {
+    const [fechaRemota, nRemota] = partirVersion(remota);
+    const [fechaHorneada, nHorneada] = partirVersion(horneada);
+    if (fechaRemota !== fechaHorneada) return fechaRemota > fechaHorneada;
+    return nRemota > nHorneada;
+  }
+
+  function partirVersion(version: string): [string, number] {
+    const [fecha = '', sufijo] = version.trim().split('.');
+    const numero = Number.parseInt(sufijo ?? '', 10);
+    return [fecha, Number.isNaN(numero) ? 0 : numero];
+  }
 
   function esDocumento(valor: unknown): valor is DocumentoRemoto {
     const candidato = valor as Partial<DocumentoRemoto> | null;
@@ -77,20 +107,35 @@ const endpoint = legalDocumentUrl(doc);
     );
   }
 
+  // Astro scopea los estilos del componente con un atributo `data-astro-cid-*`
+  // que solo existe en el marcado del build. Los nodos que se crean acá tienen
+  // que heredarlo o el documento refrescado sale sin ningún estilo.
+  function atributoDeScope(contenedor: HTMLElement): string | undefined {
+    return contenedor.getAttributeNames().find((nombre) => nombre.startsWith('data-astro-cid-'));
+  }
+
   function pintar(contenedor: HTMLElement, secciones: SeccionRemota[]): void {
+    const scope = atributoDeScope(contenedor);
+    const crear = <K extends keyof HTMLElementTagNameMap>(
+      etiqueta: K,
+      clase: string,
+    ): HTMLElementTagNameMap[K] => {
+      const nodo = document.createElement(etiqueta);
+      nodo.className = clase;
+      if (scope) nodo.setAttribute(scope, '');
+      return nodo;
+    };
+
     // textContent en cada nodo (nunca innerHTML): el cuerpo es texto plano que
     // viene del panel y no debe interpretarse como marcado.
     contenedor.replaceChildren(
       ...secciones.map((seccion) => {
-        const bloque = document.createElement('section');
-        bloque.className = 'documento__seccion';
+        const bloque = crear('section', 'documento__seccion');
 
-        const titulo = document.createElement('h2');
-        titulo.className = 'documento__seccion-titulo';
+        const titulo = crear('h2', 'documento__seccion-titulo');
         titulo.textContent = seccion.title;
 
-        const cuerpo = document.createElement('p');
-        cuerpo.className = 'documento__seccion-cuerpo';
+        const cuerpo = crear('p', 'documento__seccion-cuerpo');
         cuerpo.textContent = seccion.body;
 
         bloque.append(titulo, cuerpo);
@@ -104,13 +149,14 @@ const endpoint = legalDocumentUrl(doc);
     const versionHorneada = articulo.dataset.legalVersion ?? '';
     if (!endpoint) return;
 
-    const respuesta = await fetch(endpoint);
+    const respuesta = await fetch(endpoint, { signal: AbortSignal.timeout(TIMEOUT_MS) });
     if (!respuesta.ok) return;
 
     const cuerpo: unknown = await respuesta.json();
     const remoto = (cuerpo as { data?: unknown } | null)?.data;
     if (!esDocumento(remoto)) return;
-    if (remoto.version <= versionHorneada || remoto.sections.length === 0) return;
+    if (remoto.version === versionHorneada || remoto.sections.length === 0) return;
+    if (!esMasNueva(remoto.version, versionHorneada)) return;
 
     const contenedor = articulo.querySelector<HTMLElement>('[data-legal-secciones]');
     if (contenedor) pintar(contenedor, remoto.sections);
@@ -162,12 +208,15 @@ const endpoint = legalDocumentUrl(doc);
     letter-spacing: -0.01em;
   }
 
+  /* pre-line: los saltos de línea que el admin escribe en el panel son parte
+     del texto legal (listas, incisos) y tienen que verse acá igual. */
   .documento__seccion-cuerpo {
     margin-top: 0.5rem;
     color: var(--tinta-suave);
     font-size: 1rem;
     line-height: 1.65;
     text-wrap: pretty;
+    white-space: pre-line;
   }
 
   .documento__volver {

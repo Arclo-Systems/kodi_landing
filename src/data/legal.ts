@@ -46,11 +46,11 @@ export const PRIVACY_DOC: LegalDocument = {
     },
     {
       title: '6. Seguridad',
-      body: 'Aplicamos medidas técnicas y organizativas razonables para proteger tu información (cifrado en tránsito, almacenamiento seguro de credenciales, controles de acceso). Ningún sistema es 100 % seguro — si detectás algo sospechoso, escribinos a soporte@kodi.app.',
+      body: 'Aplicamos medidas técnicas y organizativas razonables para proteger tu información (cifrado en tránsito, almacenamiento seguro de credenciales, controles de acceso). Ningún sistema es 100 % seguro — si detectás algo sospechoso, escribinos a soporte@holakodi.com.',
     },
     {
       title: '7. Tus derechos',
-      body: 'Podés acceder a tus datos personales y corregirlos en cualquier momento desde Perfil → Editar perfil, y eliminar tu cuenta desde Configuración → Cuenta → Eliminar cuenta. También podés solicitar una copia exportable de tus datos escribiendo a privacidad@kodi.app.',
+      body: 'Podés acceder a tus datos personales y corregirlos en cualquier momento desde Perfil → Editar perfil, y eliminar tu cuenta desde Configuración → Cuenta → Eliminar cuenta. También podés solicitar una copia exportable de tus datos escribiendo a soporte@holakodi.com.',
     },
     {
       title: '8. Retención de datos',
@@ -62,7 +62,7 @@ export const PRIVACY_DOC: LegalDocument = {
     },
     {
       title: '10. Contacto',
-      body: 'Kodi es un producto de Arclo Systems, con operación en Costa Rica. Para consultas sobre privacidad o para ejercer tus derechos, escribinos a privacidad@kodi.app.',
+      body: 'Kodi es un producto de Arclo Systems, con operación en Costa Rica. Para consultas sobre privacidad o para ejercer tus derechos, escribinos a soporte@holakodi.com.',
     },
   ],
 };
@@ -110,7 +110,7 @@ export const TERMS_DOC: LegalDocument = {
     },
     {
       title: '10. Contacto',
-      body: 'Kodi es un producto de Arclo Systems, con operación en Costa Rica. Para consultas sobre estos Términos, escribinos a legal@kodi.app.',
+      body: 'Kodi es un producto de Arclo Systems, con operación en Costa Rica. Para consultas sobre estos Términos, escribinos a soporte@holakodi.com.',
     },
   ],
 };
