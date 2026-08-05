@@ -1,28 +1,133 @@
 ---
 import type { LegalDocument } from '../data/legal';
+import { legalDocumentUrl } from '../data/api';
 
 interface Props {
+  /** Cuál de los dos documentos es — identifica el recurso en el API público. */
+  doc: 'terms' | 'privacy';
   documento: LegalDocument;
 }
 
-const { documento } = Astro.props;
+const { doc, documento } = Astro.props;
+
+// El texto horneado se sirve SIEMPRE: la página no depende del API para ser
+// legible (es lo que ven los crawlers y quien tenga JS apagado). El fetch de
+// abajo solo lo reemplaza si el panel publicó una versión más nueva.
+const endpoint = legalDocumentUrl(doc);
 ---
 
-<article class="documento">
+<article
+  class="documento"
+  data-legal
+  data-legal-endpoint={endpoint}
+  data-legal-version={documento.version}
+>
   <h1 class="documento__titulo">{documento.title}</h1>
-  <p class="documento__fecha">Última actualización: {documento.lastUpdated}</p>
+  <p class="documento__fecha" data-legal-fecha>
+    Última actualización: {documento.lastUpdated}
+  </p>
 
-  {
-    documento.sections.map((seccion) => (
-      <section class="documento__seccion">
-        <h2 class="documento__seccion-titulo">{seccion.title}</h2>
-        <p class="documento__seccion-cuerpo">{seccion.body}</p>
-      </section>
-    ))
-  }
+  <div data-legal-secciones>
+    {
+      documento.sections.map((seccion) => (
+        <section class="documento__seccion">
+          <h2 class="documento__seccion-titulo">{seccion.title}</h2>
+          <p class="documento__seccion-cuerpo">{seccion.body}</p>
+        </section>
+      ))
+    }
+  </div>
 
   <a class="documento__volver" href="/">Volver al inicio</a>
 </article>
+
+<script>
+  // Trae el documento vigente del API público y reemplaza el horneado SOLO si es
+  // más nuevo. La versión es la fecha de publicación (`YYYY-MM-DD`), así que
+  // compararla como texto ya ordena bien.
+  //
+  // Falla en silencio a propósito: si el API no responde, la página ya está
+  // completa con el texto del build. Un documento legal en blanco sería peor que
+  // uno con unos días de atraso.
+  interface SeccionRemota {
+    title: string;
+    body: string;
+  }
+
+  interface DocumentoRemoto {
+    version: string;
+    last_updated: string;
+    sections: SeccionRemota[];
+  }
+
+  const FORMATO_FECHA = new Intl.DateTimeFormat('es-CR', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  });
+
+  function esDocumento(valor: unknown): valor is DocumentoRemoto {
+    const candidato = valor as Partial<DocumentoRemoto> | null;
+    return (
+      typeof candidato?.version === 'string' &&
+      Array.isArray(candidato.sections) &&
+      candidato.sections.every(
+        (seccion) => typeof seccion?.title === 'string' && typeof seccion?.body === 'string',
+      )
+    );
+  }
+
+  function pintar(contenedor: HTMLElement, secciones: SeccionRemota[]): void {
+    // textContent en cada nodo (nunca innerHTML): el cuerpo es texto plano que
+    // viene del panel y no debe interpretarse como marcado.
+    contenedor.replaceChildren(
+      ...secciones.map((seccion) => {
+        const bloque = document.createElement('section');
+        bloque.className = 'documento__seccion';
+
+        const titulo = document.createElement('h2');
+        titulo.className = 'documento__seccion-titulo';
+        titulo.textContent = seccion.title;
+
+        const cuerpo = document.createElement('p');
+        cuerpo.className = 'documento__seccion-cuerpo';
+        cuerpo.textContent = seccion.body;
+
+        bloque.append(titulo, cuerpo);
+        return bloque;
+      }),
+    );
+  }
+
+  async function refrescar(articulo: HTMLElement): Promise<void> {
+    const endpoint = articulo.dataset.legalEndpoint;
+    const versionHorneada = articulo.dataset.legalVersion ?? '';
+    if (!endpoint) return;
+
+    const respuesta = await fetch(endpoint);
+    if (!respuesta.ok) return;
+
+    const cuerpo: unknown = await respuesta.json();
+    const remoto = (cuerpo as { data?: unknown } | null)?.data;
+    if (!esDocumento(remoto)) return;
+    if (remoto.version <= versionHorneada || remoto.sections.length === 0) return;
+
+    const contenedor = articulo.querySelector<HTMLElement>('[data-legal-secciones]');
+    if (contenedor) pintar(contenedor, remoto.sections);
+
+    const fecha = articulo.querySelector<HTMLElement>('[data-legal-fecha]');
+    const publicado = new Date(remoto.last_updated);
+    if (fecha && !Number.isNaN(publicado.getTime())) {
+      fecha.textContent = `Última actualización: ${FORMATO_FECHA.format(publicado)}`;
+    }
+  }
+
+  for (const articulo of document.querySelectorAll<HTMLElement>('[data-legal]')) {
+    void refrescar(articulo).catch(() => {
+      /* sin red o API caída: se queda el texto del build */
+    });
+  }
+</script>
 
 <style>
   .documento {
