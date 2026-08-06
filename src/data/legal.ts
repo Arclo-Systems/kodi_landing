@@ -20,7 +20,7 @@ export interface LegalDocument {
 }
 
 export const PRIVACY_DOC: LegalDocument = {
-  version: '2026-08-05.1',
+  version: '2026-08-05.2',
   lastUpdated: '5 de agosto, 2026',
   title: 'Política de privacidad',
   sections: [
@@ -38,7 +38,7 @@ export const PRIVACY_DOC: LegalDocument = {
     },
     {
       title: '4. Menores de edad',
-      body: 'Kodi es una app educativa orientada a estudiantes de bachillerato y admisión universitaria. Si sos menor de edad, debés contar con la autorización de tu madre, padre o tutor legal para usar Kodi. Si tenés menos de 13 años, además verificamos ese permiso antes de activar la cuenta: le enviamos un correo a tu madre, padre o tutor, y guardamos el registro de su aprobación con la fecha, la versión del aviso aceptada y los datos técnicos de esa aprobación. Sin ese permiso la cuenta queda pendiente y no se puede usar.',
+      body: 'Si tenés menos de 13 años, necesitás la autorización de tu madre, padre o tutor legal para usar Kodi: le enviamos un correo y guardamos el registro de su aprobación con la fecha, la versión del aviso aceptada y los datos técnicos de esa aprobación. Sin ese permiso la cuenta queda pendiente y no se puede usar.',
     },
     {
       title: '5. Publicidad, cookies y tecnologías similares',
@@ -68,7 +68,7 @@ export const PRIVACY_DOC: LegalDocument = {
 };
 
 export const TERMS_DOC: LegalDocument = {
-  version: '2026-08-05.1',
+  version: '2026-08-05.2',
   lastUpdated: '5 de agosto, 2026',
   title: 'Términos de uso',
   sections: [
@@ -78,11 +78,11 @@ export const TERMS_DOC: LegalDocument = {
     },
     {
       title: '2. Descripción del servicio',
-      body: 'Kodi es una plataforma educativa móvil para la preparación de exámenes en Centroamérica (Costa Rica, Guatemala, El Salvador, Honduras, Panamá). Incluye contenido de práctica, simulacros, modos competitivos y un sistema de logros. El servicio se financia con suscripciones y con anuncios en el plan gratuito.',
+      body: 'Kodi es una plataforma educativa móvil para la preparación de exámenes académicos y de certificación. Incluye contenido de práctica, simulacros, modos competitivos y un sistema de logros. La disponibilidad de módulos y países puede variar. El servicio se financia con suscripciones y con anuncios en el plan gratuito.',
     },
     {
       title: '3. Cuenta de usuario',
-      body: 'Sos responsable de mantener la confidencialidad de tu cuenta y contraseña, y de toda actividad que ocurra bajo tu cuenta. Si sos menor de edad, debés contar con la autorización de tu madre, padre o tutor legal para crear una cuenta y usar Kodi. Si tenés menos de 13 años, verificamos ese permiso por correo antes de activar la cuenta.',
+      body: 'Sos responsable de mantener la confidencialidad de tu cuenta y contraseña, y de toda actividad que ocurra bajo tu cuenta. Si tenés menos de 13 años, necesitás la autorización de tu madre, padre o tutor legal para crear una cuenta: la verificamos por correo antes de activarla.',
     },
     {
       title: '4. Conducta del usuario',
