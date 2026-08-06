@@ -20,7 +20,7 @@ export interface LegalDocument {
 }
 
 export const PRIVACY_DOC: LegalDocument = {
-  version: '2026-08-05.2',
+  version: '2026-08-05.3',
   lastUpdated: '5 de agosto, 2026',
   title: 'Política de privacidad',
   sections: [
@@ -42,7 +42,7 @@ export const PRIVACY_DOC: LegalDocument = {
     },
     {
       title: '5. Publicidad, cookies y tecnologías similares',
-      body: 'La app muestra anuncios de Google AdMob: videos con recompensa que elegís ver y un anuncio ocasional al cerrar una sesión en el plan gratuito. Google puede usar el identificador de publicidad de tu dispositivo para mostrar y medir esos anuncios y, según tu configuración, personalizarlos. Si sos menor de edad le pedimos a Google anuncios NO personalizados y aptos para tu edad. En iOS, Apple exige tu permiso explícito (el cuadro de diálogo de rastreo, ATT) para usar ese identificador con fines publicitarios: mientras no lo autorices seguís viendo anuncios, pero no personalizados. Podés cambiar esta preferencia cuando quieras desde los ajustes de tu teléfono (iOS: Privacidad y seguridad → Rastreo; Android: Google → Anuncios). Fuera de la publicidad usamos identificadores de dispositivo y almacenamiento local solo para mantener tu sesión, guardar preferencias y medir uso de la app.',
+      body: 'La app muestra anuncios de Google AdMob: videos con recompensa que elegís ver y un anuncio ocasional al cerrar una sesión en el plan gratuito. Google puede usar el identificador de publicidad de tu dispositivo para mostrar y medir esos anuncios y, según tu configuración, personalizarlos. Si tenés menos de 18 años le pedimos a Google anuncios NO personalizados y aptos para tu edad. En iOS, Apple exige tu permiso explícito (el cuadro de diálogo de rastreo, ATT) para usar ese identificador con fines publicitarios: mientras no lo autorices seguís viendo anuncios, pero no personalizados. Podés cambiar esta preferencia cuando quieras desde los ajustes de tu teléfono (iOS: Privacidad y seguridad → Rastreo; Android: Google → Anuncios). Fuera de la publicidad usamos identificadores de dispositivo y almacenamiento local solo para mantener tu sesión, guardar preferencias y medir uso de la app.',
     },
     {
       title: '6. Seguridad',
