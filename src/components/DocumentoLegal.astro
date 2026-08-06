@@ -1,10 +1,10 @@
 ---
 import type { LegalDocument } from '../data/legal';
-import { legalDocumentUrl } from '../data/api';
+import { legalDocumentUrl, type LegalDocSlug } from '../data/api';
 
 interface Props {
-  /** Cuál de los dos documentos es — identifica el recurso en el API público. */
-  doc: 'terms' | 'privacy';
+  /** Cuál documento es — identifica el recurso en el API público. */
+  doc: LegalDocSlug;
   documento: LegalDocument;
 }
 

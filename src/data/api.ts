@@ -14,7 +14,10 @@ export const API_BASE_URL = (
   import.meta.env.PUBLIC_KODI_API_URL || 'https://api.holakodi.com'
 ).replace(/\/$/, '');
 
-/** Términos o privacidad vigentes: `{ data: { doc, version, last_updated, sections } }`. */
-export function legalDocumentUrl(doc: 'terms' | 'privacy'): string {
+/** Los documentos legales que el API público sirve por slug. */
+export type LegalDocSlug = 'terms' | 'privacy' | 'raffle_rules';
+
+/** Documento vigente: `{ data: { doc, version, last_updated, sections } }`. */
+export function legalDocumentUrl(doc: LegalDocSlug): string {
   return `${API_BASE_URL}/v1/public/legal/${doc}`;
 }

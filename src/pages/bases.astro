@@ -1,0 +1,23 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import DocumentoLegal from '../components/DocumentoLegal.astro';
+import Wordmark from '../components/Wordmark.astro';
+import { RAFFLE_RULES_DOC } from '../data/legal';
+---
+
+<BaseLayout
+  title="Bases de premiaciones — Kodi"
+  description="Cómo funcionan las premiaciones de Kodi: quién puede participar, cómo se gana, los premios y la entrega."
+>
+  <div class="pantalla">
+    <header class="encabezado">
+      <a href="/" aria-label="Kodi, ir al inicio">
+        <Wordmark class="marca" />
+      </a>
+    </header>
+
+    <main>
+      <DocumentoLegal doc="raffle_rules" documento={RAFFLE_RULES_DOC} />
+    </main>
+  </div>
+</BaseLayout>

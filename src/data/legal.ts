@@ -1,4 +1,4 @@
-// ESPEJO de `frontend/src/lib/legal/privacy.ts` y `frontend/src/lib/legal/terms.ts`.
+// ESPEJO de `frontend/src/lib/legal/{privacy,terms,raffle-rules}.ts`.
 // La app y estas páginas web deben decir EXACTAMENTE lo mismo: la landing no
 // puede importar del repo del frontend, así que el contenido se duplica aquí
 // con la misma forma para que un diff sea literal.
@@ -20,8 +20,8 @@ export interface LegalDocument {
 }
 
 export const PRIVACY_DOC: LegalDocument = {
-  version: '2026-08-04',
-  lastUpdated: '4 de agosto, 2026',
+  version: '2026-08-05.1',
+  lastUpdated: '5 de agosto, 2026',
   title: 'Política de privacidad',
   sections: [
     {
@@ -38,7 +38,7 @@ export const PRIVACY_DOC: LegalDocument = {
     },
     {
       title: '4. Menores de edad',
-      body: 'Kodi es una app educativa orientada a estudiantes de bachillerato y admisión universitaria. Si sos menor de 18 años, necesitás el consentimiento de tu madre, padre o tutor legal para registrarte, y guardamos el registro de ese consentimiento. No recopilamos conscientemente datos de menores de 13 años sin verificación parental.',
+      body: 'Kodi es una app educativa orientada a estudiantes de bachillerato y admisión universitaria. Si sos menor de edad, debés contar con la autorización de tu madre, padre o tutor legal para usar Kodi. Si tenés menos de 13 años, además verificamos ese permiso antes de activar la cuenta: le enviamos un correo a tu madre, padre o tutor, y guardamos el registro de su aprobación con la fecha, la versión del aviso aceptada y los datos técnicos de esa aprobación. Sin ese permiso la cuenta queda pendiente y no se puede usar.',
     },
     {
       title: '5. Publicidad, cookies y tecnologías similares',
@@ -50,7 +50,7 @@ export const PRIVACY_DOC: LegalDocument = {
     },
     {
       title: '7. Tus derechos',
-      body: 'Podés acceder a tus datos personales y corregirlos en cualquier momento desde Perfil → Editar perfil, y eliminar tu cuenta desde Configuración → Cuenta → Eliminar cuenta. También podés solicitar una copia exportable de tus datos escribiendo a soporte@holakodi.com.',
+      body: 'Podés acceder a tus datos personales y corregirlos en cualquier momento desde Perfil → Editar perfil, y eliminar tu cuenta desde Configuración → Cuenta → Eliminar cuenta. También podés pedir una copia exportable de tus datos desde Configuración → Cuenta → Descargar mis datos, o escribiendo a soporte@holakodi.com. El tratamiento de tus datos se rige por la Ley 8968 de Costa Rica. Si considerás que no atendimos tu solicitud, podés presentar una denuncia ante la Agencia de Protección de Datos de los Habitantes (PRODHAB).',
     },
     {
       title: '8. Retención de datos',
@@ -62,14 +62,14 @@ export const PRIVACY_DOC: LegalDocument = {
     },
     {
       title: '10. Contacto',
-      body: 'Kodi es un producto de Arclo Systems, con operación en Costa Rica. Para consultas sobre privacidad o para ejercer tus derechos, escribinos a soporte@holakodi.com.',
+      body: 'Kodi es un producto de 3-102-957909 Sociedad de Responsabilidad Limitada, que opera bajo la marca Arclo Systems, cédula jurídica 3-102-957909, con domicilio en Tilarán, Guanacaste, Costa Rica (300 metros norte del Banco Nacional de Costa Rica, casa color blanco esquinera). Teléfono: (+506) 8316-5810. Para consultas sobre privacidad o para ejercer tus derechos, escribinos a soporte@holakodi.com.',
     },
   ],
 };
 
 export const TERMS_DOC: LegalDocument = {
-  version: '2026-08-04',
-  lastUpdated: '4 de agosto, 2026',
+  version: '2026-08-05.1',
+  lastUpdated: '5 de agosto, 2026',
   title: 'Términos de uso',
   sections: [
     {
@@ -82,7 +82,7 @@ export const TERMS_DOC: LegalDocument = {
     },
     {
       title: '3. Cuenta de usuario',
-      body: 'Sos responsable de mantener la confidencialidad de tu cuenta y contraseña, y de toda actividad que ocurra bajo tu cuenta. Si sos menor de edad, necesitás el consentimiento de tu madre, padre o tutor legal para crear una cuenta.',
+      body: 'Sos responsable de mantener la confidencialidad de tu cuenta y contraseña, y de toda actividad que ocurra bajo tu cuenta. Si sos menor de edad, debés contar con la autorización de tu madre, padre o tutor legal para crear una cuenta y usar Kodi. Si tenés menos de 13 años, verificamos ese permiso por correo antes de activar la cuenta.',
     },
     {
       title: '4. Conducta del usuario',
@@ -90,7 +90,7 @@ export const TERMS_DOC: LegalDocument = {
     },
     {
       title: '5. Suscripciones y pagos',
-      body: 'Las suscripciones a Kodi Plus se cobran a través de App Store o Google Play, y se renuevan automáticamente salvo que las canceles desde la tienda antes del fin del período. La gestión de cobros, cancelaciones y reembolsos la maneja la tienda donde compraste. Los pagos no son reembolsables salvo que la ley local lo exija.',
+      body: 'Las suscripciones de pago de Kodi (Kodi Premium) se cobran a través de App Store o Google Play, y se renuevan automáticamente salvo que las canceles desde la tienda antes del fin del período. Si activás una prueba gratuita, al terminar se convierte en suscripción de pago salvo que la canceles antes desde la tienda. La gestión de cobros, cancelaciones y reembolsos la maneja la tienda donde compraste. Los pagos no son reembolsables salvo que la ley local lo exija.',
     },
     {
       title: '6. Propiedad intelectual',
@@ -110,7 +110,51 @@ export const TERMS_DOC: LegalDocument = {
     },
     {
       title: '10. Contacto',
-      body: 'Kodi es un producto de Arclo Systems, con operación en Costa Rica. Para consultas sobre estos Términos, escribinos a soporte@holakodi.com.',
+      body: 'Kodi es un producto de 3-102-957909 Sociedad de Responsabilidad Limitada, que opera bajo la marca Arclo Systems, cédula jurídica 3-102-957909, con domicilio en Tilarán, Guanacaste, Costa Rica (300 metros norte del Banco Nacional de Costa Rica, casa color blanco esquinera). Teléfono: (+506) 8316-5810. Para consultas sobre estos Términos, escribinos a soporte@holakodi.com.',
+    },
+  ],
+};
+
+export const RAFFLE_RULES_DOC: LegalDocument = {
+  version: '2026-08-05.2',
+  lastUpdated: '5 de agosto, 2026',
+  title: 'Bases de premiaciones',
+  sections: [
+    {
+      title: '1. Naturaleza del programa',
+      body: 'Las premiaciones de Kodi reconocen el mérito académico. No son un sorteo, rifa ni juego de azar: no se compra participación, no existe pago para participar ni para mejorar las probabilidades. Participar es gratuito para cualquier usuario elegible.',
+    },
+    {
+      title: '2. Elegibilidad',
+      body: 'Usuarios registrados en Kodi con cuenta activa y residencia en Costa Rica. Las personas menores de edad requieren la autorización parental vigente dentro de la app. No pueden participar colaboradores de Kodi ni del patrocinador de la premiación, ni sus familiares directos.',
+    },
+    {
+      title: '3. Cómo se gana',
+      body: 'El premio de cada período se asigna por mérito según la posición final en la liga Genio del módulo correspondiente, determinada por los puntos EXP obtenidos respondiendo correctamente dentro del período indicado en la app. Los criterios son objetivos y verificables; no interviene el azar ni ningún pago.',
+    },
+    {
+      title: '4. Premios y entrega',
+      body: 'Kodi organiza estas premiaciones y responde ante las personas participantes. El premio de cada período se describe en la pantalla de Premiaciones y lo aporta el patrocinador indicado, que se encarga de la entrega en el plazo y forma que se comunique a la persona ganadora por los datos de contacto de su cuenta. Los premios no son canjeables por dinero ni transferibles, salvo que el patrocinador indique lo contrario.',
+    },
+    {
+      title: '5. Apple y Google',
+      body: 'Apple Inc. no es patrocinador de estas premiaciones y no participa en ellas de ninguna forma. Google LLC tampoco es patrocinador ni participa de ninguna forma. Cualquier consulta o reclamo debe dirigirse a Kodi o al patrocinador indicado, nunca a Apple ni a Google.',
+    },
+    {
+      title: '6. Conducta y descalificación',
+      body: 'Kodi puede descalificar cuentas que obtengan puntos mediante trampa, automatización, cuentas múltiples o cualquier violación de los Términos de uso. La descalificación puede aplicarse antes o después de anunciar resultados.',
+    },
+    {
+      title: '7. Datos personales',
+      body: 'Los datos de la persona ganadora se usan únicamente para coordinar la entrega del premio, conforme a la Política de privacidad de Kodi. El nombre visible en la app puede mostrarse en la lista de ganadores.',
+    },
+    {
+      title: '8. Vigencia y cambios',
+      body: 'Kodi puede modificar estas bases; la versión vigente es siempre la publicada en esta pantalla. Los cambios no afectan premios ya anunciados.',
+    },
+    {
+      title: '9. Legislación y contacto',
+      body: 'Estas premiaciones las organiza 3-102-957909 Sociedad de Responsabilidad Limitada, que opera bajo la marca Arclo Systems, cédula jurídica 3-102-957909, con domicilio en Tilarán, Guanacaste, Costa Rica, teléfono (+506) 8316-5810. Estas bases se rigen por la legislación de Costa Rica. Consultas: soporte@holakodi.com.',
     },
   ],
 };
