@@ -12,7 +12,7 @@ export const SOCIAL: Record<SocialId, SocialLink> = {
   },
   instagram: {
     id: 'instagram',
-    href: 'https://www.instagram.com/kodi.cr',
+    href: 'https://www.instagram.com/kodicostarica',
   },
   facebook: {
     id: 'facebook',
