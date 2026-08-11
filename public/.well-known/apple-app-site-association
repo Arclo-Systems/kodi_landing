@@ -1,0 +1,19 @@
+{
+  "applinks": {
+    "details": [
+      {
+        "appIDs": ["TEAMID.com.holakodi.app"],
+        "components": [
+          {
+            "/": "/u/*",
+            "comment": "Enlaces compartidos de la app: perfiles, retos y contenido"
+          },
+          {
+            "/": "/r/*",
+            "comment": "Enlaces de referido e invitaciones"
+          }
+        ]
+      }
+    ]
+  }
+}
