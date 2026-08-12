@@ -4,7 +4,9 @@
     "target": {
       "namespace": "android_app",
       "package_name": "com.holakodi.app",
-      "sha256_cert_fingerprints": ["REEMPLAZAR_CON_SHA256_DE_EAS"]
+      "sha256_cert_fingerprints": [
+        "52:E7:AF:76:5C:40:6B:6D:DF:F1:D5:0D:49:07:11:5F:50:92:99:0F:DF:B1:C3:3E:5C:1D:F4:23:8B:08:D4:CC"
+      ]
     }
   }
 ]

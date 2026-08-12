@@ -37,10 +37,10 @@ que después de poner el Team ID real hay que volver a consultar la CDN (comando
 abajo) y no dar por bueno el `curl` al dominio propio. Para probar sin esperar a la
 CDN, en la app se usa `applinks:holakodi.com?mode=developer`.
 
-## Pendiente 2 — Huella SHA-256 de Android
+## ~~Pendiente 2~~ — Huella SHA-256 de Android ✅ resuelto
 
-`assetlinks.json` tiene el placeholder `REEMPLAZAR_CON_SHA256_DE_EAS` en
-`sha256_cert_fingerprints`. Se obtiene desde el proyecto de la app:
+`assetlinks.json` ya lleva la huella real del keystore de EAS (clave de subida), así
+que del lado de Android no queda nada por rellenar. Para volver a obtenerla:
 
 ```bash
 eas credentials
@@ -49,18 +49,17 @@ eas credentials
 # → Keystore: Download / View existing → "SHA256 Fingerprint"
 ```
 
-Formato esperado: 32 pares hexadecimales separados por dos puntos, en mayúsculas
+Formato: 32 pares hexadecimales separados por dos puntos, en mayúsculas
 (`AB:CD:EF:...`).
 
-`sha256_cert_fingerprints` es un arreglo y admite varias huellas a la vez. Conviene
-incluir todas las que firmen builds que deban abrir los enlaces:
+`sha256_cert_fingerprints` es un arreglo y admite varias huellas a la vez. Hoy tiene
+una sola, y hay que **sumar** —no reemplazar— en estos casos:
 
-1. La del keystore de EAS (clave de subida).
-2. Si se activa **Play App Signing**, la del certificado con el que Google refirma:
+1. Si se activa **Play App Signing**, la del certificado con el que Google refirma:
    Play Console → *Release* → *Setup* → *App signing* → **App signing key
-   certificate** → SHA-256. Sin esta, los enlaces no verifican en las instalaciones
-   bajadas de Play.
-3. Opcionalmente la del keystore de debug, para probar en desarrollo.
+   certificate** → SHA-256. Sin esta, los enlaces dejan de verificar en las
+   instalaciones bajadas de Play, aunque funcionen en el APK propio.
+2. Opcionalmente la del keystore de debug, para probar en desarrollo.
 
 ## Verificación después de desplegar
 
