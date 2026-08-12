@@ -8,9 +8,11 @@ interface Props {
   description: string;
   /** Páginas que se sirven bajo muchas URLs distintas (invitaciones) y no deben indexarse. */
   noindex?: boolean;
+  /** Origen al que la página va a pegarle apenas cargue (las legales, al API). */
+  preconnect?: string;
 }
 
-const { title, description, noindex = false } = Astro.props;
+const { title, description, noindex = false, preconnect } = Astro.props;
 
 // Sin canonical ni og:url cuando la página es noindex: las de invitación se
 // sirven bajo /u/* y /r/*, así que su URL real no se puede calcular en el build.
@@ -41,6 +43,7 @@ const datosEstructurados = {
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="preload" as="font" type="font/woff2" href={nunitoLatin} crossorigin />
+    {preconnect && <link rel="preconnect" href={preconnect} crossorigin />}
     {canonical && <link rel="canonical" href={canonical} />}
     {noindex && <meta name="robots" content="noindex" />}
     <title>{title}</title>

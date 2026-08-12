@@ -16,9 +16,6 @@ Si un valor no está acá, no se escribe a mano en una regla: primero se agrega 
 | `--teal-texto` | `#2c6a74` | **todo texto teal por debajo de 24 px** (5.9:1 sobre superficie, AA) |
 | `--tiktok` / `--instagram` / `--facebook` | — | acentos de tarjeta de red |
 
-Sobre la banda del pie (`--tinta`): `--pie-texto` (11.6:1), `--pie-tenue` (6.4:1),
-`--pie-legal` (4.9:1), `--pie-borde` (regla sutil, no es texto).
-
 Regla de contraste: **nada de teal `--teal` en texto menor a 24 px** — no llega a 4.5:1.
 
 ## Espaciado
@@ -31,10 +28,14 @@ del alto de la ventana):
 
 | Token | Rango | Cuándo |
 |---|---|---|
-| `--ritmo-grupo` | 12→16 | entre elementos del mismo grupo (titular ↔ bajada) |
-| `--ritmo-bloque` | 32→48 | entre grupos (hero ↔ tiendas) |
-| `--ritmo-seccion` | 48→96 | entre secciones (contenido ↔ pie) |
-| `--pad-x` / `--pad-y` | 24→64 / 32→48 | canaleta de `.pantalla`; el pie la anula con margen negativo para ir full-bleed |
+| `--ritmo-grupo` | 8→12 | entre elementos del mismo grupo (titular ↔ bajada) |
+| `--ritmo-bloque` | 24→32 | entre grupos (hero ↔ tiendas ↔ redes) |
+| `--ritmo-seccion` | 48→64 | entre secciones (contenido ↔ pie) |
+| `--pad-x` / `--pad-y` | 24→64 / 32→48 | canaleta de `.pantalla`; **sin padding inferior**: el que cierra la página es el del pie |
+
+Los rangos están calibrados para que el desktop siga viéndose como el sitio original
+(ahí el ritmo estaba bien) y el que gana aire sea el móvil, que era donde todo se
+amontonaba a 16 px planos.
 
 La proporción `--ritmo-grupo` : `--ritmo-bloque` es 1:2 o más en cualquier viewport.
 Eso es lo que hace que se lea qué va junto y qué va aparte.

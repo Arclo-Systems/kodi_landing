@@ -4,14 +4,16 @@ import DocumentoLegal from '../components/DocumentoLegal.astro';
 import Pie from '../components/Pie.astro';
 import Wordmark from '../components/Wordmark.astro';
 import { PRIVACY_DOC } from '../data/legal';
+import { API_BASE_URL } from '../data/api';
 ---
 
 <BaseLayout
-  title="Política de privacidad — Kodi"
+  title="Política de privacidad · Kodi"
   description="Qué datos recopila Kodi, para qué los usa, con quién los comparte y cómo ejercer tus derechos."
+  preconnect={API_BASE_URL}
 >
   <div class="pantalla">
-    <header class="encabezado">
+    <header class="encabezado encabezado--documento">
       <a href="/" aria-label="Kodi, ir al inicio">
         <Wordmark class="marca" />
       </a>

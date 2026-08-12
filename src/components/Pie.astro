@@ -1,165 +1,97 @@
 ---
-import Icono from './Icono.astro';
-import Wordmark from './Wordmark.astro';
 import { COPY } from '../data/copy';
-import { SOCIAL, type SocialId } from '../data/social';
-import { rotuloDeTiendas } from '../data/tiendas';
 
 interface Props {
   class?: string;
+  /** Solo para el retardo de la animación de entrada de cada página. */
+  style?: string;
 }
 
-const { class: className } = Astro.props;
-
-// El lema sale del estado de las tiendas, igual que las tarjetas: el día que se
-// peguen las URLs no puede quedar un "muy pronto" escrito a mano en el pie.
-const lema = `${rotuloDeTiendas()} App Store y Google Play`;
-
-const REDES: readonly { id: SocialId; nombre: string }[] = [
-  { id: 'tiktok', nombre: 'TikTok' },
-  { id: 'instagram', nombre: 'Instagram' },
-  { id: 'facebook', nombre: 'Facebook' },
-];
+const { class: className, style } = Astro.props;
 ---
 
-<footer class:list={['pie', className]}>
-  <div class="pie__interior">
-    <div class="pie__marca">
-      <Wordmark />
-      <p class="pie__lema">{lema}</p>
-    </div>
-
-    <nav class="pie__nav" aria-label="Legal">
-      <a href="/terminos">Términos de uso</a>
-      <a href="/privacidad">Política de privacidad</a>
-      <a href="/bases">Bases de premiaciones</a>
-    </nav>
-
-    <nav class="pie__redes" aria-label={COPY.redes}>
-      {
-        REDES.map((red) => (
-          <a
-            href={SOCIAL[red.id].href}
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label={`Kodi en ${red.nombre}`}
-          >
-            <Icono name={red.id} />
-          </a>
-        ))
-      }
-    </nav>
-  </div>
-
-  <p class="pie__legal">{COPY.pie}</p>
+<footer class:list={['pie', className]} style={style}>
+  <nav class="pie__enlaces" aria-label="Legal">
+    <a href="/terminos">Términos de uso</a>
+    <a href="/privacidad">Política de privacidad</a>
+    <a href="/bases">Bases de premiaciones</a>
+  </nav>
+  <p class="pie__legal">
+    {COPY.pie.copyright} ·{' '}
+    <a href={COPY.pie.marcaUrl} target="_blank" rel="noopener noreferrer">{COPY.pie.marca}</a>
+  </p>
 </footer>
 
 <style>
-  /* Full-bleed: anula la canaleta de .pantalla (y su padding inferior) y la
-     repone por dentro. El cambio de terreno es lo que separa el pie del
-     contenido, así no depende del sobrante de un `flex: 1`. */
+  /* El pie reclama su propio espacio: antes toda la separación era el sobrante
+     de `flex: 1` en el contenido y en una pantalla baja quedaba a 1 px de la
+     última tarjeta. Ahora hay margen, regla y padding propios, así que el piso
+     no depende del alto del viewport. */
   .pie {
-    margin-inline: calc(-1 * var(--pad-x));
     margin-top: var(--ritmo-seccion);
-    margin-bottom: calc(-1 * var(--pad-y));
-    padding: var(--e-8) var(--pad-x) max(var(--e-6), env(safe-area-inset-bottom));
-    background: var(--pie-fondo);
-    color: var(--pie-texto);
-  }
-
-  .pie__interior {
-    display: grid;
-    width: min(100%, 60rem);
-    margin-inline: auto;
-    gap: var(--e-7);
-  }
-
-  @media (min-width: 48rem) {
-    .pie__interior {
-      grid-template-columns: 1fr auto auto;
-      align-items: start;
-      gap: var(--e-8);
-    }
-  }
-
-  /* `:global` porque el SVG lo pinta <Wordmark />: los estilos scopeados de este
-     componente no alcanzan el marcado de otro. */
-  .pie__marca :global(svg) {
-    display: block;
-    width: 5.5rem;
-    height: auto;
-    color: var(--pie-claro);
-  }
-
-  .pie__lema {
-    margin-top: var(--e-3);
-    color: var(--pie-tenue);
+    padding-block: var(--e-5);
+    padding-bottom: max(var(--e-5), env(safe-area-inset-bottom));
+    border-top: 1px solid var(--borde);
+    color: var(--tinta-suave);
     font-size: 0.875rem;
+    text-align: center;
   }
 
-  .pie__nav {
+  .pie__enlaces {
     display: flex;
-    flex-direction: column;
-    gap: var(--e-1);
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--e-1) var(--e-5);
   }
 
-  /* min-height 44 y no 24: es zona de pulgar, y el aire entre enlaces lo da el
-     área táctil, no el gap. */
-  .pie__nav a {
+  /* min-height 44 y no 24: los enlaces del pie medían 20 px de alto en la zona
+     del pulgar. El aire entre filas lo da el área táctil, no el gap. */
+  .pie__enlaces a {
     display: inline-flex;
     min-height: 44px;
     align-items: center;
-    color: var(--pie-texto);
-    font-size: 0.9375rem;
-    text-decoration: none;
-  }
-
-  @media (hover: hover) and (pointer: fine) {
-    .pie__nav a:hover {
-      color: var(--pie-claro);
-      text-decoration: underline;
-      text-underline-offset: 4px;
-    }
-  }
-
-  .pie__redes {
-    display: flex;
-    gap: var(--e-2);
-  }
-
-  .pie__redes a {
-    display: inline-flex;
-    width: 44px;
-    height: 44px;
-    align-items: center;
-    justify-content: center;
-    border-radius: var(--e-3);
-    color: var(--pie-texto);
+    padding-inline: var(--e-1);
+    color: var(--tinta-suave);
+    text-decoration-color: var(--borde);
+    text-underline-offset: 3px;
     transition: color 160ms ease;
   }
 
-  .pie__redes :global(svg) {
-    width: 1.375rem;
-    height: 1.375rem;
-  }
-
   @media (hover: hover) and (pointer: fine) {
-    .pie__redes a:hover {
-      color: var(--pie-claro);
+    .pie__enlaces a:hover {
+      color: var(--teal-texto);
+      text-decoration-color: currentColor;
     }
   }
 
   .pie__legal {
-    width: min(100%, 60rem);
-    margin: var(--e-7) auto 0;
-    padding-top: var(--e-5);
-    border-top: 1px solid var(--pie-borde);
-    color: var(--pie-legal);
     font-size: 0.8125rem;
   }
 
+  /* Mismo trato que los enlaces legales: mismo color, mismo hover, misma área
+     táctil. Solo la marca es enlace, no la línea entera. */
+  .pie__legal a {
+    display: inline-flex;
+    min-height: 44px;
+    align-items: center;
+    padding-inline: var(--e-1);
+    color: var(--tinta-suave);
+    text-decoration-color: var(--borde);
+    text-underline-offset: 3px;
+    vertical-align: middle;
+    transition: color 160ms ease;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .pie__legal a:hover {
+      color: var(--teal-texto);
+      text-decoration-color: currentColor;
+    }
+  }
+
   @media (prefers-reduced-motion: reduce) {
-    .pie__redes a {
+    .pie__enlaces a,
+    .pie__legal a {
       transition: none;
     }
   }

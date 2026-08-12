@@ -178,15 +178,17 @@ const endpoint = legalDocumentUrl(doc);
 </script>
 
 <style>
+  /* 36rem ≈ 72 caracteres. A 44rem la medida llegaba a 88ch y en un documento
+     largo se pierde el renglón al volver. */
   .documento {
-    width: min(100%, 44rem);
+    width: min(100%, 36rem);
     margin: 0 auto;
     padding-bottom: var(--ritmo-seccion);
   }
 
   .documento__titulo {
     color: var(--teal);
-    font-size: clamp(2rem, 6vw, 3rem);
+    font-size: clamp(1.75rem, 5vw, 2.5rem);
     font-weight: 900;
     line-height: 1;
     letter-spacing: -0.03em;
@@ -204,8 +206,10 @@ const endpoint = legalDocumentUrl(doc);
     margin-top: var(--e-6);
   }
 
+  /* 20 px contra 16 de cuerpo: ratio 1.25. A 17 px el peso 700 hacía todo el
+     trabajo y los títulos de sección apenas se despegaban del texto. */
   .documento__seccion-titulo {
-    font-size: 1.0625rem;
+    font-size: 1.25rem;
     font-weight: 700;
     letter-spacing: -0.01em;
   }

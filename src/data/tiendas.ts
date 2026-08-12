@@ -37,8 +37,3 @@ const ROTULO_PENDIENTE = 'Muy pronto en';
 export function rotuloDeTienda(tienda: Tienda, rotuloPendiente = ROTULO_PENDIENTE): string {
   return tienda.url ? ROTULO_DISPONIBLE : rotuloPendiente;
 }
-
-/** Rótulo para hablar de las dos tiendas juntas (el lema del pie). */
-export function rotuloDeTiendas(): string {
-  return TIENDAS.every((tienda) => tienda.url) ? ROTULO_DISPONIBLE : ROTULO_PENDIENTE;
-}

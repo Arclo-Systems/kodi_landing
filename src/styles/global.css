@@ -15,15 +15,6 @@
   --tinta-suave: #525252;
   --borde: #e5e5e5;
 
-  /* Banda del pie. Contrastes medidos sobre --tinta (#141f25), que es
-     azul-pizarra y no negro puro: 16.1 · 11.6 · 6.4 · 4.9:1. --pie-borde no es
-     texto, es una regla sutil. */
-  --pie-fondo: var(--tinta);
-  --pie-claro: #fafafa;
-  --pie-texto: #cfd8dd;
-  --pie-tenue: #93a3ab;
-  --pie-legal: #7d8d96;
-  --pie-borde: #2a3841;
 
   --hero: clamp(3.25rem, 15vw, 11rem);
   --sub: clamp(1.0625rem, 2vw, 1.375rem);
@@ -46,9 +37,9 @@
      alto de la ventana, y con `vh` el mismo diseño respiraba 16 px en un
      teléfono y 41 px en una tablet. La proporción grupo:bloque es 1:2 o más en
      cualquier viewport, que es lo que separa "junto" de "aparte". */
-  --ritmo-grupo: clamp(var(--e-3), 2vw, var(--e-4)); /*   12→16 dentro de un grupo */
-  --ritmo-bloque: clamp(var(--e-6), 4vw, var(--e-7)); /*  32→48 entre grupos */
-  --ritmo-seccion: clamp(var(--e-7), 8vw, var(--e-9)); /* 48→96 entre secciones */
+  --ritmo-grupo: clamp(var(--e-2), 1.5vw, var(--e-3)); /*  8→12 dentro de un grupo */
+  --ritmo-bloque: clamp(var(--e-5), 4vw, var(--e-6)); /*  24→32 entre grupos */
+  --ritmo-seccion: clamp(var(--e-7), 8vw, var(--e-8)); /* 48→64 entre secciones */
 
   /* Canaleta única de la página: el pie la anula con margen negativo para ir
      full-bleed y la repone por dentro. */
@@ -116,7 +107,9 @@ body {
   display: flex;
   min-height: 100dvh;
   flex-direction: column;
-  padding: var(--pad-y) var(--pad-x);
+  /* Sin padding inferior: el que cierra la página es el del pie, que siempre es
+     el último hijo. Con los dos, quedaba un vacío muerto debajo del copyright. */
+  padding: var(--pad-y) var(--pad-x) 0;
 }
 
 /* El contenido empuja al pie hasta abajo; el pie ya no vive del sobrante. */
@@ -126,6 +119,14 @@ body {
 
 .encabezado {
   margin-bottom: var(--ritmo-bloque);
+}
+
+/* Mismo eje y misma medida que el documento: si no, el wordmark arranca en la
+   canaleta y el artículo centrado en otro punto, dos bordes izquierdos sin
+   razón compositiva. */
+.encabezado--documento {
+  width: min(100%, 36rem);
+  margin-inline: auto;
 }
 
 /* El ancla del wordmark medía 72×23: por debajo del mínimo de WCAG 2.2 (24) y
@@ -154,9 +155,9 @@ body {
   text-align: center;
 }
 
-/* Titular y bajada son UN grupo: se separan entre sí con --ritmo-grupo y del
-   resto con --ritmo-bloque. Antes los cuatro intervalos del hero eran idénticos
-   y nada agrupaba la lectura. */
+/* Titular y bajada son UN grupo: la bajada es la continuación de la frase, así
+   que van pegados (--e-2) y el aire grande queda después, hacia las tiendas.
+   Antes los cuatro intervalos del hero eran idénticos y nada agrupaba. */
 .intro {
   display: flex;
   flex-direction: column;
@@ -220,10 +221,9 @@ body {
 
 /* Sin href, la tarjeta es un <span>: tenía exactamente el mismo aspecto que la
    enlazada, así que se veía pulsable sin serlo. El borde punteado y el fondo
-   transparente dicen "todavía no". */
+   transparente dicen "todavía no". Vale para la home y para las invitaciones. */
 .tarjeta:not(a) {
   border-style: dashed;
-  border-color: var(--borde);
   background: transparent;
   cursor: default;
 }
