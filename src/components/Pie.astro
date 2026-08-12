@@ -18,7 +18,9 @@ const { class: className, style } = Astro.props;
   </nav>
   <p class="pie__legal">
     {COPY.pie.copyright} ·{' '}
-    <a href={COPY.pie.marcaUrl} target="_blank" rel="noopener noreferrer">{COPY.pie.marca}</a>
+    <a href={COPY.pie.marcaUrl} target="_blank" rel="noopener noreferrer">
+      {COPY.pie.marca}<span class="oculto"> (se abre en una pestaña nueva)</span>
+    </a>
   </p>
 </footer>
 

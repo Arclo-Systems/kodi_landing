@@ -15,7 +15,6 @@
   --tinta-suave: #525252;
   --borde: #e5e5e5;
 
-
   --hero: clamp(3.25rem, 15vw, 11rem);
   --sub: clamp(1.0625rem, 2vw, 1.375rem);
 
@@ -33,20 +32,19 @@
   --e-8: 4rem; /*     64 */
   --e-9: 6rem; /*     96 */
 
-  /* Ritmo semántico. SIEMPRE vw, nunca vh: el aire de una página no depende del
-     alto de la ventana, y con `vh` el mismo diseño respiraba 16 px en un
-     teléfono y 41 px en una tablet. La proporción grupo:bloque es 1:2 o más en
-     cualquier viewport, que es lo que separa "junto" de "aparte". */
-  /* Dos niveles y nada más. --ritmo-grupo es EXACTAMENTE la mitad de
+  /* Ritmo semántico, SIEMPRE en vw y nunca en vh: el aire de una página no
+     depende del alto de la ventana, y con `vh` el mismo diseño respiraba 16 px
+     en un teléfono y 41 px en una tablet.
+     Dos niveles y nada más: --ritmo-grupo es EXACTAMENTE la mitad de
      --ritmo-bloque en cualquier viewport (12/24, 2vw/4vw, 16/32), así en el
-     inspector las bandas se leen sistemáticas: la chica adentro de cada grupo,
+     inspector las bandas se leen sistemáticas — la chica adentro de cada grupo,
      la grande idéntica entre grupos. */
   --ritmo-grupo: clamp(var(--e-3), 2vw, var(--e-4)); /*   12→16 dentro de un grupo */
   --ritmo-bloque: clamp(var(--e-5), 4vw, var(--e-6)); /*  24→32 entre grupos */
   --ritmo-seccion: clamp(var(--e-7), 8vw, var(--e-8)); /* 48→64 entre secciones */
 
-  /* Canaleta única de la página: el pie la anula con margen negativo para ir
-     full-bleed y la repone por dentro. */
+  /* Canaleta única de la página. El borde inferior lo cierra el pie con su
+     propio padding, no `.pantalla`: ver el comentario de .pantalla. */
   --pad-x: clamp(var(--e-5), 5vw, var(--e-8)); /* 24→64 */
   --pad-y: clamp(var(--e-6), 6vw, var(--e-7)); /* 32→48 */
 }
@@ -160,8 +158,8 @@ body {
 }
 
 /* Titular y bajada son UN grupo: la bajada es la continuación de la frase, así
-   que van pegados (--e-2) y el aire grande queda después, hacia las tiendas.
-   Antes los cuatro intervalos del hero eran idénticos y nada agrupaba. */
+   que se separan con el paso chico y el aire grande queda después, hacia las
+   tiendas. Antes los cuatro intervalos del hero eran idénticos y nada agrupaba. */
 .intro {
   display: flex;
   flex-direction: column;

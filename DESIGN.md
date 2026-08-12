@@ -28,7 +28,7 @@ del alto de la ventana):
 
 | Token | Rango | Cuándo |
 |---|---|---|
-| `--ritmo-grupo` | 8→12 | entre elementos del mismo grupo (titular ↔ bajada) |
+| `--ritmo-grupo` | 12→16 | entre elementos del mismo grupo (titular ↔ bajada, rótulo ↔ tarjetas) |
 | `--ritmo-bloque` | 24→32 | entre grupos (hero ↔ tiendas ↔ redes) |
 | `--ritmo-seccion` | 48→64 | entre secciones (contenido ↔ pie) |
 | `--pad-x` / `--pad-y` | 24→64 / 32→48 | canaleta de `.pantalla`; **sin padding inferior**: el que cierra la página es el del pie |
@@ -37,8 +37,15 @@ Los rangos están calibrados para que el desktop siga viéndose como el sitio or
 (ahí el ritmo estaba bien) y el que gana aire sea el móvil, que era donde todo se
 amontonaba a 16 px planos.
 
-La proporción `--ritmo-grupo` : `--ritmo-bloque` es 1:2 o más en cualquier viewport.
-Eso es lo que hace que se lea qué va junto y qué va aparte.
+`--ritmo-grupo` es **exactamente la mitad** de `--ritmo-bloque` en cualquier viewport
+(12/24 · 2vw/4vw · 16/32). Solo existen esos dos niveles: en el inspector de gaps las
+bandas se leen sistemáticas, la chica adentro de cada grupo y la grande idéntica entre
+grupos. Eso es lo que hace que se lea qué va junto y qué va aparte.
+
+Cuidado con el titular: `line-height: 0.88` recorta su caja por encima de la tinta, así
+que los descendentes se comen la banda del gap. `.titular` lleva `padding-bottom: 0.08em`
+(el sobrante medido con las métricas reales de Nunito 900) para que la caja termine donde
+termina la tinta.
 
 ## Tipografía
 
