@@ -26,6 +26,7 @@ export const TIENDAS: readonly Tienda[] = [
 ];
 
 const ROTULO_DISPONIBLE = 'Descargala en';
+const ROTULO_PENDIENTE = 'Muy pronto en';
 
 /**
  * El rótulo sale del estado de la tienda, nunca escrito a mano en la página: el
@@ -33,6 +34,11 @@ const ROTULO_DISPONIBLE = 'Descargala en';
  * con el enlace vivo. `rotuloPendiente` existe solo porque la home usa una
  * variante más corta que las páginas de invitación.
  */
-export function rotuloDeTienda(tienda: Tienda, rotuloPendiente = 'Muy pronto en'): string {
+export function rotuloDeTienda(tienda: Tienda, rotuloPendiente = ROTULO_PENDIENTE): string {
   return tienda.url ? ROTULO_DISPONIBLE : rotuloPendiente;
+}
+
+/** Rótulo para hablar de las dos tiendas juntas (el lema del pie). */
+export function rotuloDeTiendas(): string {
+  return TIENDAS.every((tienda) => tienda.url) ? ROTULO_DISPONIBLE : ROTULO_PENDIENTE;
 }

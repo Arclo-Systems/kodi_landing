@@ -1,4 +1,5 @@
 ---
+import Pie from './Pie.astro';
 import Tarjeta from './Tarjeta.astro';
 import Wordmark from './Wordmark.astro';
 import { COPY } from '../data/copy';
@@ -56,14 +57,7 @@ const { copy } = Astro.props;
     <a class="volver entra" style="animation-delay: 280ms" href="/">Conocé más de Kodi</a>
   </main>
 
-  <footer class="pie entra" style="animation-delay: 320ms">
-    <nav class="pie__enlaces" aria-label="Legal">
-      <a href="/terminos">Términos de uso</a>
-      <a href="/privacidad">Política de privacidad</a>
-      <a href="/bases">Bases de premiaciones</a>
-    </nav>
-    <p>{COPY.pie}</p>
-  </footer>
+  <Pie class="entra" />
 </div>
 
 <script is:inline>

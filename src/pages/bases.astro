@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import DocumentoLegal from '../components/DocumentoLegal.astro';
+import Pie from '../components/Pie.astro';
 import Wordmark from '../components/Wordmark.astro';
 import { RAFFLE_RULES_DOC } from '../data/legal';
 ---
@@ -19,5 +20,7 @@ import { RAFFLE_RULES_DOC } from '../data/legal';
     <main>
       <DocumentoLegal doc="raffle_rules" documento={RAFFLE_RULES_DOC} />
     </main>
+
+    <Pie />
   </div>
 </BaseLayout>

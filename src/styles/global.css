@@ -12,6 +12,16 @@
   --tinta-suave: #525252;
   --borde: #e5e5e5;
 
+  /* Banda del pie. Contrastes medidos sobre --tinta (#141f25), que es
+     azul-pizarra y no negro puro: 16.1 · 11.6 · 6.4 · 4.9:1. --pie-borde no es
+     texto, es una regla sutil. */
+  --pie-fondo: var(--tinta);
+  --pie-claro: #fafafa;
+  --pie-texto: #cfd8dd;
+  --pie-tenue: #93a3ab;
+  --pie-legal: #7d8d96;
+  --pie-borde: #2a3841;
+
   --hero: clamp(3.25rem, 15vw, 11rem);
   --sub: clamp(1.0625rem, 2vw, 1.375rem);
 
@@ -249,34 +259,6 @@ a.tarjeta:active {
 @media (hover: hover) and (pointer: fine) {
   a.tarjeta:hover {
     transform: translateY(-2px);
-  }
-}
-
-.pie {
-  color: var(--tinta-suave);
-  font-size: 0.8125rem;
-  text-align: center;
-}
-
-.pie__enlaces {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 0.5rem 1.5rem;
-  margin-bottom: 0.75rem;
-}
-
-.pie__enlaces a {
-  color: var(--tinta-suave);
-  text-decoration-color: var(--borde);
-  text-underline-offset: 3px;
-  transition: color 160ms ease;
-}
-
-@media (hover: hover) and (pointer: fine) {
-  .pie__enlaces a:hover {
-    color: var(--teal);
-    text-decoration-color: currentColor;
   }
 }
 

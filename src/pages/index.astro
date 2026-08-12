@@ -1,9 +1,9 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import Pie from '../components/Pie.astro';
 import Tarjeta from '../components/Tarjeta.astro';
 import Wordmark from '../components/Wordmark.astro';
 import { COPY } from '../data/copy';
-import { SOCIAL } from '../data/social';
 import { TIENDAS, rotuloDeTienda } from '../data/tiendas';
 ---
 
@@ -31,42 +31,8 @@ import { TIENDAS, rotuloDeTienda } from '../data/tiendas';
           ))
         }
       </div>
-
-      <section class="bloque entra" style="animation-delay: 240ms">
-        <h2 class="rotulo-seccion">{COPY.redes}</h2>
-        <div class="fila">
-          <Tarjeta
-            icono="tiktok"
-            rotulo="Seguinos en"
-            nombre="TikTok"
-            href={SOCIAL.tiktok.href}
-            acento="tiktok"
-          />
-          <Tarjeta
-            icono="instagram"
-            rotulo="Seguinos en"
-            nombre="Instagram"
-            href={SOCIAL.instagram.href}
-            acento="instagram"
-          />
-          <Tarjeta
-            icono="facebook"
-            rotulo="Seguinos en"
-            nombre="Facebook"
-            href={SOCIAL.facebook.href}
-            acento="facebook"
-          />
-        </div>
-      </section>
     </main>
 
-    <footer class="pie entra" style="animation-delay: 300ms">
-      <nav class="pie__enlaces" aria-label="Legal">
-        <a href="/terminos">Términos de uso</a>
-        <a href="/privacidad">Política de privacidad</a>
-        <a href="/bases">Bases de premiaciones</a>
-      </nav>
-      <p>{COPY.pie}</p>
-    </footer>
+    <Pie class="entra" />
   </div>
 </BaseLayout>
