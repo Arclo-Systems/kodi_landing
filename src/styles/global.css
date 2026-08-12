@@ -37,7 +37,11 @@
      alto de la ventana, y con `vh` el mismo diseño respiraba 16 px en un
      teléfono y 41 px en una tablet. La proporción grupo:bloque es 1:2 o más en
      cualquier viewport, que es lo que separa "junto" de "aparte". */
-  --ritmo-grupo: clamp(var(--e-2), 1.5vw, var(--e-3)); /*  8→12 dentro de un grupo */
+  /* Dos niveles y nada más. --ritmo-grupo es EXACTAMENTE la mitad de
+     --ritmo-bloque en cualquier viewport (12/24, 2vw/4vw, 16/32), así en el
+     inspector las bandas se leen sistemáticas: la chica adentro de cada grupo,
+     la grande idéntica entre grupos. */
+  --ritmo-grupo: clamp(var(--e-3), 2vw, var(--e-4)); /*   12→16 dentro de un grupo */
   --ritmo-bloque: clamp(var(--e-5), 4vw, var(--e-6)); /*  24→32 entre grupos */
   --ritmo-seccion: clamp(var(--e-7), 8vw, var(--e-8)); /* 48→64 entre secciones */
 
@@ -288,7 +292,7 @@ body {
   width: min(100%, 46rem);
   flex-direction: column;
   align-items: center;
-  gap: var(--e-5);
+  gap: var(--ritmo-grupo);
 }
 
 a.tarjeta:active {
