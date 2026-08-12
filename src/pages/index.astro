@@ -4,6 +4,7 @@ import Tarjeta from '../components/Tarjeta.astro';
 import Wordmark from '../components/Wordmark.astro';
 import { COPY } from '../data/copy';
 import { SOCIAL } from '../data/social';
+import { TIENDAS, rotuloDeTienda } from '../data/tiendas';
 ---
 
 <BaseLayout title={COPY.titulo} description={COPY.bajada}>
@@ -18,8 +19,16 @@ import { SOCIAL } from '../data/social';
       <p class="bajada entra" style="animation-delay: 120ms">{COPY.bajada}</p>
 
       <div class="fila entra" style="animation-delay: 180ms">
-        <Tarjeta icono="appstore" rotulo="Pronto en" nombre="App Store" />
-        <Tarjeta icono="googleplay" rotulo="Pronto en" nombre="Google Play" />
+        {
+          TIENDAS.map((tienda) => (
+            <Tarjeta
+              icono={tienda.icono}
+              rotulo={rotuloDeTienda(tienda, 'Pronto en')}
+              nombre={tienda.nombre}
+              href={tienda.url ?? undefined}
+            />
+          ))
+        }
       </div>
 
       <section class="bloque entra" style="animation-delay: 240ms">

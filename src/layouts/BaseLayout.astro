@@ -6,11 +6,18 @@ import '../styles/global.css';
 interface Props {
   title: string;
   description: string;
+  /** Páginas que se sirven bajo muchas URLs distintas (invitaciones) y no deben indexarse. */
+  noindex?: boolean;
 }
 
-const { title, description } = Astro.props;
+const { title, description, noindex = false } = Astro.props;
 
-const canonical = Astro.site ? new URL(Astro.url.pathname, Astro.site).href : undefined;
+// Sin canonical ni og:url cuando la página es noindex: las de invitación se
+// sirven bajo /u/* y /r/*, así que su URL real no se puede calcular en el build.
+// Declarar la del archivo (/invitacion) haría que las redes compartan un enlace
+// sin el código y le diría a Google que indexe lo que acabamos de excluir.
+const canonical =
+  !noindex && Astro.site ? new URL(Astro.url.pathname, Astro.site).href : undefined;
 const imagen = Astro.site ? new URL('/og.png', Astro.site).href : '/og.png';
 
 const datosEstructurados = {
@@ -33,6 +40,7 @@ const datosEstructurados = {
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="preload" as="font" type="font/woff2" href={nunitoLatin} crossorigin />
     {canonical && <link rel="canonical" href={canonical} />}
+    {noindex && <meta name="robots" content="noindex" />}
     <title>{title}</title>
     <meta name="description" content={description} />
     <meta name="theme-color" content="#fafafa" />

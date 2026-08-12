@@ -109,11 +109,62 @@ lo recibiría.
 Antes de poner el Team ID: o la app aprende a canjear referidos (resolver + pantalla +
 `pathPrefix: "/r/"` en Android), o se borra el bloque `/r/*` de este AASA.
 
-## Fuera del alcance de estos archivos
+Ahora que `/r/*` tiene página propia, borrarlo del AASA salió barato: quien abra una
+invitación en iOS cae en una página que le muestra el código, no en una ruta sin match
+adentro de la app.
 
-`holakodi.com/u/*` y `/r/*` no tienen página web: hoy devuelven el 404 en texto plano
-de Vercel. Eso es lo que ve quien abre el enlace **sin** la app instalada (escritorio,
-navegador embebido de WhatsApp, Android antes de verificar). Los enlaces universales
-funcionan igual —iOS y Android matchean por patrón de URL, no por que el recurso
-exista— pero conviene una página de aterrizaje con el código visible y los botones de
-las tiendas.
+## Página de aterrizaje para quien no tiene la app
+
+`holakodi.com/u/*` y `/r/*` ya no devuelven el 404 en texto plano de Vercel: sirven una
+página de invitación. Es lo que ve quien abre el enlace **sin** la app instalada
+(escritorio, navegador embebido de WhatsApp, Android antes de verificar). Los enlaces
+universales no se ven afectados: iOS y Android matchean por patrón de URL y actúan
+antes de que el navegador pida nada.
+
+| Ruta pública | Rewrite en `vercel.json` | Página que la genera |
+| --- | --- | --- |
+| `/u/<código>` | `/invitacion-perfil/index.html` | `src/pages/invitacion-perfil.astro` |
+| `/r/<código>` | `/invitacion/index.html` | `src/pages/invitacion.astro` |
+
+Las dos usan el mismo componente (`src/components/Invitacion.astro`) y solo cambian el
+copy, que vive en `src/data/invitacion.ts`.
+
+Detalles que conviene no romper:
+
+- El sitio es **estático**: no hay rutas dinámicas de Astro que puedan resolver un
+  código arbitrario. Por eso la traducción `/r/<lo que sea>` → página fija se hace con
+  rewrites de Vercel, no con `getStaticPaths`.
+- El destino apunta al archivo (`/invitacion/index.html`) y no a la ruta limpia
+  (`/invitacion`) a propósito: es un archivo que existe literalmente en `dist/`, así que
+  no depende de cómo Vercel resuelva los índices de directorio después del rewrite.
+- Los rewrites **no tocan `/.well-known/*`** (los `source` empiezan por `/u/` y `/r/`) y
+  además solo se evalúan cuando ningún archivo estático matcheó. Los headers de
+  `Content-Type` de los dos archivos de arriba siguen igual, en el mismo `vercel.json`.
+- Las dos rutas llevan un código de amigo (`friendLink()` en
+  `frontend/src/lib/links.ts` comparte `holakodi.com/u/KODI-XXXXXX`), así que las dos
+  páginas lo rescatan de `location.pathname` con un script inline mínimo, sin llamar a
+  ninguna API. Se **valida el formato canónico** —`KODI-` + 6 caracteres del alfabeto
+  sin I, L, O, 0 ni 1, el que genera `backend/src/modules/auth/auth.service.ts`— en vez
+  de limpiar lo que venga: si no calza, no se muestra nada. Así `/r/PREMIUM-GRATIS` no
+  puede pintar el texto que se le antoje con la tipografía y el dominio de Kodi. Lo que
+  sí calza se pinta por `textContent`, nunca como marcado.
+- Las dos páginas van con `noindex`, fuera del sitemap y **sin `canonical` ni `og:url`**:
+  son una misma página servida bajo infinitas URLs de compartir, y declarar la URL del
+  archivo (`/invitacion`) haría que las redes sociales compartieran un enlace sin el
+  código.
+
+## El día que la app se publique: dónde van las URLs de las tiendas
+
+En **un solo lugar**: `src/data/tiendas.ts`.
+
+```ts
+export const TIENDAS: readonly Tienda[] = [
+  { icono: 'appstore', nombre: 'App Store', url: null },
+  { icono: 'googleplay', nombre: 'Google Play', url: null },
+];
+```
+
+Se reemplazan los dos `null` por las URLs reales y no hay que tocar ninguna página: la
+home y las dos páginas de invitación leen de ahí. Mientras sean `null`, las tarjetas se
+pintan sin enlace (se ven, pero no llevan a ningún lado) y en las páginas de invitación
+el rótulo dice "Muy pronto en"; con URL cambia solo a "Descargala en".

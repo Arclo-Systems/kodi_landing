@@ -1,5 +1,9 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
+  "rewrites": [
+    { "source": "/u/:path*", "destination": "/invitacion-perfil/index.html" },
+    { "source": "/r/:path*", "destination": "/invitacion/index.html" }
+  ],
   "headers": [
     {
       "source": "/.well-known/apple-app-site-association",

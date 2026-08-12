@@ -1,0 +1,10 @@
+---
+// Se sirve en holakodi.com/u/<usuario> vía rewrite de vercel.json.
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Invitacion from '../components/Invitacion.astro';
+import { INVITACION_PERFIL } from '../data/invitacion';
+---
+
+<BaseLayout title={INVITACION_PERFIL.titulo} description={INVITACION_PERFIL.descripcion} noindex>
+  <Invitacion copy={INVITACION_PERFIL} />
+</BaseLayout>
