@@ -20,7 +20,7 @@ const { copy } = Astro.props;
     </a>
   </header>
 
-  <main class="centro">
+  <main id="contenido" class="centro">
     <h1 class="titular titular--invitacion entra" style="animation-delay: 60ms">
       {copy.titular}
     </h1>
@@ -160,7 +160,10 @@ const { copy } = Astro.props;
   }
 
   .volver {
-    color: var(--teal);
+    display: inline-flex;
+    min-height: 44px;
+    align-items: center;
+    color: var(--teal-texto);
     font-size: 0.9375rem;
     font-weight: 700;
     text-underline-offset: 4px;

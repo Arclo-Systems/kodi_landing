@@ -36,7 +36,9 @@ const datosEstructurados = {
 <html lang="es-CR">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!-- viewport-fit=cover: sin esto, env(safe-area-inset-*) vale 0 y el pie
+         queda debajo de la barra del iPhone con notch. -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="preload" as="font" type="font/woff2" href={nunitoLatin} crossorigin />
     {canonical && <link rel="canonical" href={canonical} />}
@@ -59,6 +61,7 @@ const datosEstructurados = {
     <script is:inline type="application/ld+json" set:html={JSON.stringify(datosEstructurados)} />
   </head>
   <body>
+    <a class="salto" href="#contenido">Ir al contenido</a>
     <slot />
   </body>
 </html>

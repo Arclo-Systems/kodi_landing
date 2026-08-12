@@ -4,6 +4,9 @@
   --superficie: #fafafa;
   --tarjeta: #ffffff;
   --teal: #408d99;
+  /* El teal de marca da 3.67:1 sobre la superficie: alcanza para texto grande y
+     falla AA en cuerpo. Todo texto teal por debajo de 24 px usa este, 5.9:1. */
+  --teal-texto: #2c6a74;
   --tiktok: #fe2c55;
   --instagram: #e4405f;
   --facebook: #1877f2;
@@ -87,6 +90,27 @@ body {
   outline-offset: 4px;
 }
 
+/* Solo aparece con el teclado, y siempre primero en el orden de tabulación. */
+.salto {
+  position: absolute;
+  z-index: 1;
+  top: var(--e-4);
+  left: var(--e-4);
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  padding: var(--e-2) var(--e-4);
+  border-radius: 0.875rem;
+  background: var(--tarjeta);
+  color: var(--teal-texto);
+  font-weight: 700;
+  transform: translateY(-200%);
+}
+
+.salto:focus {
+  transform: none;
+}
+
 .pantalla {
   position: relative;
   display: flex;
@@ -104,8 +128,13 @@ body {
   margin-bottom: var(--ritmo-bloque);
 }
 
+/* El ancla del wordmark medía 72×23: por debajo del mínimo de WCAG 2.2 (24) y
+   muy por debajo del recomendado táctil (44). El área crece con padding, la
+   marca no cambia de tamaño. */
 .encabezado a {
-  display: inline-block;
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
   color: inherit;
 }
 

@@ -27,7 +27,9 @@ const endpoint = legalDocumentUrl(doc);
     Última actualización: {documento.lastUpdated}
   </p>
 
-  <div data-legal-secciones>
+  <!-- aria-live: el refresco desde el API reemplaza las secciones después del
+       load; sin esto el cambio es mudo para un lector de pantalla. -->
+  <div data-legal-secciones aria-live="polite">
     {
       documento.sections.map((seccion) => (
         <section class="documento__seccion">
@@ -220,9 +222,11 @@ const endpoint = legalDocumentUrl(doc);
   }
 
   .documento__volver {
-    display: inline-block;
+    display: inline-flex;
+    min-height: 44px;
+    align-items: center;
     margin-top: var(--e-7);
-    color: var(--teal);
+    color: var(--teal-texto);
     font-size: 0.9375rem;
     font-weight: 700;
     text-underline-offset: 4px;
