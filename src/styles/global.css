@@ -1,4 +1,6 @@
 :root {
+  color-scheme: light;
+
   --superficie: #fafafa;
   --tarjeta: #ffffff;
   --teal: #408d99;
@@ -14,6 +16,31 @@
   --sub: clamp(1.0625rem, 2vw, 1.375rem);
 
   --salida: cubic-bezier(0.23, 1, 0.32, 1);
+
+  /* Escala de espaciado — base 4 px, progresión ~1.5x. Todo el sitio cabe acá:
+     ningún archivo escribe un rem de separación a mano. */
+  --e-1: 0.25rem; /*  4 */
+  --e-2: 0.5rem; /*   8 */
+  --e-3: 0.75rem; /*  12 */
+  --e-4: 1rem; /*     16 */
+  --e-5: 1.5rem; /*   24 */
+  --e-6: 2rem; /*     32 */
+  --e-7: 3rem; /*     48 */
+  --e-8: 4rem; /*     64 */
+  --e-9: 6rem; /*     96 */
+
+  /* Ritmo semántico. SIEMPRE vw, nunca vh: el aire de una página no depende del
+     alto de la ventana, y con `vh` el mismo diseño respiraba 16 px en un
+     teléfono y 41 px en una tablet. La proporción grupo:bloque es 1:2 o más en
+     cualquier viewport, que es lo que separa "junto" de "aparte". */
+  --ritmo-grupo: clamp(var(--e-3), 2vw, var(--e-4)); /*   12→16 dentro de un grupo */
+  --ritmo-bloque: clamp(var(--e-6), 4vw, var(--e-7)); /*  32→48 entre grupos */
+  --ritmo-seccion: clamp(var(--e-7), 8vw, var(--e-9)); /* 48→96 entre secciones */
+
+  /* Canaleta única de la página: el pie la anula con margen negativo para ir
+     full-bleed y la repone por dentro. */
+  --pad-x: clamp(var(--e-5), 5vw, var(--e-8)); /* 24→64 */
+  --pad-y: clamp(var(--e-6), 6vw, var(--e-7)); /* 32→48 */
 }
 
 *,
@@ -28,7 +55,6 @@ html {
 }
 
 body {
-  min-height: 100dvh;
   background: var(--superficie);
   color: var(--tinta);
   font-family: 'Nunito Variable', ui-sans-serif, system-ui, sans-serif;
@@ -56,11 +82,16 @@ body {
   display: flex;
   min-height: 100dvh;
   flex-direction: column;
-  padding: clamp(2rem, 5vh, 3.5rem) clamp(1.5rem, 5vw, 4rem);
+  padding: var(--pad-y) var(--pad-x);
+}
+
+/* El contenido empuja al pie hasta abajo; el pie ya no vive del sobrante. */
+.pantalla > main {
+  flex: 1;
 }
 
 .encabezado {
-  margin-bottom: clamp(1.5rem, 4vh, 2.5rem);
+  margin-bottom: var(--ritmo-bloque);
 }
 
 .encabezado a {
@@ -77,12 +108,21 @@ body {
 
 .centro {
   display: flex;
-  flex: 1;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: clamp(1.75rem, 4vh, 2.5rem);
+  gap: var(--ritmo-bloque);
   text-align: center;
+}
+
+/* Titular y bajada son UN grupo: se separan entre sí con --ritmo-grupo y del
+   resto con --ritmo-bloque. Antes los cuatro intervalos del hero eran idénticos
+   y nada agrupaba la lectura. */
+.intro {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--ritmo-grupo);
 }
 
 .titular {
@@ -99,21 +139,22 @@ body {
   max-width: 42ch;
   color: var(--tinta-suave);
   font-size: var(--sub);
+  text-wrap: balance;
 }
 
 .fila {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 0.875rem;
+  gap: var(--e-3);
 }
 
 .tarjeta {
   display: inline-flex;
   min-width: 13.5rem;
   align-items: center;
-  gap: 0.75rem;
-  padding: calc(0.75rem - 1px) calc(1.25rem - 1px);
+  gap: var(--e-3);
+  padding: var(--e-3) var(--e-5);
   border: 2px solid var(--borde);
   border-radius: 0.875rem;
   background: var(--tarjeta);
@@ -176,7 +217,7 @@ body {
   display: flex;
   margin: 0;
   align-items: center;
-  gap: 0.875rem;
+  gap: var(--e-3);
   width: 100%;
   color: var(--tinta-suave);
   font-size: 0.8125rem;
@@ -198,7 +239,7 @@ body {
   width: min(100%, 46rem);
   flex-direction: column;
   align-items: center;
-  gap: 1.25rem;
+  gap: var(--e-5);
 }
 
 a.tarjeta:active {
@@ -244,23 +285,15 @@ a.tarjeta:active {
     --hero: clamp(2.5rem, 13vw, 4rem);
   }
 
-  .centro {
-    gap: 1rem;
-  }
-
   .tarjeta {
     min-width: 9.5rem;
-    padding: calc(0.625rem - 1px) calc(0.875rem - 1px);
-    gap: 0.5rem;
+    padding: var(--e-3) var(--e-4);
+    gap: var(--e-2);
   }
 
   .tarjeta svg {
     width: 1.5rem;
     height: 1.5rem;
-  }
-
-  .fila {
-    gap: 0.625rem;
   }
 
   .bloque .fila {

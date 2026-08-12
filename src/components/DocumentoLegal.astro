@@ -179,7 +179,7 @@ const endpoint = legalDocumentUrl(doc);
   .documento {
     width: min(100%, 44rem);
     margin: 0 auto;
-    padding-bottom: clamp(2rem, 6vh, 4rem);
+    padding-bottom: var(--ritmo-seccion);
   }
 
   .documento__titulo {
@@ -193,13 +193,13 @@ const endpoint = legalDocumentUrl(doc);
   }
 
   .documento__fecha {
-    margin-top: 0.75rem;
+    margin-top: var(--e-3);
     color: var(--tinta-suave);
     font-size: 0.8125rem;
   }
 
   .documento__seccion {
-    margin-top: 2rem;
+    margin-top: var(--e-6);
   }
 
   .documento__seccion-titulo {
@@ -211,7 +211,7 @@ const endpoint = legalDocumentUrl(doc);
   /* pre-line: los saltos de línea que el admin escribe en el panel son parte
      del texto legal (listas, incisos) y tienen que verse acá igual. */
   .documento__seccion-cuerpo {
-    margin-top: 0.5rem;
+    margin-top: var(--e-2);
     color: var(--tinta-suave);
     font-size: 1rem;
     line-height: 1.65;
@@ -221,7 +221,7 @@ const endpoint = legalDocumentUrl(doc);
 
   .documento__volver {
     display: inline-block;
-    margin-top: 3rem;
+    margin-top: var(--e-7);
     color: var(--teal);
     font-size: 0.9375rem;
     font-weight: 700;
