@@ -173,6 +173,12 @@ body {
   color: var(--teal);
   font-size: var(--hero);
   font-weight: 900;
+  /* line-height 0.88 recorta la caja por debajo de la tinta: los descendentes de
+     "muy pronto" se salían 0.078em (9 px medidos con las métricas reales de
+     Nunito 900) y se comían el gap del flex, que quedaba tapado. El padding
+     devuelve la caja al borde de la tinta para que la banda del gap se vea
+     entera. No agrega aire: reemplaza el que la tinta estaba invadiendo. */
+  padding-bottom: 0.08em;
   line-height: 0.88;
   letter-spacing: -0.035em;
   text-transform: lowercase;
