@@ -1,0 +1,189 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Pie from '../components/Pie.astro';
+import Wordmark from '../components/Wordmark.astro';
+
+// A diferencia de /terminos, /privacidad y /bases, esta página NO es un
+// documento legal versionado en el panel: es el instructivo que Google Play
+// exige como "URL de eliminación de cuenta" y describe un flujo de la app. Por
+// eso no usa DocumentoLegal (que sincroniza contra el API por slug) y no
+// necesita preconnect.
+const CORREO_SOPORTE = 'soporte@holakodi.com';
+---
+
+<BaseLayout
+  title="Eliminar tu cuenta · Kodi"
+  description="Cómo eliminar tu cuenta de Kodi desde la app o por correo, qué datos se borran, cuáles se conservan y cómo cancelar la suscripción."
+>
+  <div class="pantalla">
+    <header class="encabezado encabezado--documento">
+      <a href="/" aria-label="Kodi, ir al inicio">
+        <Wordmark class="marca" />
+      </a>
+    </header>
+
+    <main id="contenido">
+      <article class="documento">
+        <h1 class="documento__titulo">Eliminar tu cuenta de Kodi</h1>
+        <p class="documento__entrada">
+          Podés eliminar tu cuenta desde la app o pedirlo por correo. Acá está el procedimiento,
+          qué datos se borran y qué pasa con tu suscripción.
+        </p>
+
+        <section class="documento__seccion">
+          <h2 class="documento__seccion-titulo">Desde la app</h2>
+          <ol class="documento__pasos">
+            <li>Abrí Kodi e iniciá sesión.</li>
+            <li>Entrá a la pestaña <strong>Perfil</strong>.</li>
+            <li>Abrí <strong>Configuración</strong> y tocá <strong>Eliminar cuenta</strong>.</li>
+            <li>Confirmá con la contraseña de tu cuenta.</li>
+          </ol>
+          <p class="documento__seccion-cuerpo">
+            Al confirmar, la cuenta se desactiva de inmediato y perdés el acceso. Tenés 30 días
+            para revertirlo: si volvés a iniciar sesión dentro de ese plazo, te ofrecemos
+            reactivarla. Pasados los 30 días el borrado es definitivo y no se puede deshacer.
+          </p>
+        </section>
+
+        <section class="documento__seccion">
+          <h2 class="documento__seccion-titulo">Sin la app</h2>
+          <p class="documento__seccion-cuerpo">
+            Escribinos a <a href={`mailto:${CORREO_SOPORTE}?subject=Eliminar%20cuenta`}
+              >{CORREO_SOPORTE}</a
+            > desde la misma dirección de correo con la que creaste la cuenta, con el asunto
+            «Eliminar cuenta». Verificamos que ese correo corresponda a la cuenta, hacemos la
+            eliminación y te confirmamos por el mismo medio.
+          </p>
+        </section>
+
+        <section class="documento__seccion">
+          <h2 class="documento__seccion-titulo">Qué se elimina</h2>
+          <p class="documento__seccion-cuerpo">
+            Los datos de tu cuenta y todo lo asociado a ella: nombre, correo, teléfono y
+            preferencias; tu progreso de aprendizaje, estadísticas y respuestas; EXP, racha,
+            monedas del juego, artículos obtenidos dentro de la app y logros; tu actividad social
+            y tus conversaciones con soporte.
+          </p>
+        </section>
+
+        <section class="documento__seccion">
+          <h2 class="documento__seccion-titulo">Qué se conserva</h2>
+          <p class="documento__seccion-cuerpo">
+            Únicamente lo que la ley aplicable obliga a conservar: registros de facturación y los
+            datos mínimos necesarios para prevenir fraude y abuso. Se guardan por el plazo legal
+            que corresponda, con acceso restringido y sin usarse para ningún otro fin. También
+            podemos conservar datos agregados o anonimizados que ya no permiten identificarte.
+          </p>
+        </section>
+
+        <section class="documento__seccion">
+          <h2 class="documento__seccion-titulo">Tu suscripción se cancela aparte</h2>
+          <p class="documento__seccion-cuerpo">
+            Si tenés una suscripción activa, la cobra y la administra la tienda donde la
+            compraste, no Kodi. Eliminar la cuenta no cancela la suscripción ni detiene las
+            renovaciones: cancelala primero desde la tienda. En Google Play, desde Play Store →
+            tu foto de perfil → Pagos y suscripciones → Suscripciones → Kodi → Cancelar
+            suscripción. En App Store, desde Ajustes → tu nombre → Suscripciones.
+          </p>
+        </section>
+
+        <section class="documento__seccion">
+          <h2 class="documento__seccion-titulo">Más información</h2>
+          <p class="documento__seccion-cuerpo">
+            El detalle de qué datos tratamos y por cuánto tiempo está en la <a href="/privacidad"
+              >Política de privacidad</a
+            >.
+          </p>
+        </section>
+
+        <a class="documento__volver" href="/">Volver al inicio</a>
+      </article>
+    </main>
+
+    <Pie />
+  </div>
+</BaseLayout>
+
+<style>
+  /* Misma medida y misma tipografía que DocumentoLegal: los estilos de Astro son
+     de alcance por componente, así que la página que no lo usa los repite. */
+  .documento {
+    width: min(100%, 36rem);
+    margin: 0 auto;
+    padding-bottom: var(--ritmo-seccion);
+  }
+
+  .documento__titulo {
+    color: var(--teal);
+    font-size: clamp(1.75rem, 5vw, 2.5rem);
+    font-weight: 900;
+    line-height: 1;
+    letter-spacing: -0.03em;
+    text-transform: lowercase;
+    text-wrap: balance;
+  }
+
+  /* Ocupa el lugar de la fecha de los documentos legales: entra al texto sin que
+     el primer título de sección quede pegado al titular. */
+  .documento__entrada {
+    margin-top: var(--e-4);
+    color: var(--tinta-suave);
+    font-size: 1rem;
+    line-height: 1.65;
+    text-wrap: pretty;
+  }
+
+  .documento__seccion {
+    margin-top: var(--e-6);
+  }
+
+  .documento__seccion-titulo {
+    font-size: 1.25rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+
+  .documento__seccion-cuerpo {
+    margin-top: var(--e-2);
+    color: var(--tinta-suave);
+    font-size: 1rem;
+    line-height: 1.65;
+    text-wrap: pretty;
+  }
+
+  /* Los pasos son una lista de verdad y no un párrafo con guiones: es la parte
+     que alguien viene a ejecutar, y el número la hace seguible. */
+  .documento__pasos {
+    margin-top: var(--e-3);
+    padding-left: var(--e-5);
+    color: var(--tinta-suave);
+    font-size: 1rem;
+    line-height: 1.65;
+  }
+
+  .documento__pasos li + li {
+    margin-top: var(--e-2);
+  }
+
+  .documento__pasos strong {
+    color: var(--tinta);
+    font-weight: 700;
+  }
+
+  .documento__seccion-cuerpo a {
+    color: var(--teal-texto);
+    font-weight: 700;
+    text-underline-offset: 3px;
+  }
+
+  .documento__volver {
+    display: inline-flex;
+    min-height: 44px;
+    align-items: center;
+    margin-top: var(--e-7);
+    color: var(--teal-texto);
+    font-size: 0.9375rem;
+    font-weight: 700;
+    text-underline-offset: 4px;
+  }
+</style>
