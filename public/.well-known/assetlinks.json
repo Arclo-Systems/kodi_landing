@@ -5,6 +5,8 @@
       "namespace": "android_app",
       "package_name": "com.holakodi.app",
       "sha256_cert_fingerprints": [
+        "BF:4F:EB:23:65:9A:80:A6:17:E6:72:EF:17:58:BB:1A:31:17:6A:B9:88:69:E2:AE:E6:D9:E6:76:A2:2B:B1:05",
+        "1B:E9:78:85:8E:04:74:2B:BF:A8:7C:8D:3A:91:30:2D:8D:ED:D1:81:2D:52:5D:EE:95:D2:E9:CB:59:5A:DB:D0",
         "52:E7:AF:76:5C:40:6B:6D:DF:F1:D5:0D:49:07:11:5F:50:92:99:0F:DF:B1:C3:3E:5C:1D:F4:23:8B:08:D4:CC",
         "F2:7A:70:58:6A:6D:23:55:03:39:BB:06:8A:A8:E7:DA:E4:F8:F9:81:9C:EE:68:10:38:F7:F3:7E:5B:68:DA:C2"
       ]
