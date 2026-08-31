@@ -7,15 +7,32 @@
   /* El teal de marca da 3.67:1 sobre la superficie: alcanza para texto grande y
      falla AA en cuerpo. Todo texto teal por debajo de 24 px usa este, 5.9:1. */
   --teal-texto: #2c6a74;
+  /* Lo que va ENCIMA del teal cuando el teal es fondo (el botón de la lista de
+     espera). Sobre `--teal-texto` da 6.1:1; sobre `--teal` daría 3.8:1, así que
+     un fondo teal de marca con texto encima no existe en el sitio. */
+  --sobre-teal: #ffffff;
   --tiktok: #fe2c55;
   --instagram: #e4405f;
   --facebook: #1877f2;
+  /* El verde de marca de WhatsApp (#25d366) da 2:1 sobre la tarjeta: la mitad
+     de lo que dan los otros tres y por debajo del 3:1 que pide un gráfico. Este
+     es el verde oscuro oficial de la misma marca, 4.1:1, en línea con el resto. */
+  --whatsapp: #128c7e;
+  /* El rojo de Kodi marca lo que acaba de salir. Es la variante de TEXTO del
+     coral de marca (#f47c6b, que sobre la tarjeta da 2.8:1 y no llega a AA);
+     esta es `coralDark` de la app y da 5.4:1. */
+  --coral-texto: #b34734;
 
   --tinta: #141f25;
   --tinta-suave: #525252;
   --borde: #e5e5e5;
 
-  --hero: clamp(3.25rem, 15vw, 11rem);
+  /* El titular pasó de dos palabras ("¡muy pronto!") a una frase, y debajo hay
+     dos bloques más que antes. A 15vw/11rem la frase se partía en tres líneas y
+     la página dejaba de entrar en una pantalla: el tope baja a 4.5rem, que es
+     lo que hace falta para que "¡ya está en android!" quepa en un renglón desde
+     los 900 px de ancho y siga siendo, por lejos, lo más grande de la página. */
+  --hero: clamp(2.5rem, 7vw, 4.5rem);
   --sub: clamp(1.0625rem, 2vw, 1.375rem);
 
   --salida: cubic-bezier(0.23, 1, 0.32, 1);
@@ -41,7 +58,11 @@
      la grande idéntica entre grupos. */
   --ritmo-grupo: clamp(var(--e-3), 2vw, var(--e-4)); /*   12→16 dentro de un grupo */
   --ritmo-bloque: clamp(var(--e-5), 4vw, var(--e-6)); /*  24→32 entre grupos */
-  --ritmo-seccion: clamp(var(--e-7), 8vw, var(--e-8)); /* 48→64 entre secciones */
+  /* Bajó de 48→64 a 32→48 cuando la home pasó de tres bloques a cinco: la banda
+     entre el contenido y el pie era el hueco más grande de la página y era el
+     único que no separaba dos cosas que se miran juntas. Sigue siendo el paso
+     más grande de los tres. */
+  --ritmo-seccion: clamp(var(--e-6), 6vw, var(--e-7)); /* 32→48 entre secciones */
 
   /* Canaleta única de la página. El borde inferior lo cierra el pie con su
      propio padding, no `.pantalla`: ver el comentario de .pantalla. */
@@ -120,7 +141,7 @@ body {
 }
 
 .encabezado {
-  margin-bottom: var(--ritmo-bloque);
+  margin-bottom: var(--ritmo-grupo);
 }
 
 /* Mismo eje y misma medida que el documento: si no, el wordmark arranca en la
@@ -270,6 +291,14 @@ body {
   color: var(--facebook);
 }
 
+.tarjeta--whatsapp {
+  border-color: var(--whatsapp);
+}
+
+.tarjeta--whatsapp svg {
+  color: var(--whatsapp);
+}
+
 .rotulo-seccion {
   display: flex;
   margin: 0;
@@ -299,6 +328,43 @@ body {
   gap: var(--ritmo-grupo);
 }
 
+/* La misma medida que la grilla de exámenes: los dos bloques anchos de la home
+   comparten borde izquierdo y derecho. */
+.bloque--ancho {
+  width: min(100%, 58rem);
+}
+
+/* Las tarjetas de tienda y la fila de exámenes: un grupo, paso chico adentro. */
+.descarga {
+  display: flex;
+  width: min(100%, 58rem);
+  flex-direction: column;
+  align-items: center;
+  gap: var(--ritmo-grupo);
+}
+
+/* Las redes son cuatro y no tres: en grilla y no en `.fila`, porque con flex
+   una fila que solo aguanta tres deja la cuarta sola y descolgada. La grilla
+   pasa de 4 a 2 columnas de una vez, y dos filas de dos siguen estando
+   alineadas. En un teléfono también son 2×2: apiladas de a una, la página se
+   iba media pantalla más abajo. */
+.redes {
+  display: grid;
+  width: 100%;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--e-3);
+}
+
+@media (max-width: 58rem) {
+  .redes {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.redes .tarjeta {
+  min-width: 0;
+}
+
 a.tarjeta:active {
   transform: scale(0.98);
 }
@@ -311,7 +377,7 @@ a.tarjeta:active {
 
 @media (max-width: 30rem) {
   :root {
-    --hero: clamp(2.5rem, 13vw, 4rem);
+    --hero: clamp(2.25rem, 11vw, 3.25rem);
   }
 
   .tarjeta {

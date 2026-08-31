@@ -1,0 +1,336 @@
+---
+import { LISTA_ESPERA_URL } from '../data/api';
+import { COPY } from '../data/copy';
+
+interface Props {
+  class?: string;
+  /** Solo para el retardo de la animación de entrada. */
+  style?: string;
+}
+
+const { class: className, style } = Astro.props;
+const { titulo, bajada, etiqueta, marcador, boton, estados } = COPY.lista;
+---
+
+{/* El endpoint y los mensajes viajan como `data-*` en vez de `define:vars`
+    para que el script siga siendo un módulo (diferido y cacheable) y para que
+    el copy no se duplique adentro del JavaScript: sigue viviendo en copy.ts. */}
+<section class:list={['lista', className]} style={style}>
+  <div class="lista__texto">
+    <h2 class="lista__titulo">{titulo}</h2>
+    <p class="lista__bajada">{bajada}</p>
+  </div>
+
+  <div class="lista__accion">
+    <form
+      class="lista__form"
+      novalidate
+      data-lista
+      data-endpoint={LISTA_ESPERA_URL}
+      data-enviando={estados.enviando}
+      data-ok={estados.ok}
+      data-duplicado={estados.duplicado}
+      data-invalido={estados.invalido}
+      data-error={estados.error}
+    >
+      <label class="oculto" for="lista-correo">{etiqueta}</label>
+      <input
+        class="lista__campo"
+        id="lista-correo"
+        name="correo"
+        type="email"
+        inputmode="email"
+        autocomplete="email"
+        spellcheck="false"
+        placeholder={marcador}
+        required
+        aria-describedby="lista-estado"
+        data-campo
+      />
+      <button class="lista__boton" type="submit" data-boton>{boton}</button>
+    </form>
+
+    {/* Vive siempre en el DOM aunque esté vacío: una región `aria-live` que se
+        crea recién con el mensaje adentro no se anuncia. */}
+    <p class="lista__estado" id="lista-estado" role="status" aria-live="polite" data-estado></p>
+
+    {/* Sin JavaScript el formulario no manda a ningún lado: en vez de dejar un
+        botón que no hace nada, se ofrece la misma promesa por correo. */}
+    <noscript>
+      <p class="lista__estado">
+        Escribinos a <a href="mailto:soporte@holakodi.com">soporte@holakodi.com</a> y te avisamos.
+      </p>
+    </noscript>
+  </div>
+</section>
+
+<style>
+  /* Caja propia y no otro bloque suelto sobre la superficie: es lo único de la
+     página que pide algo (un correo), así que se despega del fondo con el mismo
+     material que las tarjetas —fondo `--tarjeta`, borde de 2 px— y un radio más
+     grande, que es lo que la distingue de una tarjeta cualquiera.
+     Más angosta que las bandas de exámenes y de redes (58rem) a propósito: es
+     una tarjeta, no una banda. A 58 el texto no llegaba ni a la mitad de su
+     columna y quedaba un vacío de casi 200 px entre la frase y el campo. */
+  .lista {
+    display: grid;
+    width: min(100%, 46rem);
+    gap: var(--ritmo-grupo);
+    padding: var(--e-5);
+    border: 2px solid var(--borde);
+    border-radius: 1.25rem;
+    background: var(--tarjeta);
+    text-align: left;
+  }
+
+  /* Dos columnas cuando hay ancho: la promesa a la izquierda y el campo a la
+     derecha, como en el diseño aprobado. En un teléfono se apilan y el texto se
+     centra, que es como está compuesto el resto de la página.
+     La columna del formulario se dimensiona a lo que necesita (19–22rem) y la
+     del texto se queda con el resto, en vez de partir la caja en dos mitades
+     iguales que ninguno de los dos llena. `minmax(0, 1fr)` y no `1fr`: el
+     mínimo de una columna de grilla es el ancho de su contenido, así que con
+     `1fr` la columna del formulario no bajaba de campo + botón y el botón se
+     iba a la línea de abajo. */
+  @media (min-width: 44rem) {
+    .lista {
+      grid-template-columns: minmax(0, 1fr) minmax(19rem, 22rem);
+      align-items: center;
+      gap: var(--ritmo-bloque);
+    }
+  }
+
+  @media (max-width: 43.999rem) {
+    .lista {
+      text-align: center;
+    }
+  }
+
+  /* Título y bajada son una sola frase: se separan con el paso más chico de la
+     escala, no con el ritmo de grupo, que es el que los separa del formulario. */
+  .lista__texto {
+    display: flex;
+    flex-direction: column;
+    gap: var(--e-1);
+  }
+
+  .lista__accion {
+    display: flex;
+    flex-direction: column;
+    gap: var(--e-2);
+  }
+
+  .lista__titulo {
+    font-size: 1.25rem;
+    font-weight: 800;
+    line-height: 1.25;
+    text-wrap: balance;
+  }
+
+  .lista__bajada {
+    color: var(--tinta-suave);
+    font-size: 0.9375rem;
+    text-wrap: balance;
+  }
+
+  /* `nowrap`: campo y botón van SIEMPRE en la misma línea, y el que cede ancho
+     es el campo. El único lugar donde se parten es el teléfono, y ahí se parte
+     a propósito (abajo del todo). */
+  .lista__form {
+    display: flex;
+    width: 100%;
+    flex-wrap: nowrap;
+    align-items: stretch;
+    gap: var(--e-2);
+  }
+
+  /* 1.0625rem y nunca menos de 1rem: por debajo de 16 px Safari hace zoom al
+     enfocar el campo y la página deja de entrar en una pantalla.
+     56 px de alto y no los 44 del mínimo: es el único campo del sitio y el
+     mínimo accesible es un piso, no una meta. */
+  /* `min-width: 0` es la parte que importa: el mínimo de un ítem de flex es su
+     tamaño intrínseco, y el de un input es el de su atributo `size` (~20
+     caracteres). Sin esto el campo se planta en 200 y pico de píxeles y empuja
+     al botón fuera de la línea. */
+  .lista__campo {
+    min-width: 0;
+    flex: 1 1 0;
+    min-height: 56px;
+    padding: var(--e-3) var(--e-4);
+    border: 2px solid var(--borde);
+    border-radius: 0.875rem;
+    /* Fondo de superficie y no de tarjeta: el campo vive DENTRO de una tarjeta,
+       y blanco sobre blanco no se leería como un hueco donde escribir. */
+    background: var(--superficie);
+    color: var(--tinta);
+    font-family: inherit;
+    font-size: 1.0625rem;
+    font-weight: 400;
+  }
+
+  .lista__campo::placeholder {
+    color: var(--tinta-suave);
+    opacity: 1;
+  }
+
+  .lista__campo[aria-invalid='true'] {
+    border-color: var(--tiktok);
+  }
+
+  /* Fondo `--teal-texto` y no `--teal`: el blanco sobre el teal de marca da
+     3.8:1 y no llega a AA para el cuerpo del botón. Sobre este, 6.1:1. */
+  .lista__boton {
+    flex: none;
+    min-height: 56px;
+    padding: var(--e-3) var(--e-5);
+    white-space: nowrap;
+    border: 2px solid var(--teal-texto);
+    border-radius: 0.875rem;
+    background: var(--teal-texto);
+    color: var(--sobre-teal);
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 1.0625rem;
+    font-weight: 700;
+    transition: transform 160ms var(--salida);
+  }
+
+  .lista__boton:disabled {
+    cursor: default;
+    opacity: 0.6;
+  }
+
+  .lista__boton:active:not(:disabled) {
+    transform: scale(0.98);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .lista__boton:hover:not(:disabled) {
+      transform: translateY(-2px);
+    }
+  }
+
+  .lista__estado {
+    color: var(--tinta-suave);
+    font-size: 0.875rem;
+    text-wrap: balance;
+  }
+
+  /* Sin mensaje no ocupa lugar: si no, el `gap` del flex dejaría una banda
+     muerta debajo del formulario en el estado normal, que es el 99 % del tiempo. */
+  .lista__estado:empty {
+    display: none;
+  }
+
+  .lista__estado--error {
+    color: var(--tinta);
+  }
+
+  .lista__estado a {
+    color: var(--teal-texto);
+  }
+
+  /* En un teléfono el botón baja a ancho completo A PROPÓSITO: en la misma
+     línea, el campo se queda con unos 160 px y "tu@correo.com" no entra entero.
+     Es un salto de línea decidido, no un desborde. */
+  @media (max-width: 30rem) {
+    .lista__form {
+      flex-wrap: wrap;
+    }
+
+    .lista__boton {
+      flex: 1 0 100%;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .lista__boton {
+      transition: none;
+    }
+  }
+</style>
+
+<script>
+  type Estado = 'enviando' | 'ok' | 'duplicado' | 'invalido' | 'error';
+
+  // Deliberadamente permisiva: la única validación que vale es la del servidor
+  // (y el correo de confirmación). Acá solo se atajan los errores de dedo —
+  // falta la arroba, falta el punto, quedó un espacio.
+  const CORREO = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+  const ESPERA_MAX_MS = 8000;
+
+  const formulario = document.querySelector<HTMLFormElement>('[data-lista]');
+  const campo = formulario?.querySelector<HTMLInputElement>('[data-campo]');
+  const boton = formulario?.querySelector<HTMLButtonElement>('[data-boton]');
+  const salida = document.querySelector<HTMLParagraphElement>('[data-estado]');
+
+  if (formulario && campo && boton && salida) {
+    const mensaje = (estado: Estado): string => formulario.dataset[estado] ?? '';
+
+    const mostrar = (estado: Estado): void => {
+      salida.textContent = mensaje(estado);
+      salida.classList.toggle('lista__estado--error', estado === 'error' || estado === 'invalido');
+      campo.setAttribute('aria-invalid', String(estado === 'invalido'));
+    };
+
+    const ocupado = (activo: boolean): void => {
+      boton.disabled = activo;
+      formulario.setAttribute('aria-busy', String(activo));
+    };
+
+    // El servidor manda: 409 es "ya estaba", cualquier 2xx es "quedó". Todo lo
+    // demás —404 porque el endpoint todavía no existe, 500, la red caída— cae
+    // en el mismo error, que ofrece el correo de soporte como salida.
+    const registrar = async (correo: string): Promise<Estado> => {
+      const cancelar = new AbortController();
+      const reloj = setTimeout(() => cancelar.abort(), ESPERA_MAX_MS);
+
+      try {
+        const respuesta = await fetch(formulario.dataset.endpoint ?? '', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: correo, origen: 'landing-ios' }),
+          signal: cancelar.signal,
+        });
+
+        if (respuesta.ok) return 'ok';
+        if (respuesta.status === 409) return 'duplicado';
+        return 'error';
+      } catch {
+        return 'error';
+      } finally {
+        clearTimeout(reloj);
+      }
+    };
+
+    // Mientras corrige, el reproche se calla: el mensaje vuelve a aparecer solo
+    // si al enviar de nuevo el correo sigue mal.
+    campo.addEventListener('input', () => {
+      if (campo.getAttribute('aria-invalid') !== 'true') return;
+      salida.textContent = '';
+      salida.classList.remove('lista__estado--error');
+      campo.setAttribute('aria-invalid', 'false');
+    });
+
+    formulario.addEventListener('submit', async (evento) => {
+      evento.preventDefault();
+
+      const correo = campo.value.trim();
+      if (!CORREO.test(correo)) {
+        mostrar('invalido');
+        campo.focus();
+        return;
+      }
+
+      ocupado(true);
+      mostrar('enviando');
+
+      // El campo y el botón vuelven a quedar vivos incluso después del alta:
+      // deshabilitarlos le saca el foco al que acaba de apretar (el foco de un
+      // elemento deshabilitado se cae al body) y quien mande el correo dos
+      // veces se lleva un "ya estaba", que es la verdad.
+      mostrar(await registrar(correo));
+      ocupado(false);
+    });
+  }
+</script>

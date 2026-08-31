@@ -1,0 +1,144 @@
+---
+import { Image } from 'astro:assets';
+
+import { COPY } from '../data/copy';
+import { MODULOS } from '../data/modulos';
+
+interface Props {
+  class?: string;
+}
+
+const { class: className } = Astro.props;
+
+// Ancho al que Astro genera el archivo: el doble del que se ve en pantalla
+// (56 px de tope), para que se vea nítido en pantallas de 2x sin arrastrar el
+// original de 1501 px.
+const ANCHO = 112;
+---
+
+<section class:list={['modulos', className]}>
+  <h2 class="rotulo-seccion">{COPY.modulos}</h2>
+  <ul class="modulos__grilla">
+    {
+      MODULOS.map((modulo) => (
+        <li class="examen">
+          {/* alt vacío: el arte es un retrato decorativo y el nombre del examen
+              ya está en texto al lado. Con alt lo leería dos veces. */}
+          {/* `eager` y no el `lazy` por defecto: la página entera es la primera
+              pantalla, así que estas cinco imágenes nunca están "más abajo". */}
+          <Image class="examen__arte" src={modulo.arte} alt="" width={ANCHO} loading="eager" />
+          <span class="examen__texto">
+            <span class="examen__nombre">{modulo.nombre}</span>
+            {/* La etiqueta cierra la misma línea de la nota, después del punto
+                medio: es la segunda mitad de la descripción, no un renglón
+                nuevo, así que las cinco tarjetas siguen midiendo lo mismo. */}
+            <span class="examen__nota">
+              {modulo.nota}
+              {
+                modulo.etiqueta && (
+                  <Fragment>
+                    {' · '}
+                    <span class="examen__etiqueta">{modulo.etiqueta}</span>
+                  </Fragment>
+                )
+              }
+            </span>
+          </span>
+        </li>
+      ))
+    }
+  </ul>
+</section>
+
+<style>
+  /* Más ancha que `.bloque` (46rem) para que las cinco tarjetas entren en dos
+     filas de tres y dos en un portátil, en vez de tres filas desparejas. */
+  .modulos {
+    display: flex;
+    width: min(100%, 58rem);
+    flex-direction: column;
+    align-items: center;
+    gap: var(--ritmo-grupo);
+  }
+
+  /* Flex y no grid: son cinco tarjetas y la última fila nunca está completa. En
+     una grilla las dos que sobran quedan pegadas al borde izquierdo con un
+     hueco a la derecha; acá se centran debajo de las tres de arriba. El número
+     de columnas lo decide el ancho de la base, sin un solo breakpoint. */
+  .modulos__grilla {
+    display: flex;
+    width: 100%;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--e-3);
+    padding: 0;
+    list-style: none;
+  }
+
+  /* Misma tarjeta que las de tienda y redes: fondo `--tarjeta`, borde de 2 px y
+     el mismo radio. Es una ficha, no un botón: no se toca ni cambia al pasar
+     el mouse. */
+  .examen {
+    display: flex;
+    /* Base fija y sin crecer: las cinco tarjetas miden lo mismo aunque en la
+       última fila queden dos. Con `1 1` las de abajo se estiraban al doble. */
+    flex: 0 1 17.5rem;
+    align-items: center;
+    gap: var(--e-3);
+    padding: var(--e-3);
+    border: 2px solid var(--borde);
+    border-radius: 0.875rem;
+    background: var(--tarjeta);
+    text-align: left;
+  }
+
+  /* El arte trae las esquinas redondeadas en el propio archivo (con alfa), así
+     que no lleva border-radius ni fondo: cualquier caja detrás asomaría por las
+     esquinas. */
+  .examen__arte {
+    width: clamp(2.75rem, 4vw, 3.5rem);
+    height: auto;
+    flex: none;
+  }
+
+  .examen__texto {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    line-height: 1.25;
+  }
+
+  .examen__titulo {
+    display: flex;
+    align-items: baseline;
+    gap: var(--e-2);
+  }
+
+  .examen__nombre {
+    font-size: 1.0625rem;
+    font-weight: 700;
+  }
+
+  .examen__nota {
+    color: var(--tinta-suave);
+    font-size: 0.8125rem;
+  }
+
+  /* En un teléfono entra una sola por fila: que ocupe el ancho completo en vez
+     de quedar a 280 px con aire suelto a los lados. */
+  @media (max-width: 30rem) {
+    .examen {
+      flex-basis: 100%;
+    }
+  }
+
+  /* Texto rojo y no una píldora de color: en Kodi no hay píldoras decorativas,
+     y la mayúscula con letterspacing ya la despega del nombre. */
+  .examen__etiqueta {
+    color: var(--coral-texto);
+    font-size: 0.75rem;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+</style>

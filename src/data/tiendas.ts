@@ -1,17 +1,16 @@
 /**
  * ÚNICO lugar del sitio donde viven las URLs de las tiendas.
  *
- * Mientras `url` sea `null`, todas las tarjetas de descarga (la home y las
- * páginas de invitación) se pintan sin enlace: se ven, pero no llevan a
- * ninguna parte. Es a propósito — la app todavía no está publicada y un botón
- * que cae en un 404 de la tienda es peor que uno que dice "muy pronto".
+ * Mientras `url` sea `null`, la tarjeta de esa tienda se pinta sin enlace: se
+ * ve, pero no lleva a ninguna parte. Es a propósito — un botón que cae en un
+ * 404 de la tienda es peor que uno que dice "muy pronto".
  *
- * EL DÍA QUE LA APP SE PUBLIQUE: se pegan las dos URLs acá y listo. No hay que
- * tocar ninguna página; el rótulo de las tarjetas de invitación cambia solo de
+ * Android salió primero (agosto 2026). iPhone todavía no: su tarjeta sigue en
+ * `null` y la home ofrece la lista de espera. EL DÍA QUE SALGA iOS se pega la
+ * URL acá y listo — ninguna página se toca, el rótulo cambia solo de
  * "Muy pronto en" a "Descargala en".
  *
  *   App Store    https://apps.apple.com/cr/app/<slug>/id<ID_NUMERICO>
- *   Google Play  https://play.google.com/store/apps/details?id=com.holakodi.app
  */
 export interface Tienda {
   /** Nombre del icono en `components/Icono.astro`. */
@@ -21,8 +20,12 @@ export interface Tienda {
 }
 
 export const TIENDAS: readonly Tienda[] = [
+  {
+    icono: 'googleplay',
+    nombre: 'Google Play',
+    url: 'https://play.google.com/store/apps/details?id=com.holakodi.app',
+  },
   { icono: 'appstore', nombre: 'App Store', url: null },
-  { icono: 'googleplay', nombre: 'Google Play', url: null },
 ];
 
 const ROTULO_DISPONIBLE = 'Descargala en';

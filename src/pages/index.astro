@@ -1,5 +1,7 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import ListaEspera from '../components/ListaEspera.astro';
+import Modulos from '../components/Modulos.astro';
 import Pie from '../components/Pie.astro';
 import Tarjeta from '../components/Tarjeta.astro';
 import Wordmark from '../components/Wordmark.astro';
@@ -20,22 +22,31 @@ import { TIENDAS, rotuloDeTienda } from '../data/tiendas';
         <p class="bajada">{COPY.bajada}</p>
       </div>
 
-      <div class="fila entra" style="animation-delay: 180ms">
-        {
-          TIENDAS.map((tienda) => (
-            <Tarjeta
-              icono={tienda.icono}
-              rotulo={rotuloDeTienda(tienda, 'Pronto en')}
-              nombre={tienda.nombre}
-              href={tienda.url ?? undefined}
-            />
-          ))
-        }
+      {/* Las tiendas y los exámenes son un solo grupo: "descargala" y "esto es
+          lo que trae adentro" se leen de corrido, así que van con el paso chico
+          entre ellos y el aire grande queda afuera. */}
+      <div class="descarga entra" style="animation-delay: 180ms">
+        <div class="fila">
+          {
+            TIENDAS.map((tienda) => (
+              <Tarjeta
+                icono={tienda.icono}
+                rotulo={rotuloDeTienda(tienda, 'Pronto en')}
+                nombre={tienda.nombre}
+                href={tienda.url ?? undefined}
+              />
+            ))
+          }
+        </div>
+
+        <Modulos />
       </div>
 
-      <section class="bloque entra" style="animation-delay: 240ms">
+      <ListaEspera class="entra" style="animation-delay: 240ms" />
+
+      <section class="bloque bloque--ancho entra" style="animation-delay: 300ms">
         <h2 class="rotulo-seccion">{COPY.redes}</h2>
-        <div class="fila">
+        <div class="redes">
           <Tarjeta
             icono="tiktok"
             rotulo="Seguinos en"
@@ -57,10 +68,17 @@ import { TIENDAS, rotuloDeTienda } from '../data/tiendas';
             href={SOCIAL.facebook.href}
             acento="facebook"
           />
+          <Tarjeta
+            icono="whatsapp"
+            rotulo="Seguinos en"
+            nombre="WhatsApp"
+            href={SOCIAL.whatsapp.href}
+            acento="whatsapp"
+          />
         </div>
       </section>
     </main>
 
-    <Pie class="entra" style="animation-delay: 300ms" />
+    <Pie class="entra" style="animation-delay: 360ms" />
   </div>
 </BaseLayout>

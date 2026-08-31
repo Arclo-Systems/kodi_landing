@@ -13,10 +13,18 @@ Si un valor no está acá, no se escribe a mano en una regla: primero se agrega 
 | `--tinta-suave` | `#525252` | texto secundario (7.49:1 sobre superficie) |
 | `--borde` | `#e5e5e5` | bordes y reglas finas |
 | `--teal` | `#408d99` | marca: titulares ≥24 px, wordmark, `:focus-visible` |
-| `--teal-texto` | `#2c6a74` | **todo texto teal por debajo de 24 px** (5.9:1 sobre superficie, AA) |
-| `--tiktok` / `--instagram` / `--facebook` | — | acentos de tarjeta de red |
+| `--teal-texto` | `#2c6a74` | **todo texto teal por debajo de 24 px** (5.9:1 sobre superficie, AA) y **fondo del único botón sólido** |
+| `--sobre-teal` | `#ffffff` | texto encima de un fondo teal (6.1:1 sobre `--teal-texto`) |
+| `--coral-texto` | `#b34734` | lo que acaba de salir ("nuevo"); es `coralDark` de la app, 5.4:1 |
+| `--tiktok` / `--instagram` / `--facebook` / `--whatsapp` | — | acentos de tarjeta de red |
+
+Los acentos de red se pintan en borde e ícono, nunca en texto. `--whatsapp` es el verde
+**oscuro** oficial (`#128c7e`, 4.1:1) y no el de marca (`#25d366`, 2:1): un ícono es un gráfico
+y pide 3:1, igual que los otros tres.
 
 Regla de contraste: **nada de teal `--teal` en texto menor a 24 px** — no llega a 4.5:1.
+Como fondo pasa lo mismo al revés: blanco sobre `--teal` da 3.8:1, así que un botón teal se
+pinta con `--teal-texto`, nunca con `--teal`.
 
 ## Espaciado
 
@@ -30,7 +38,7 @@ del alto de la ventana):
 |---|---|---|
 | `--ritmo-grupo` | 12→16 | entre elementos del mismo grupo (titular ↔ bajada, rótulo ↔ tarjetas) |
 | `--ritmo-bloque` | 24→32 | entre grupos (hero ↔ tiendas ↔ redes) |
-| `--ritmo-seccion` | 48→64 | entre secciones (contenido ↔ pie) |
+| `--ritmo-seccion` | 32→48 | entre secciones (contenido ↔ pie) |
 | `--pad-x` / `--pad-y` | 24→64 / 32→48 | canaleta de `.pantalla`; **sin padding inferior**: el que cierra la página es el del pie |
 
 Los rangos están calibrados para que el desktop siga viéndose como el sitio original
@@ -57,6 +65,9 @@ termina la tinta.
 ## Interacción
 
 - Área táctil mínima **44 px** en todo lo que se toque (padding, nunca agrandando el texto).
+  El campo de correo y su botón van a **56**: 44 es el piso accesible, no la medida de todo.
+- Cuerpo de formulario **nunca por debajo de 16 px**: Safari hace zoom al enfocar y la página
+  se sale de una pantalla.
 - `:focus-visible` con outline de 3 px teal y offset de 4.
 - Transiciones solo en `transform` / `opacity`, con `--salida`; `prefers-reduced-motion` las apaga.
 
