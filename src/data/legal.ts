@@ -20,13 +20,13 @@ export interface LegalDocument {
 }
 
 export const PRIVACY_DOC: LegalDocument = {
-  version: '2026-08-05.3',
-  lastUpdated: '5 de agosto, 2026',
+  version: '2026-09-03.1',
+  lastUpdated: '3 de septiembre, 2026',
   title: 'Política de privacidad',
   sections: [
     {
       title: '1. Información que recopilamos',
-      body: 'Recopilamos los datos que nos das al crear tu cuenta (nombre, correo, teléfono, país y módulos elegidos), tu progreso de aprendizaje, métricas de uso de la app y datos técnicos del dispositivo (modelo, sistema operativo, identificadores de instalación y el identificador de publicidad del dispositivo). Cuando algo se rompe en la app también recibimos un reporte automático del error con el estado del dispositivo en ese momento.',
+      body: 'Recopilamos los datos que nos das al crear tu cuenta (nombre, correo, país y módulos elegidos), la foto de perfil si elegís subir una, tu progreso de aprendizaje, métricas de uso de la app y datos técnicos del dispositivo (modelo, sistema operativo, identificadores de instalación y el identificador de publicidad del dispositivo). Cuando algo se rompe en la app también recibimos un reporte automático del error con el estado del dispositivo en ese momento.',
     },
     {
       title: '2. Cómo usamos tu información',
@@ -34,42 +34,50 @@ export const PRIVACY_DOC: LegalDocument = {
     },
     {
       title: '3. Compartir con terceros',
-      body: 'Compartimos datos solo con los proveedores que nos ayudan a operar la app: Google AdMob (anuncios), Sentry (reportes de errores y fallos), Cloudflare R2 (almacenamiento de archivos e imágenes), Brevo (correos), Firebase Cloud Messaging de Google (notificaciones push) y Railway (hosting de la API y la base de datos). Las compras las procesan directamente App Store (Apple) y Google Play (Google): nunca vemos ni guardamos los datos de tu tarjeta. Estos proveedores operan servidores fuera de Costa Rica, así que tu información puede procesarse en otros países bajo compromisos contractuales de protección. Todos están obligados a usarla solo para el servicio acordado.',
+      body: 'Compartimos datos solo con los proveedores que nos ayudan a operar la app: Google AdMob (anuncios), Sentry (reportes de errores y fallos), Cloudflare R2 (almacenamiento de archivos e imágenes), Brevo (correos), Firebase Cloud Messaging de Google (notificaciones push), Anthropic (el modelo de inteligencia artificial del tutor) y Railway (hosting de la API y la base de datos). Las compras las procesan directamente App Store (Apple) y Google Play (Google): nunca vemos ni guardamos los datos de tu tarjeta. Estos proveedores operan servidores fuera de Costa Rica, así que tu información puede procesarse en otros países bajo compromisos contractuales de protección. Todos están obligados a usarla solo para el servicio acordado.',
     },
     {
-      title: '4. Menores de edad',
-      body: 'Si tenés menos de 13 años, necesitás la autorización de tu madre, padre o tutor legal para usar Kodi: le enviamos un correo y guardamos el registro de su aprobación con la fecha, la versión del aviso aceptada y los datos técnicos de esa aprobación. Sin ese permiso la cuenta queda pendiente y no se puede usar.',
+      title: '4. Permisos del dispositivo: ubicación, fotos y cámara',
+      body: 'Kodi funciona sin acceder a tu ubicación, tus fotos ni tu cámara. Cada uno de estos permisos se pide únicamente cuando usás la función que lo necesita, y podés negarlo o revocarlo cuando quieras desde los ajustes de tu teléfono. Ubicación: si abrís el mapa de cupones y tocás el botón para centrar el mapa, te pedimos permiso de ubicación en primer plano y leemos tu posición aproximada (precisión balanceada, del orden de cien metros) con el único fin de mover el mapa a donde estás. Esa posición no sale de tu dispositivo: no se envía a nuestros servidores ni a terceros, no se guarda y no hay seguimiento en segundo plano; si negás el permiso, el mapa sigue funcionando. Fotos: la foto de perfil es opcional. Si elegís poner una, la app abre el selector de tu galería y accede solo a la imagen que seleccionás, nunca al resto de tus fotos; la imagen se recorta y se comprime en tu dispositivo antes de subirse a nuestro proveedor de almacenamiento (Cloudflare R2), donde queda asociada a tu cuenta y visible para otras personas usuarias en tu perfil. Toda foto de perfil está sujeta a revisión: podemos retirarla si incumple las normas de contenido de los Términos de uso, y vos podés quitarla en cualquier momento desde tu perfil. Al eliminar tu cuenta, la foto se borra del almacenamiento. Cámara: se usa solo para leer el código QR de otra persona usuaria cuando querés agregarla como amiga o retarla. La imagen de la cámara se procesa en tu dispositivo para detectar el código: no se graba, no se guarda y no se envía a ningún servidor; lo único que viaja a nuestros servidores es el código leído.',
     },
     {
-      title: '5. Publicidad, cookies y tecnologías similares',
+      title: '5. Inteligencia artificial',
+      body: 'Kodi incluye funciones de tutor y de análisis generadas con inteligencia artificial. Cuando pedís que te expliquen una pregunta, nuestro servidor envía al proveedor del modelo el enunciado de esa pregunta, sus opciones, cuál es la opción correcta, la opción que marcaste, la nota del autor de la pregunta si existe y, si escribís una repregunta, ese texto tal como lo escribiste. En el resumen semanal, el plan de estudio y el diagnóstico de sesión se envían solo datos agregados de tu actividad: cantidad de preguntas respondidas y acertadas, el tema a reforzar, la materia y la fecha de examen que registraste. En ninguna de estas llamadas enviamos tu nombre, tu correo, tu identificador de cuenta ni ningún otro dato que te identifique directamente. El proveedor es Anthropic, que actúa como encargado del tratamiento y procesa ese contenido únicamente para generar la respuesta que te devolvemos. Como el texto de tus repreguntas viaja tal cual, te pedimos no escribirle datos personales al tutor.',
+    },
+    {
+      title: '6. Menores de edad',
+      body: 'Kodi es para personas de 13 años en adelante. Al registrarte te pedimos tu fecha de nacimiento y, por debajo de esa edad, la cuenta no se crea: tampoco recopilamos a sabiendas datos de menores de 13 años. Si sos menor de 13 y querés estudiar con Kodi, la cuenta la crea tu madre, padre o encargado. Si sos madre, padre o encargado y creés que un menor de 13 años creó una cuenta, escribinos a soporte@holakodi.com y la eliminamos.',
+    },
+    {
+      title: '7. Publicidad, cookies y tecnologías similares',
       body: 'La app muestra anuncios de Google AdMob: videos con recompensa que elegís ver y un anuncio ocasional al cerrar una sesión en el plan gratuito. Google puede usar el identificador de publicidad de tu dispositivo para mostrar y medir esos anuncios y, según tu configuración, personalizarlos. Si tenés menos de 18 años le pedimos a Google anuncios NO personalizados y aptos para tu edad. En iOS, Apple exige tu permiso explícito (el cuadro de diálogo de rastreo, ATT) para usar ese identificador con fines publicitarios: mientras no lo autorices seguís viendo anuncios, pero no personalizados. Podés cambiar esta preferencia cuando quieras desde los ajustes de tu teléfono (iOS: Privacidad y seguridad → Rastreo; Android: Google → Anuncios). Fuera de la publicidad usamos identificadores de dispositivo y almacenamiento local solo para mantener tu sesión, guardar preferencias y medir uso de la app.',
     },
     {
-      title: '6. Seguridad',
+      title: '8. Seguridad',
       body: 'Aplicamos medidas técnicas y organizativas razonables para proteger tu información (cifrado en tránsito, almacenamiento seguro de credenciales, controles de acceso). Ningún sistema es 100 % seguro — si detectás algo sospechoso, escribinos a soporte@holakodi.com.',
     },
     {
-      title: '7. Tus derechos',
+      title: '9. Tus derechos',
       body: 'Podés acceder a tus datos personales y corregirlos en cualquier momento desde Perfil → Editar perfil, y eliminar tu cuenta desde Configuración → Cuenta → Eliminar cuenta. También podés pedir una copia exportable de tus datos desde Configuración → Cuenta → Descargar mis datos, o escribiendo a soporte@holakodi.com. El tratamiento de tus datos se rige por la Ley 8968 de Costa Rica. Si considerás que no atendimos tu solicitud, podés presentar una denuncia ante la Agencia de Protección de Datos de los Habitantes (PRODHAB).',
     },
     {
-      title: '8. Retención de datos',
+      title: '10. Retención de datos',
       body: 'Conservamos tus datos mientras tu cuenta esté activa. Cuando eliminás tu cuenta, los datos personales se borran dentro de 30 días, salvo aquellos que debemos retener por obligación legal o fiscal.',
     },
     {
-      title: '9. Cambios a esta política',
+      title: '11. Cambios a esta política',
       body: 'Podemos actualizar esta Política de privacidad cuando cambien nuestras prácticas o la regulación aplicable. Si hay cambios materiales, te avisaremos en la app antes de que entren en vigor.',
     },
     {
-      title: '10. Contacto',
+      title: '12. Contacto',
       body: 'Kodi es un producto de 3-102-957909 Sociedad de Responsabilidad Limitada, que opera bajo la marca Arclo Systems, cédula jurídica 3-102-957909, con domicilio en Tilarán, Guanacaste, Costa Rica (300 metros norte del Banco Nacional de Costa Rica, casa color blanco esquinera). Teléfono: (+506) 8316-5810. Para consultas sobre privacidad o para ejercer tus derechos, escribinos a soporte@holakodi.com.',
     },
   ],
 };
 
 export const TERMS_DOC: LegalDocument = {
-  version: '2026-08-05.2',
-  lastUpdated: '5 de agosto, 2026',
+  version: '2026-09-03.1',
+  lastUpdated: '3 de septiembre, 2026',
   title: 'Términos de uso',
   sections: [
     {
@@ -82,11 +90,11 @@ export const TERMS_DOC: LegalDocument = {
     },
     {
       title: '3. Cuenta de usuario',
-      body: 'Sos responsable de mantener la confidencialidad de tu cuenta y contraseña, y de toda actividad que ocurra bajo tu cuenta. Si tenés menos de 13 años, necesitás la autorización de tu madre, padre o tutor legal para crear una cuenta: la verificamos por correo antes de activarla.',
+      body: 'Sos responsable de mantener la confidencialidad de tu cuenta y contraseña, y de toda actividad que ocurra bajo tu cuenta. Para crear una cuenta hay que tener 13 años cumplidos; por debajo de esa edad la cuenta la crea tu madre, padre o encargado. Si todavía no alcanzaste la mayoría de edad de tu país, al usar Kodi declarás que contás con su permiso.',
     },
     {
       title: '4. Conducta del usuario',
-      body: 'No podés usar Kodi para actividades ilegales, suplantar a otra persona, hacer ingeniería inversa de la app, abusar de los sistemas de competición (multi-cuentas, bots) ni distribuir contenido protegido por derechos de autor sin autorización.',
+      body: 'No podés usar Kodi para actividades ilegales, suplantar a otra persona, hacer ingeniería inversa de la app, abusar de los sistemas de competición (multi-cuentas, bots) ni distribuir contenido protegido por derechos de autor sin autorización. Tampoco podés subir, publicar ni compartir contenido sexual o pornográfico, desnudos, violencia gráfica, acoso, intimidación, amenazas ni discurso de odio, sea en tu foto de perfil, en tu nombre visible o en cualquier otro contenido que cargues en la app. El incumplimiento puede llevar al retiro del contenido, incluida la foto de perfil, y a la suspensión o el cierre de tu cuenta.',
     },
     {
       title: '5. Suscripciones y pagos',
