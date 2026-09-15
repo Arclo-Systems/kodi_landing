@@ -7,39 +7,78 @@ import penPrimaria from '../assets/modulos/pne-primaria.webp';
 import penSecundaria from '../assets/modulos/pne-bachillerato.webp';
 
 /**
- * Los exámenes que la app cubre hoy en Costa Rica, con el MISMO arte que se ve
- * adentro: los archivos salen de `frontend/assets/modules/` y los nombres son
- * los `shortName` de la tabla `modules` en producción. Si el producto da de
- * alta o retira un módulo, esta lista se actualiza a mano — la landing es
- * estática y no consulta el API para esto.
+ * Los `examType` REALES de la tabla `modules` en producción, verificados contra
+ * la base el 2026-09-14.
  *
- * Acá va SOLO imagen y nombre del examen. Nada de tamaño de mercado, cantidad
- * de personas que lo presentan, precios ni ningún otro dato del negocio: es
- * información interna y la página es pública.
- *
- * Las imágenes se importan (no viven en `public/`) para que Astro las
- * redimensione en el build: el arte original mide 1501 px y en la página se ve
- * a 56–64, así que servirla tal cual sería un asset pesado por gusto.
+ * ⚠️ No inventar slugs: `admision`, `pne_primaria` y `pne_bachillerato` NO
+ * existen, aunque aparezcan en documentos viejos del proyecto. Este tipo es la
+ * llave que une módulos, preguntas de muestra y fechas: si no coincide con
+ * producción, se desincroniza todo en silencio.
  */
+export type ModuloSlug =
+  | 'paa'
+  | 'cosevi_auto'
+  | 'cosevi_moto'
+  | 'estandarizada_primaria'
+  | 'estandarizada_secundaria';
+
 export interface Modulo {
+  readonly slug: ModuloSlug;
+  /** Como lo llama la gente, no como lo llama la base. */
   readonly nombre: string;
-  /** Una línea, para saber de cuál examen se trata sin abrir nada. */
-  readonly nota: string;
   /**
-   * Cierra la línea de la nota, después del punto medio y en rojo. Solo lo
-   * llevan los exámenes que el producto acaba de estrenar; cuando dejan de ser
-   * noticia se borra el campo y la nota vuelve sola a ser una frase normal.
+   * Qué cubre el examen, EN PALABRAS.
+   *
+   * Decisión del founder (2026-09-14): la landing no muestra cantidades de
+   * preguntas en ninguna parte. La prueba de que el contenido es serio es la
+   * fuente oficial, no un número que además envejece con cada banco nuevo.
    */
-  readonly etiqueta?: string;
+  readonly cubre: string;
+  /** Solo en los que el producto acaba de estrenar. Se borra cuando dejan de ser noticia. */
+  readonly etiqueta?: 'nuevo';
+  /** El mismo arte que se ve dentro de la app. */
   readonly arte: ImageMetadata;
 }
 
 export const MODULOS: readonly Modulo[] = [
-  { nombre: 'Admisión', nota: 'UCR · UNA · TEC', arte: paa },
-  { nombre: 'COSEVI Auto', nota: 'Teórico B1', etiqueta: 'nuevo', arte: coseviAuto },
-  { nombre: 'COSEVI Moto', nota: 'Prueba A1', etiqueta: 'nuevo', arte: coseviMoto },
-  // Cortas a propósito: en una tarjeta de 280 px la nota tiene 184 para ella, y
-  // la que se pasa parte en dos renglones y estira su tarjeta sola.
-  { nombre: 'PEN Primaria', nota: 'Sexto grado · 4 materias', arte: penPrimaria },
-  { nombre: 'PEN Secundaria', nota: 'Quinto año · 5 materias', arte: penSecundaria },
+  {
+    slug: 'paa',
+    nombre: 'Admisión',
+    cubre: 'UCR · UNA · TEC — razonamiento verbal y matemático',
+    arte: paa,
+  },
+  {
+    slug: 'cosevi_auto',
+    nombre: 'COSEVI Auto',
+    cubre: 'Teórico B1 — señales, prioridades, mecánica y ley de tránsito',
+    etiqueta: 'nuevo',
+    arte: coseviAuto,
+  },
+  {
+    slug: 'cosevi_moto',
+    nombre: 'COSEVI Moto',
+    cubre: 'Prueba A1 — señales, maniobras, equipo y mantenimiento',
+    etiqueta: 'nuevo',
+    arte: coseviMoto,
+  },
+  {
+    slug: 'estandarizada_primaria',
+    nombre: 'PEN Primaria',
+    cubre: 'Sexto grado — Español, Matemática, Ciencias y Estudios Sociales',
+    arte: penPrimaria,
+  },
+  {
+    slug: 'estandarizada_secundaria',
+    nombre: 'PEN Secundaria',
+    // Pendiente del founder: nombrar las cinco materias. Mientras tanto esta
+    // frase es cierta y no lleva corchete, que es lo que no puede salir a prod.
+    cubre: 'Quinto año — las cinco materias de la prueba',
+    arte: penSecundaria,
+  },
 ];
+
+export function moduloDe(slug: ModuloSlug): Modulo {
+  const modulo = MODULOS.find((m) => m.slug === slug);
+  if (!modulo) throw new Error(`Módulo desconocido: ${slug}`);
+  return modulo;
+}
