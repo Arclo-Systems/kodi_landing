@@ -14,7 +14,11 @@ import FondoHero from '../islas/FondoHero';
 // y a la escala de la rejilla quedan como astillas de color que no dicen nada.
 // Las pantallas de la app se muestran en su sección, en un teléfono, que es
 // donde se entienden.
-const IMAGENES = MODULOS.map((m) => ({ image: m.arte.src, title: m.nombre }));
+const IMAGENES = MODULOS.map((m) => ({
+  url: m.arte.src,
+  width: m.arte.width,
+  height: m.arte.height,
+}));
 
 // El mismo valor que `--superficie` en `global.css`. Va literal porque viaja a
 // WebGL, que no lee variables de CSS.
@@ -22,7 +26,7 @@ const FONDO = '#fafafa';
 ---
 
 <section class="hero" id="inicio">
-  <FondoHero client:load items={IMAGENES} fondo={FONDO} />
+  <FondoHero client:load imagenes={IMAGENES} fondo={FONDO} />
 
   {/* Un velo entre la rejilla y el texto: sin él, una imagen clara que pasa
       justo detrás del titular se lo come. */}

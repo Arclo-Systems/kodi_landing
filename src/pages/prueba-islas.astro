@@ -4,12 +4,10 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Encabezado from '../components/Encabezado.astro';
 import Hero from '../components/secciones/Hero.astro';
-import Carga from '../components/islas/Carga';
 import { COPY } from '../data/copy';
 ---
 
 <BaseLayout title={COPY.titulo} description={COPY.descripcion} noindex>
-  <Carga client:load texto="Cargando…" fondo="#fafafa" />
   <Encabezado />
   <main id="contenido">
     <Hero />

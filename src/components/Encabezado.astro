@@ -18,44 +18,9 @@ import { COPY, URL_PLAY } from '../data/copy';
     <a href="#como">{COPY.nav.como}</a>
   </nav>
 
-  {/* La píldora del centro: en la referencia lleva el menú y el porcentaje de
-      avance del scroll. Acá el porcentaje se queda —dice cuánta página falta,
-      que en una landing larga es información real— y el menú se va, porque las
-      secciones ya están en la píldora de la izquierda. */}
-  <div class="cabecera__avance">
-    <span class="cabecera__avance-numero" id="avance">0%</span>
-  </div>
-
   <a class="cabecera__cta" href={URL_PLAY}>{COPY.nav.descargar}</a>
 </header>
 
-<script>
-  // Porcentaje de avance del scroll. En un `requestAnimationFrame` y no en el
-  // evento directo: el listener de scroll se dispara decenas de veces por
-  // segundo y escribir en el DOM en cada uno provoca recálculos de layout.
-  const salida = document.getElementById('avance');
-
-  if (salida) {
-    let pendiente = false;
-
-    const pintar = () => {
-      pendiente = false;
-      const recorrido = document.documentElement.scrollHeight - window.innerHeight;
-      const avance = recorrido > 0 ? Math.round((window.scrollY / recorrido) * 100) : 0;
-      salida.textContent = `${Math.min(100, Math.max(0, avance))}%`;
-    };
-
-    const agendar = () => {
-      if (pendiente) return;
-      pendiente = true;
-      requestAnimationFrame(pintar);
-    };
-
-    window.addEventListener('scroll', agendar, { passive: true });
-    window.addEventListener('resize', agendar);
-    pintar();
-  }
-</script>
 
 <style>
   .cabecera {
@@ -90,6 +55,7 @@ import { COPY, URL_PLAY } from '../data/copy';
   /* Píldora de secciones: blanca, borde de un píxel, radio completo. */
   .cabecera__pildora {
     display: flex;
+    margin-inline-end: auto;
     align-items: center;
     gap: var(--e-1);
     height: 52px;
@@ -118,34 +84,8 @@ import { COPY, URL_PLAY } from '../data/copy';
     }
   }
 
-  /* La píldora oscura del centro. `margin-inline: auto` la empuja al medio sin
-     sacarla del flujo, así en pantallas angostas se acomoda sola. */
-  .cabecera__avance {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--e-3);
-    height: 52px;
-    margin-inline: auto;
-    padding: 8px;
-    border-radius: 999px;
-    background: var(--tinta);
-    color: var(--superficie);
-    font-size: 0.875rem;
-    font-weight: 500;
-  }
-
-  .cabecera__avance-numero {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-width: 52px;
-    height: 36px;
-    padding-inline: var(--e-2);
-    border-radius: 999px;
-    background: color-mix(in srgb, var(--superficie) 18%, transparent);
-    font-variant-numeric: tabular-nums;
-  }
-
+  
+  
   .cabecera__cta {
     display: inline-flex;
     align-items: center;
@@ -170,8 +110,7 @@ import { COPY, URL_PLAY } from '../data/copy';
   /* En móvil solo quedan la marca y el botón: tres píldoras en 390 px dejan al
      botón sin lugar, y el camino a la descarga ahí es la barra de abajo. */
   @media (max-width: 860px) {
-    .cabecera__pildora,
-    .cabecera__avance {
+    .cabecera__pildora {
       display: none;
     }
 
