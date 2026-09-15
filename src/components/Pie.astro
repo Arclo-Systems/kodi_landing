@@ -16,6 +16,9 @@ const { class: className, style } = Astro.props;
     <a href="/privacidad">Política de privacidad</a>
     <a href="/bases">Bases de premiaciones</a>
     <a href="/eliminar-cuenta">Eliminar cuenta</a>
+    {/* Sin enlace hasta que empresas.holakodi.com exista: un enlace muerto en
+        el pie es peor que no ofrecerlo. */}
+    <span class="pie__pendiente">{COPY.empresas.enlace}</span>
   </nav>
   <p class="pie__legal">
     {COPY.pie.copyright} ·{' '}
@@ -23,6 +26,11 @@ const { class: className, style } = Astro.props;
       {COPY.pie.marca}<span class="oculto"> (se abre en una pestaña nueva)</span>
     </a>
   </p>
+  {/* Nombrar seis instituciones sin aclarar que no hay relación implica un
+      respaldo que no existe. La línea es fina a propósito: es un deslinde, no
+      un argumento de venta. */}
+  <p class="pie__deslinde">{COPY.pie.deslinde}</p>
+  <p class="pie__expansion">{COPY.pie.expansion}</p>
 </footer>
 
 <style>
@@ -69,6 +77,32 @@ const { class: className, style } = Astro.props;
 
   .pie__legal {
     font-size: 0.8125rem;
+  }
+
+  .pie__deslinde,
+  .pie__expansion {
+    max-width: 62ch;
+    margin-inline: auto;
+    font-size: 0.75rem;
+    line-height: 1.5;
+  }
+
+  .pie__deslinde {
+    margin-top: var(--e-3);
+  }
+
+  .pie__expansion {
+    margin-top: var(--e-2);
+  }
+
+  /* Mismo alto y mismo aire que un enlace, pero sin subrayado ni hover: se ve
+     que está ahí y se ve que todavía no lleva a ningún lado. */
+  .pie__pendiente {
+    display: inline-flex;
+    min-height: 44px;
+    align-items: center;
+    padding-inline: var(--e-1);
+    opacity: 0.5;
   }
 
   /* Mismo trato que los enlaces legales: mismo color, mismo hover, misma área

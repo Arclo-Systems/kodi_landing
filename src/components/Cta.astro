@@ -1,0 +1,118 @@
+---
+import { COPY, URL_PLAY } from '../data/copy';
+
+interface Props {
+  /** El texto del botón. Cada sección tiene el suyo; todos llevan al mismo lado. */
+  texto?: string;
+  /** `grande` para el hero y el cierre; `normal` para los CTA de sección. */
+  tamano?: 'normal' | 'grande';
+  /** Muestra la línea de anuncios y compras. Va en el hero y en el cierre. */
+  conMicrocopy?: boolean;
+  /** Ofrece la lista de espera de iPhone. Solo tiene sentido fuera de esa sección. */
+  conIphone?: boolean;
+  class?: string;
+}
+
+const {
+  texto = COPY.hero.cta,
+  tamano = 'normal',
+  conMicrocopy = false,
+  conIphone = false,
+  class: className,
+} = Astro.props;
+---
+
+{/* Un solo componente para TODOS los llamados a descargar, y un solo destino.
+    La página tiene cinco puntos de conversión; si cada uno escribe su propio
+    enlace, tarde o temprano uno apunta a un ancla y nadie lo nota. */}
+<div class:list={['cta', `cta--${tamano}`, className]}>
+  <a class="cta__boton" href={URL_PLAY}>
+    <svg class="cta__icono" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <path d="M4 3.5v17l9.5-8.5L4 3.5z" fill="#34a853" />
+      <path d="M4 3.5l9.5 8.5 3-2.7L5.2 3.1c-.4-.2-.9-.1-1.2.4z" fill="#4285f4" />
+      <path d="M4 20.5l9.5-8.5 3 2.7-11.3 6.2c-.5.2-1 .1-1.2-.4z" fill="#ea4335" />
+      <path d="M16.5 9.3L13.5 12l3 2.7 3.2-1.8c.7-.4.7-1.4 0-1.8l-3.2-1.8z" fill="#fbbc04" />
+    </svg>
+    {texto}
+  </a>
+
+  {conMicrocopy && <p class="cta__micro">{COPY.hero.microcopy}</p>}
+  {conIphone && <a class="cta__iphone" href="#descargar">{COPY.hero.iphone}</a>}
+</div>
+
+<style>
+  .cta {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--e-2);
+  }
+
+  /* Centrado cuando la sección lo está: lo decide el contenedor con
+     `text-align`, no una variante más del componente. */
+  :global(.centrado) .cta {
+    align-items: center;
+  }
+
+  .cta__boton {
+    display: inline-flex;
+    min-height: 56px;
+    align-items: center;
+    gap: var(--e-3);
+    padding-inline: var(--e-5);
+    border-radius: 12px;
+    background: var(--teal-texto);
+    color: var(--sobre-teal);
+    font-weight: 900;
+    font-size: 1rem;
+    text-decoration: none;
+    transition:
+      transform 300ms var(--salida),
+      background-color 160ms ease;
+  }
+
+  .cta--grande .cta__boton {
+    min-height: 60px;
+    font-size: 1.0625rem;
+    padding-inline: var(--e-6);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .cta__boton:hover {
+      background: var(--teal);
+      transform: translateY(-2px);
+    }
+  }
+
+  .cta__boton:active {
+    transform: translateY(0);
+  }
+
+  .cta__icono {
+    width: 24px;
+    height: 24px;
+    flex: none;
+  }
+
+  /* Lo que la ficha de Play declara y la landing callaba. Dicho acá cuesta una
+     línea; descubierto al apretar "Instalar" cuesta la instalación. */
+  .cta__micro {
+    font-size: 0.8125rem;
+    color: var(--tinta-suave);
+  }
+
+  .cta__iphone {
+    display: inline-flex;
+    min-height: 44px;
+    align-items: center;
+    color: var(--teal-texto);
+    font-weight: 700;
+    font-size: 0.9375rem;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .cta__boton {
+      transition: none;
+    }
+  }
+</style>

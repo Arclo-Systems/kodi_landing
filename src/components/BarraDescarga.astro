@@ -1,0 +1,108 @@
+---
+import { COPY, URL_PLAY } from '../data/copy';
+---
+
+{/* Barra fija de descarga, solo en móvil.
+    Existe porque entre el hero y el cierre hay seis pantallas sin una sola
+    forma de instalar: el que se convence leyendo "Pixel te explica" tenía que
+    atravesar cuatro secciones más para poder actuar.
+
+    Va en Astro y no en una isla de React: es un botón y dos observadores, y no
+    vale un solo KB de JavaScript de framework. */}
+<div class="barra" id="barra-descarga" data-testid="barra-descarga" hidden>
+  <a class="barra__boton" href={URL_PLAY}>{COPY.hero.cta}</a>
+  <p class="barra__micro">{COPY.hero.microcopy}</p>
+</div>
+
+<script>
+  const barra = document.getElementById('barra-descarga');
+  const hero = document.getElementById('inicio');
+  const cierre = document.getElementById('descargar');
+
+  if (barra && hero && cierre) {
+    // Dos estados independientes: el hero salió de pantalla, y el cierre entró.
+    // La barra se muestra cuando lo primero es cierto y lo segundo no: abajo
+    // del todo ya está el botón grande, y dos botones iguales a 40 px uno del
+    // otro es ruido.
+    let heroFuera = false;
+    let cierreDentro = false;
+
+    const pintar = () => {
+      barra.hidden = !(heroFuera && !cierreDentro);
+    };
+
+    new IntersectionObserver(
+      ([e]) => {
+        heroFuera = !e.isIntersecting;
+        pintar();
+      },
+      { threshold: 0 },
+    ).observe(hero);
+
+    new IntersectionObserver(
+      ([e]) => {
+        cierreDentro = e.isIntersecting;
+        pintar();
+      },
+      { threshold: 0 },
+    ).observe(cierre);
+  }
+</script>
+
+<style>
+  .barra {
+    position: fixed;
+    inset: auto 0 0 0;
+    z-index: 30;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--e-1);
+    padding: var(--e-3) var(--e-4);
+    padding-bottom: max(var(--e-3), env(safe-area-inset-bottom));
+    background: color-mix(in srgb, var(--superficie) 92%, transparent);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border-top: 1px solid var(--borde);
+    animation: barra-entra 300ms var(--salida);
+  }
+
+  /* Solo en móvil: en escritorio el botón vive en la cabecera, que está
+     siempre a la vista. */
+  @media (min-width: 801px) {
+    .barra {
+      display: none;
+    }
+  }
+
+  .barra__boton {
+    display: flex;
+    width: 100%;
+    min-height: 52px;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    background: var(--teal-texto);
+    color: var(--sobre-teal);
+    font-weight: 900;
+    font-size: 1rem;
+    text-decoration: none;
+  }
+
+  .barra__micro {
+    font-size: 0.75rem;
+    color: var(--tinta-suave);
+  }
+
+  @keyframes barra-entra {
+    from {
+      transform: translateY(100%);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .barra {
+      animation: none;
+    }
+  }
+</style>
