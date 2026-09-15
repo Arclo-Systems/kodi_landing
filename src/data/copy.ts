@@ -40,7 +40,11 @@ export const COPY = {
   // `titular` y `bajada` quedan en la raíz porque los consumen `og.astro` (la
   // imagen que se ve al compartir el enlace) e `Invitacion.astro`. Cambiarles
   // el nombre rompe esas dos páginas.
-  titular: 'Practicá tu examen hasta que te salga',
+  // "hasta que te salga" describia el esfuerzo repetido, no el premio: el
+  // lector recibia "vas a tener que insistir" en vez de "vas a aprobar".
+  // Esta vende el estado de llegar tranquilo, que es lo que el estudiante
+  // quiere, sin prometer un resultado que no depende de Kodi.
+  titular: 'Llegá al examen sabiendo que lo pasás',
   bajada:
     'COSEVI auto y moto, admisión UCR · UNA · TEC y Pruebas Nacionales. Preguntas hechas desde el material oficial, cada una con su explicación.',
 
@@ -71,7 +75,7 @@ export const COPY = {
     cuenta: (dias: number, nombre: string) =>
       dias === 0 ? `Hoy es ${nombre}` : `Faltan ${dias} días para ${nombre}`,
     // COSEVI no lleva cuenta regresiva: la cita la agenda cada persona.
-    sinFecha: 'Tu examen es cuando vos lo agendés. Practicá hasta que te salga.',
+    sinFecha: 'Tu examen es cuando vos lo agendés. Practicá hasta estar listo.',
   },
 
   // ─── 2. Franja de confianza ───────────────────────────────────────────────
