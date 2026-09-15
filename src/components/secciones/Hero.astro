@@ -109,10 +109,14 @@ const FONDO = '#fafafa';
     pointer-events: auto;
   }
 
-  /* El rasgo de la referencia: enorme, peso MEDIO y muy apretado. Un 900 a este
-     tamaño grita; un 500 con el interletrado cerrado se lee como tipografía
-     editorial y deja que hable el contenido. */
+  /* El rasgo de la referencia: enorme, peso medio y muy apretado. Un 900 a este
+     tamaño grita; con el interletrado cerrado se lee como tipografía editorial
+     y deja que hable el contenido.
+     Va en Geist, no en Nunito: es la misma grotesca de la referencia, y su
+     trazo recto aguanta el peso 500 a 84 px. Nunito, más redonda y fina, se
+     veía floja al mismo número y había que subirla a 600 para compensar. */
   .hero__titular {
+    font-family: var(--fuente-titular);
     font-size: clamp(2.75rem, 7vw, 5.25rem);
     font-weight: 500;
     line-height: 1.02;

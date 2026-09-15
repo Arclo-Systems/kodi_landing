@@ -1,6 +1,8 @@
 ---
 import nunitoLatin from '@fontsource-variable/nunito/files/nunito-latin-wght-normal.woff2?url';
+import geistLatin from '@fontsource-variable/geist/files/geist-latin-wght-normal.woff2?url';
 import '@fontsource-variable/nunito/wght.css';
+import '@fontsource-variable/geist/wght.css';
 import '../styles/tailwind.css';
 
 interface Props {
@@ -43,6 +45,10 @@ const datosEstructurados = {
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="preload" as="font" type="font/woff2" href={nunitoLatin} crossorigin />
+    {/* Geist va en los titulares y aparece en la primera pantalla, así que se
+        precarga igual que Nunito: sin esto el titular se dibuja con la fuente
+        del sistema y salta de forma al llegar la buena. */}
+    <link rel="preload" as="font" type="font/woff2" href={geistLatin} crossorigin />
     {preconnect && <link rel="preconnect" href={preconnect} crossorigin />}
     {canonical && <link rel="canonical" href={canonical} />}
     {noindex && <meta name="robots" content="noindex" />}
