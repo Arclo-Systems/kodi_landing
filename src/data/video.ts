@@ -1,9 +1,13 @@
 /**
  * El video de la app que crece con el scroll.
  *
- * MIENTRAS `archivo` SEA `null`, LA SECCIÓN NO SE DIBUJA. Es a propósito: un
- * recuadro vacío con la palabra "video" es peor que no tener sección, y así la
- * página nunca muestra un hueco esperando material.
+ * La sección se dibuja si hay VIDEO o si hay PORTADA. Con solo la portada se
+ * ve el efecto completo —el recuadro crece con el scroll— pero con una imagen
+ * quieta en vez de una grabación. Sirve para juzgar el efecto antes de que el
+ * video exista.
+ *
+ * Si los dos son `null`, la sección no se dibuja: un recuadro vacío con la
+ * palabra "video" es peor que no tener sección.
  *
  * Para encenderla, cuando el video exista:
  *   1. Poné el archivo en `landing/public/video/` (por ejemplo `kodi.mp4`).
@@ -35,7 +39,9 @@ export interface VideoApp {
 
 export const VIDEO: VideoApp = {
   archivo: null,
-  portada: null,
+  // PROVISIONAL: una captura de la app sobre fondo de marca, solo para ver el
+  // efecto. Se reemplaza por el fotograma real del video.
+  portada: '/video/portada-provisional.jpg',
   rotulo: 'Mirá la app por dentro',
   descripcion:
     'Grabación de Kodi: se responde una pregunta, Pixel explica el error y la liga sube de puesto.',

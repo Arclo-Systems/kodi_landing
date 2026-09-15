@@ -1,13 +1,15 @@
 ---
 import { VIDEO } from '../../data/video';
 
-// Sin archivo no hay sección. Un recuadro vacío esperando material se lee como
-// una página a medio terminar; no mostrar nada no se lee de ninguna manera.
+// Con video se reproduce; con solo la portada se ve el mismo efecto sobre una
+// imagen quieta. Sin ninguno de los dos, la sección no existe: un recuadro
+// vacío esperando material se lee como una página a medio terminar.
 const hayVideo = VIDEO.archivo !== null;
+const hayAlgo = hayVideo || VIDEO.portada !== null;
 ---
 
 {
-  hayVideo && (
+  hayAlgo && (
     <section class="video" id="video">
       {/* El alto de esta sección ES el recorrido del efecto: mientras dura,
           la caja de adentro queda pegada y el video crece. Tres pantallas dan
@@ -25,17 +27,23 @@ const hayVideo = VIDEO.archivo !== null;
               pantalla completa en cuanto arranca y se rompe el efecto.
               `muted` también: ningún navegador deja reproducir solo con
               sonido, y sin esta bandera el video simplemente no arranca. */}
-          <video
-            class="video__pieza"
-            id="video-pieza"
-            src={VIDEO.archivo!}
-            poster={VIDEO.portada ?? undefined}
-            muted
-            loop
-            playsinline
-            preload="metadata"
-            aria-label={VIDEO.descripcion}
-          />
+          {
+            hayVideo ? (
+              <video
+                class="video__pieza"
+                id="video-pieza"
+                src={VIDEO.archivo!}
+                poster={VIDEO.portada ?? undefined}
+                muted
+                loop
+                playsinline
+                preload="metadata"
+                aria-label={VIDEO.descripcion}
+              />
+            ) : (
+              <img class="video__pieza" src={VIDEO.portada!} alt={VIDEO.descripcion} loading="lazy" />
+            )
+          }
         </div>
       </div>
     </section>
@@ -43,7 +51,7 @@ const hayVideo = VIDEO.archivo !== null;
 }
 
 {
-  hayVideo && (
+  hayAlgo && (
     <script>
       {/* El video crece con el scroll. Dos cuidados:
           · El cálculo va dentro de `requestAnimationFrame`: el evento de scroll
@@ -54,7 +62,7 @@ const hayVideo = VIDEO.archivo !== null;
       const pista = document.getElementById('video-pista');
       const pieza = document.getElementById('video-pieza');
 
-      if (pista && pieza instanceof HTMLVideoElement) {
+      if (pista) {
         let pendiente = false;
 
         const pintar = () => {
@@ -80,14 +88,17 @@ const hayVideo = VIDEO.archivo !== null;
         pintar();
 
         // El video solo corre mientras se ve. Un video en bucle fuera de
-        // pantalla gasta batería sin que nadie lo mire.
-        new IntersectionObserver(
-          ([e]) => {
-            if (e.isIntersecting) pieza.play().catch(() => {});
-            else pieza.pause();
-          },
-          { threshold: 0.1 },
-        ).observe(pieza);
+        // pantalla gasta batería sin que nadie lo mire. Con la portada sola no
+        // hay nada que pausar.
+        if (pieza instanceof HTMLVideoElement) {
+          new IntersectionObserver(
+            ([e]) => {
+              if (e.isIntersecting) pieza.play().catch(() => {});
+              else pieza.pause();
+            },
+            { threshold: 0.1 },
+          ).observe(pieza);
+        }
       }
     </script>
   )

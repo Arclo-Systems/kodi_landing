@@ -2,38 +2,13 @@
 import { COPY } from '../../data/copy';
 import Tarjeta from '../Tarjeta.astro';
 import { TIENDAS, rotuloDeTienda } from '../../data/tiendas';
-import { MODULOS } from '../../data/modulos';
-import FondoHero from '../islas/FondoHero';
 
-// Lo que flota alrededor del titular. En la referencia son fotos porque es una
-// app de fotos; acá va lo que Kodi tiene para mostrar: el arte de los cinco
-// exámenes y las pantallas reales de la app.
-//
-// La galería necesita las medidas originales para no deformar nada, y Astro las
-// trae en el import de cada imagen.
-// Solo el arte de los cinco exámenes: es cuadrado y se lee a cualquier tamaño.
-// Las capturas del teléfono se probaron y NO sirven acá — son altas y angostas,
-// y a la escala de la rejilla quedan como astillas de color que no dicen nada.
-// Las pantallas de la app se muestran en su sección, en un teléfono, que es
-// donde se entienden.
-const IMAGENES = MODULOS.map((m) => ({
-  url: m.arte.src,
-  width: m.arte.width,
-  height: m.arte.height,
-}));
-
-// El mismo valor que `--superficie` en `global.css`. Va literal porque viaja a
-// WebGL, que no lee variables de CSS.
-const FONDO = '#fafafa';
+// El fondo del hero queda a la espera del componente que elija el founder.
+// Hasta entonces el hero es tipografía sobre la superficie, sin isla: nada de
+// JavaScript y nada que pueda fallar al montar.
 ---
 
 <section class="hero" id="inicio">
-  <FondoHero client:load imagenes={IMAGENES} fondo={FONDO} />
-
-  {/* Un velo entre la rejilla y el texto: sin él, una imagen clara que pasa
-      justo detrás del titular se lo come. */}
-  <div class="hero__velo" aria-hidden="true"></div>
-
   <div class="hero__centro">
     <h1 class="hero__titular">{COPY.titular}</h1>
     <p class="hero__bajada">{COPY.bajada}</p>
@@ -76,21 +51,6 @@ const FONDO = '#fafafa';
     isolation: isolate;
   }
 
-  /* El velo no es un color plano: se abre en el centro para que el texto tenga
-     fondo limpio y deja ver la rejilla entera en los bordes. */
-  .hero__velo {
-    position: absolute;
-    inset: 0;
-    z-index: 1;
-    background: radial-gradient(
-      58% 46% at 50% 48%,
-      var(--superficie) 0%,
-      color-mix(in srgb, var(--superficie) 88%, transparent) 52%,
-      transparent 82%
-    );
-    pointer-events: none;
-  }
-
   .hero__centro {
     position: relative;
     z-index: 2;
@@ -100,13 +60,6 @@ const FONDO = '#fafafa';
     gap: var(--e-5);
     width: min(100%, 52rem);
     text-align: center;
-    /* La rejilla se arrastra con el cursor; el texto de encima no debe
-       robarle el gesto salvo en lo que de verdad se toca. */
-    pointer-events: none;
-  }
-
-  .hero__centro :global(a) {
-    pointer-events: auto;
   }
 
   /* El rasgo de la referencia: enorme, peso medio y muy apretado. Un 900 a este
