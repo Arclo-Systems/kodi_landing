@@ -8,3 +8,7 @@ node_modules/
 npm-debug.log*
 .env.local
 .env.*.local
+
+# Salidas de las pruebas de navegador
+test-results/
+playwright-report/
