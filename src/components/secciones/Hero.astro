@@ -1,5 +1,7 @@
 ---
-import { COPY, URL_PLAY } from '../../data/copy';
+import { COPY } from '../../data/copy';
+import Tarjeta from '../Tarjeta.astro';
+import { TIENDAS, rotuloDeTienda } from '../../data/tiendas';
 import { MODULOS } from '../../data/modulos';
 import FondoHero from '../islas/FondoHero';
 
@@ -36,10 +38,24 @@ const FONDO = '#fafafa';
     <h1 class="hero__titular">{COPY.titular}</h1>
     <p class="hero__bajada">{COPY.bajada}</p>
 
-    <div class="hero__botones">
-      <a class="boton boton--solido" href={URL_PLAY}>{COPY.hero.cta}</a>
-      <a class="boton boton--borde" href="#como">{COPY.nav.como}</a>
+    {/* La tarjeta de tienda en vez de un botón inventado: es el badge que ya
+        usa el sitio, con el ícono de Play, el rótulo chico arriba y el nombre
+        de la tienda abajo. El día que salga iOS, su tarjeta cambia sola de
+        "Muy pronto en" a "Descargala en" — el rótulo sale del estado de la
+        tienda, no está escrito a mano. */}
+    <div class="hero__tiendas">
+      {
+        TIENDAS.map((tienda) => (
+          <Tarjeta
+            icono={tienda.icono}
+            rotulo={rotuloDeTienda(tienda)}
+            nombre={tienda.nombre}
+            href={tienda.url ?? undefined}
+          />
+        ))
+      }
     </div>
+
 
     <p class="hero__micro">{COPY.hero.microcopy}</p>
   </div>
@@ -113,7 +129,7 @@ const FONDO = '#fafafa';
     text-wrap: pretty;
   }
 
-  .hero__botones {
+  .hero__tiendas {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
@@ -123,49 +139,5 @@ const FONDO = '#fafafa';
   .hero__micro {
     font-size: 0.8125rem;
     color: var(--tinta-suave);
-  }
-
-  /* Botones de la referencia: píldora, peso medio, uno sólido y uno de borde. */
-  .boton {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 52px;
-    padding-inline: var(--e-6);
-    border-radius: 999px;
-    font-size: 0.9375rem;
-    font-weight: 700;
-    text-decoration: none;
-    transition:
-      transform 300ms var(--salida),
-      background-color 160ms ease,
-      border-color 160ms ease;
-  }
-
-  .boton--solido {
-    background: var(--tinta);
-    color: var(--superficie);
-  }
-
-  .boton--borde {
-    background: var(--tarjeta);
-    border: 1px solid var(--borde);
-    color: var(--tinta);
-  }
-
-  @media (hover: hover) and (pointer: fine) {
-    .boton:hover {
-      transform: translateY(-2px);
-    }
-
-    .boton--borde:hover {
-      border-color: var(--tinta-suave);
-    }
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .boton {
-      transition: none;
-    }
   }
 </style>

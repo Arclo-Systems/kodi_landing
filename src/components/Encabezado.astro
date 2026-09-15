@@ -1,26 +1,45 @@
 ---
 import { COPY, URL_PLAY } from '../data/copy';
+import Wordmark from './Wordmark.astro';
 ---
 
-{/* Cabecera calcada de la referencia: flota sobre el contenido, sin fondo
-    propio, con tres islas en píldora.
-    Fuera queda su bloque de "Login / Sign up": Kodi no tiene sesión en la web,
-    y ese hueco lo ocupa el único botón que importa, el de descargar. */}
-<header class="cabecera" id="cabecera">
-  {/* El isotipo cuadrado y no el wordmark: el logotipo es ancho y dentro de un
-      círculo de 52 px se recorta. Es el mismo archivo que usa la pestaña. */}
-  <a class="cabecera__marca" href="#inicio" aria-label="Kodi, ir al inicio">
-    <img src="/favicon.svg" alt="" width="52" height="52" />
-  </a>
+{/* Cabecera de tres zonas: enlaces a la izquierda, la marca centrada, enlaces
+    a la derecha. El último de la derecha va destacado y es el que descarga.
 
-  <nav class="cabecera__pildora" aria-label="Secciones">
+    La marca va centrada con posición absoluta y no como tercera columna de un
+    flex: así queda centrada respecto de la VENTANA y no del hueco que dejan los
+    enlaces, que cambian de ancho y dejarían el logo corrido. */}
+<header class="cabecera">
+  <nav class="cabecera__enlaces" aria-label="Secciones">
     <a href="#examenes">{COPY.nav.examenes}</a>
     <a href="#como">{COPY.nav.como}</a>
+    <a href="#jugar">Jugá</a>
   </nav>
 
-  <a class="cabecera__cta" href={URL_PLAY}>{COPY.nav.descargar}</a>
-</header>
+  <a class="cabecera__marca" href="#inicio" aria-label="Kodi, ir al inicio">
+    <Wordmark />
+  </a>
 
+  <nav class="cabecera__enlaces" aria-label="Acciones">
+    <a href="#empresas">Empresas</a>
+    <a class="cabecera__destacado" href={URL_PLAY}>{COPY.nav.descargar}</a>
+  </nav>
+
+  {/* En móvil los cinco enlaces no entran. Se usa `details` nativo: el menú
+      abre aunque el JavaScript falle. */}
+  <details class="cabecera__menu">
+    <summary aria-label="Abrir menú">
+      <span class="cabecera__hamburguesa" aria-hidden="true"></span>
+    </summary>
+    <div class="cabecera__desplegable">
+      <a href="#examenes">{COPY.nav.examenes}</a>
+      <a href="#como">{COPY.nav.como}</a>
+      <a href="#jugar">Jugá</a>
+      <a href="#empresas">Empresas</a>
+      <a class="cabecera__destacado" href={URL_PLAY}>{COPY.nav.descargar}</a>
+    </div>
+  </details>
+</header>
 
 <style>
   .cabecera {
@@ -29,99 +48,156 @@ import { COPY, URL_PLAY } from '../data/copy';
     z-index: 50;
     display: flex;
     align-items: center;
+    justify-content: space-between;
     gap: var(--e-4);
-    height: 80px;
+    height: 64px;
     padding-inline: clamp(var(--e-4), 3vw, var(--e-7));
+    background: color-mix(in srgb, var(--superficie) 86%, transparent);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+  }
+
+  .cabecera__enlaces {
+    display: flex;
+    align-items: center;
+    gap: clamp(var(--e-4), 2.2vw, var(--e-6));
+  }
+
+  /* Enlaces chicos, apagados y con el interletrado abierto: en la referencia
+     son rótulos, no botones. Ese aire entre letras es lo que los deja legibles
+     a 13 px sin necesidad de negrita. */
+  .cabecera__enlaces a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    color: var(--tinta-suave);
+    font-size: 0.8125rem;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: color 160ms ease;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .cabecera__enlaces a:hover {
+      color: var(--tinta);
+    }
+  }
+
+  /* El único destacado es el que descarga: mismo tamaño, tinta plena y más
+     peso. Sin caja — en esta cabecera nada la lleva. */
+  .cabecera__destacado {
+    color: var(--tinta);
+    font-weight: 700;
   }
 
   .cabecera__marca {
+    position: absolute;
+    left: 50%;
+    translate: -50%;
     display: inline-flex;
     align-items: center;
-    justify-content: center;
-    width: 52px;
-    height: 52px;
-    flex: none;
-    border-radius: 999px;
-    background: var(--tarjeta);
-    overflow: hidden;
-  }
-
-  .cabecera__marca img {
-    width: 100%;
-    height: 100%;
-    display: block;
-  }
-
-  /* Píldora de secciones: blanca, borde de un píxel, radio completo. */
-  .cabecera__pildora {
-    display: flex;
-    margin-inline-end: auto;
-    align-items: center;
-    gap: var(--e-1);
-    height: 52px;
-    padding: 6px;
-    border-radius: 999px;
-    border: 1px solid var(--borde);
-    background: var(--tarjeta);
-  }
-
-  .cabecera__pildora a {
-    display: inline-flex;
-    align-items: center;
-    height: 40px;
-    padding-inline: var(--e-4);
-    border-radius: 999px;
+    min-height: 44px;
     color: var(--tinta);
-    font-size: 0.875rem;
+  }
+
+  .cabecera__marca :global(svg) {
+    display: block;
+    height: 20px;
+    width: auto;
+  }
+
+  /* ── Menú de móvil ─────────────────────────────────────────────────────── */
+  .cabecera__menu {
+    display: none;
+    position: relative;
+  }
+
+  .cabecera__menu summary {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    cursor: pointer;
+    list-style: none;
+  }
+
+  .cabecera__menu summary::-webkit-details-marker {
+    display: none;
+  }
+
+  /* Las tres rayas, dibujadas con bordes: no hace falta un icono aparte. */
+  .cabecera__hamburguesa {
+    position: relative;
+  }
+
+  .cabecera__hamburguesa,
+  .cabecera__hamburguesa::before,
+  .cabecera__hamburguesa::after {
+    display: block;
+    width: 18px;
+    height: 1.5px;
+    background: var(--tinta);
+  }
+
+  .cabecera__hamburguesa::before,
+  .cabecera__hamburguesa::after {
+    content: '';
+    position: absolute;
+    left: 0;
+  }
+
+  .cabecera__hamburguesa::before {
+    top: -6px;
+  }
+
+  .cabecera__hamburguesa::after {
+    top: 6px;
+  }
+
+  .cabecera__desplegable {
+    position: absolute;
+    inset: calc(100% + var(--e-3)) 0 auto auto;
+    display: flex;
+    flex-direction: column;
+    min-width: 12rem;
+    padding: var(--e-2);
+    border: 1px solid var(--borde);
+    border-radius: 16px;
+    background: var(--tarjeta);
+    box-shadow: 0 24px 48px -24px rgb(20 31 37 / 0.28);
+  }
+
+  .cabecera__desplegable a {
+    display: flex;
+    align-items: center;
+    min-height: 44px;
+    padding-inline: var(--e-3);
+    border-radius: 10px;
+    color: var(--tinta-suave);
+    font-size: 0.9375rem;
     font-weight: 500;
     text-decoration: none;
-    transition: background-color 160ms ease;
   }
 
-  @media (hover: hover) and (pointer: fine) {
-    .cabecera__pildora a:hover {
-      background: var(--superficie);
-    }
+  .cabecera__desplegable a:hover {
+    background: var(--superficie);
   }
 
-  
-  
-  .cabecera__cta {
-    display: inline-flex;
-    align-items: center;
-    height: 52px;
-    flex: none;
-    padding-inline: var(--e-6);
-    border-radius: 999px;
-    background: var(--tinta);
-    color: var(--superficie);
-    font-size: 0.875rem;
-    font-weight: 700;
-    text-decoration: none;
-    transition: transform 300ms var(--salida);
-  }
-
-  @media (hover: hover) and (pointer: fine) {
-    .cabecera__cta:hover {
-      transform: translateY(-2px);
-    }
-  }
-
-  /* En móvil solo quedan la marca y el botón: tres píldoras en 390 px dejan al
-     botón sin lugar, y el camino a la descarga ahí es la barra de abajo. */
-  @media (max-width: 860px) {
-    .cabecera__pildora {
+  @media (max-width: 900px) {
+    .cabecera__enlaces {
       display: none;
     }
 
-    .cabecera__cta {
+    .cabecera__menu {
+      display: block;
       margin-inline-start: auto;
     }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .cabecera__cta,
-    .cabecera__pildora a {
+    .cabecera__enlaces a {
       transition: none;
     }
   }
