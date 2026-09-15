@@ -1,0 +1,28 @@
+---
+// Página de andamio: comprueba que las utilidades de Tailwind le ganan al CSS
+// de la casa y que una isla de React monta y anima. NO es parte del producto y
+// se borra en la última tarea. `noindex` para que no entre a Google mientras vive.
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PruebaPortal from '../components/islas/PruebaPortal';
+---
+
+<BaseLayout title="Prueba de islas" description="Sonda de capas de CSS y de islas" noindex>
+  <main id="contenido">
+    <section style="padding: 2rem">
+      <h1>Sonda</h1>
+
+      {/* `global.css` pone `margin: 0` a todo con el selector universal.
+          Si las capas están bien, `.mt-8` de Tailwind gana y esto mide 32px.
+          Si mide 0, el orden de capas está mal y cualquier componente que se
+          instale después vendría sin estilos. */}
+      <div id="sonda-margen" class="mt-8">margen</div>
+
+      {/* Segunda sonda: una utilidad que el CSS de la casa no toca. Si esta
+          funciona y la de arriba no, el problema es solo de capas y no de que
+          Tailwind no esté generando nada. */}
+      <div id="sonda-color" class="text-red-500">color</div>
+    </section>
+
+    <PruebaPortal client:visible />
+  </main>
+</BaseLayout>

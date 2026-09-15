@@ -11,9 +11,9 @@
     "prefix": ""
   },
   "aliases": {
-    "components": "@/components",
+    "components": "@/components/react-bits",
     "utils": "@/lib/utils",
-    "ui": "@/components/reactbits",
+    "ui": "@/components/react-bits",
     "lib": "@/lib",
     "hooks": "@/hooks"
   },

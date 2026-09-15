@@ -1,0 +1,27 @@
+/* Entrada de estilos del sitio. Es lo único que importa el layout.
+ *
+ * Dos decisiones, y las dos importan:
+ *
+ * 1. SIN PREFLIGHT. Tailwind trae un reset propio que normaliza márgenes,
+ *    tipografía y bordes de todo el documento. Acá pisaría el CSS de la casa y
+ *    las siete páginas publicadas cambiarían de aspecto sin que nadie lo pida.
+ *    Se importan `theme` y `utilities`, y NO `preflight`.
+ *    Fuente: https://tailwindcss.com/docs/preflight ("Disabling Preflight")
+ *
+ * 2. EL CSS DE LA CASA VA EN SU PROPIA CAPA. En la cascada, lo que está fuera
+ *    de toda capa le gana a lo que está dentro de una. `global.css` arranca con
+ *    `*, *::before, *::after { margin: 0 }`, así que sin capa le ganaría a
+ *    `.mt-8` de `utilities` y las clases de los componentes importados
+ *    quedarían muertas — sin error, sin aviso, sin síntoma.
+ *    Por eso `global.css` entra en la capa `kodi`, declarada ANTES de
+ *    `utilities`: nuestro CSS sigue mandando sobre el tema, y las utilidades
+ *    mandan sobre nuestro CSS, que es justo lo que hace falta.
+ *
+ * El orden de la primera línea es el que manda en todo el archivo.
+ * `global.css` no se toca por dentro: solo cambia quién lo importa.
+ */
+@layer theme, base, kodi, utilities;
+
+@import 'tailwindcss/theme.css' layer(theme);
+@import './global.css' layer(kodi);
+@import 'tailwindcss/utilities.css' layer(utilities);
