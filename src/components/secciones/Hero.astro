@@ -41,11 +41,13 @@ import { TIENDAS, rotuloDeTienda } from '../../data/tiendas';
     position: relative;
     display: grid;
     place-items: center;
-    /* Alto contenido y no `100vh`: una portada que ocupa exactamente la ventana
-       deja el resto de la página fuera del primer vistazo, y en un teléfono
-       apaisado no entra ni el botón. */
-    min-height: min(88vh, 880px);
-    padding-block: clamp(var(--e-8), 12vw, 160px);
+    /* Medido en la referencia: el hero termina justo a tiempo para que el
+       recuadro del video ASOME en el borde inferior de la primera pantalla.
+       Ese pedacito asomando es lo que invita a bajar. Con el hero ocupando la
+       ventana entera, el visitante ve una pantalla cerrada y no sabe que hay
+       algo más. */
+    min-height: min(81vh, 790px);
+    padding-block: clamp(var(--e-7), 9vw, 120px) var(--e-6);
     padding-inline: var(--pad-x);
     overflow: hidden;
     isolation: isolate;

@@ -39,10 +39,17 @@ export interface VideoApp {
 
 export const VIDEO: VideoApp = {
   archivo: null,
-  // PROVISIONAL: una captura de la app sobre fondo de marca, solo para ver el
-  // efecto. Se reemplaza por el fotograma real del video.
-  portada: '/video/portada-provisional.jpg',
-  rotulo: 'Mirá la app por dentro',
+  // Apagada hasta que exista la pieza de Remotion.
+  //
+  // Se probó con una captura del teléfono de relleno y NO funciona: el marco es
+  // apaisado y una pantalla vertical adentro deja dos franjas negras enormes
+  // con una tirita en el medio. Ningún ajuste de tamaño arregla eso — hace
+  // falta material 16:9 de verdad.
+  portada: null,
+  // Misma estructura que la referencia: acción, raya, y de qué se trata.
+  // No dice "grabación de la app" porque el video va a ser una pieza
+  // promocional hecha en Remotion, no una captura de pantalla.
+  rotulo: 'Mirá el video — todo lo que trae Kodi',
   descripcion:
-    'Grabación de Kodi: se responde una pregunta, Pixel explica el error y la liga sube de puesto.',
+    'Video de Kodi: los exámenes que cubre, cómo se practica y cómo se compite.',
 };

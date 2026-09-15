@@ -1,4 +1,5 @@
 ---
+import { Play } from '@lucide/astro';
 import { VIDEO } from '../../data/video';
 
 // Con video se reproduce; con solo la portada se ve el mismo efecto sobre una
@@ -16,10 +17,8 @@ const hayAlgo = hayVideo || VIDEO.portada !== null;
           un crecimiento que se siente, sin obligar a scrollear de más. */}
       <div class="video__pista" id="video-pista">
         <div class="video__visor">
-          <p class="video__rotulo">
-            <svg width="10" height="12" viewBox="0 0 10 12" fill="currentColor" aria-hidden="true">
-              <path d="M0 0v12l10-6z" />
-            </svg>
+          <p class="video__rotulo" aria-hidden="true">
+            <Play class="video__play" size={13} stroke-width={2.5} fill="currentColor" />
             {VIDEO.rotulo}
           </p>
 
@@ -106,26 +105,40 @@ const hayAlgo = hayVideo || VIDEO.portada !== null;
 
 <style>
   .video__pista {
-    /* Tres pantallas: una para que crezca, y las otras para que se quede
-       grande un momento antes de irse. */
-    height: 300vh;
+    /* Medido en la referencia: el recuadro termina de crecer en unos 600 px de
+       scroll y ahí SUELTA — se va con la página como cualquier sección. Tres
+       pantallas pegadas, que era lo que tenía antes, se sienten eternas: la
+       persona sigue bajando y la pantalla no avanza. */
+    height: calc(100vh + 620px);
+    height: calc(100svh + 620px);
     --avance: 0;
   }
 
+  /* Rótulo y recuadro en UNA columna, no posicionados por separado: así la
+     distancia entre ellos es siempre la misma, en cualquier pantalla y en
+     cualquier punto del scroll. Posicionados aparte, cada uno se movía con su
+     propio porcentaje y el hueco crecía o se cerraba solo. */
   .video__visor {
     position: sticky;
     top: 0;
-    display: grid;
-    place-items: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    /* Medido contra la referencia en 1440x900: 178 px entre el final del hero
+       y el rótulo, 28 entre el rótulo y el recuadro, y el recuadro asomando
+       unos 50 px por el pie de la primera pantalla. Con menos hueco el bloque
+       se apelmaza; con el recuadro asomando de más, deja de ser una invitación
+       y se vuelve otra sección. */
+    gap: 28px;
     height: 100vh;
     height: 100svh;
+    padding-top: 8.5vh;
     overflow: hidden;
   }
 
   .video__rotulo {
-    position: absolute;
-    top: clamp(var(--e-7), 12vh, 140px);
     display: inline-flex;
+    flex: none;
     align-items: center;
     gap: var(--e-2);
     font-size: 0.75rem;
@@ -138,11 +151,17 @@ const hayAlgo = hayVideo || VIDEO.portada !== null;
     transition: opacity 120ms linear;
   }
 
+  .video__play {
+    flex: none;
+  }
+
   .video__pieza {
     display: block;
-    /* De 400 px a todo el ancho disponible. Se interpola el ANCHO y la altura
-       sale de la proporción, así el radio de las esquinas nunca se deforma. */
-    width: calc(400px + (min(96vw, 1360px) - 400px) * var(--avance));
+    flex: none;
+    /* De 400 px a 1360, con 40 de margen a cada lado: las medidas exactas de
+       la referencia. Se interpola el ANCHO y la altura sale de la proporción,
+       así el radio de las esquinas nunca se deforma. */
+    width: calc(400px + (min(100vw - 80px, 1360px) - 400px) * var(--avance));
     aspect-ratio: 16 / 9;
     max-width: 96vw;
     object-fit: cover;
