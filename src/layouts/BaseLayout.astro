@@ -5,6 +5,7 @@ import '@fontsource-variable/nunito/wght.css';
 import '@fontsource-variable/geist/wght.css';
 import '../styles/tailwind.css';
 import { COPY } from '../data/copy';
+import { SOCIAL } from '../data/social';
 import { TIENDAS } from '../data/tiendas';
 
 interface Props {
@@ -32,10 +33,24 @@ const sistemas = TIENDAS.filter((tienda) => tienda.url !== null).map((tienda) =>
   tienda.icono === 'googleplay' ? 'Android' : 'iOS',
 );
 
-const datosEstructurados = {
-  '@context': 'https://schema.org',
+// "Kodi" también es un centro multimedia muy conocido, así que desambiguar la
+// entidad importa acá más que de costumbre: el nodo de organización con sus
+// perfiles es la señal estándar para eso.
+const organizacion = {
+  '@type': 'Organization',
+  '@id': 'https://holakodi.com/#organizacion',
+  name: 'Kodi',
+  url: 'https://holakodi.com/',
+  logo: 'https://holakodi.com/favicon.svg',
+  email: COPY.faq.correo,
+  areaServed: 'CR',
+  sameAs: Object.values(SOCIAL).map((red) => red.href),
+};
+
+const aplicacion = {
   '@type': 'MobileApplication',
   name: 'Kodi',
+  publisher: { '@id': organizacion['@id'] },
   applicationCategory: 'EducationalApplication',
   operatingSystem: sistemas.join(', '),
   description: COPY.descripcion,
@@ -43,6 +58,11 @@ const datosEstructurados = {
   // `countriesSupported` y no `areaServed`: esa segunda no existe para este
   // tipo y el validador la descarta.
   countriesSupported: 'CR',
+};
+
+const datosEstructurados = {
+  '@context': 'https://schema.org',
+  '@graph': [organizacion, aplicacion],
 };
 ---
 
@@ -61,7 +81,11 @@ const datosEstructurados = {
     <link rel="preload" as="font" type="font/woff2" href={geistLatin} crossorigin />
     {preconnect && <link rel="preconnect" href={preconnect} crossorigin />}
     {canonical && <link rel="canonical" href={canonical} />}
-    {noindex && <meta name="robots" content="noindex" />}
+    {noindex ? (
+      <meta name="robots" content="noindex" />
+    ) : (
+      <meta name="robots" content="index, follow, max-image-preview:large" />
+    )}
     <title>{title}</title>
     <meta name="description" content={description} />
     <meta name="theme-color" content="#fafafa" />

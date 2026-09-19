@@ -6,16 +6,23 @@ import react from '@astrojs/react';
 
 import tailwindcss from '@tailwindcss/vite';
 
-const FUERA_DEL_SITEMAP = new Set(['/og/', '/invitacion/', '/invitacion-perfil/']);
+const FUERA_DEL_SITEMAP = new Set(['/og', '/invitacion', '/invitacion-perfil']);
 
 export default defineConfig({
   site: 'https://holakodi.com',
+
+  // Sin barra final, que es como están escritos TODOS los enlaces internos.
+  // Con la barra, el canonical y el sitemap apuntaban a una URL y cada enlace
+  // a otra: el rastreo se reparte entre dos formas de la misma página.
+  trailingSlash: 'never',
 
   integrations: [
     sitemap({
       // Fuera: la imagen de OG y las páginas de invitación, que se sirven bajo
       // /u/* y /r/* y no tienen una URL propia que valga la pena indexar.
-      filter: (page) => !FUERA_DEL_SITEMAP.has(new URL(page).pathname),
+      // Se normaliza la barra final: con `trailingSlash: 'never'` las rutas
+      // llegan sin ella, pero el filtro no puede depender de eso.
+      filter: (page) => !FUERA_DEL_SITEMAP.has(new URL(page).pathname.replace(/\/$/, '')),
     }),
     react(),
   ],

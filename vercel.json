@@ -1,17 +1,43 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "rewrites": [
-    { "source": "/u/:path*", "destination": "/invitacion-perfil/index.html" },
-    { "source": "/r/:path*", "destination": "/invitacion/index.html" }
+    {
+      "source": "/u/:path*",
+      "destination": "/invitacion-perfil/index.html"
+    },
+    {
+      "source": "/r/:path*",
+      "destination": "/invitacion/index.html"
+    }
   ],
   "headers": [
     {
+      "source": "/_astro/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
+    },
+    {
       "source": "/.well-known/apple-app-site-association",
-      "headers": [{ "key": "Content-Type", "value": "application/json" }]
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "application/json"
+        }
+      ]
     },
     {
       "source": "/.well-known/assetlinks.json",
-      "headers": [{ "key": "Content-Type", "value": "application/json" }]
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "application/json"
+        }
+      ]
     }
-  ]
+  ],
+  "trailingSlash": false
 }
