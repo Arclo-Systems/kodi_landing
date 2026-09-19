@@ -116,7 +116,9 @@ import { Moon, Sun } from '@lucide/astro';
     background: var(--tarjeta);
     color: var(--tinta);
     cursor: pointer;
-    opacity: 0.3;
+    /* 0.3 daba 1.91 de contraste y el mínimo son 3. Con 0.75 llega a 5.9 y
+       sigue leyéndose como un control secundario. */
+    opacity: 0.75;
     box-shadow: 0 4px 12px rgb(0 0 0 / 0.1);
     transition:
       opacity 160ms ease,

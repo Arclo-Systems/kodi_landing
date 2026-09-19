@@ -275,15 +275,20 @@ const esExterno = (href: string) => href.startsWith('http');
     text-decoration: none;
   }
 
+  /* La transición va en `opacity` y NO en `color`: sobre un color que sale de
+     una variable, Chrome no reinicia la transición cuando la variable cambia,
+     así que al cambiar de tema el enlace se quedaba con el color anterior y no
+     se recuperaba nunca. */
   .pie__lista a,
   .pie__base a {
-    transition: color 160ms var(--salida);
+    transition: opacity 160ms var(--salida);
   }
 
   @media (hover: hover) and (pointer: fine) {
     .pie__lista a:hover,
     .pie__base a:hover {
       color: var(--tinta);
+      opacity: 1;
     }
   }
 

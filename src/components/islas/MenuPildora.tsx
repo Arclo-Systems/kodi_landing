@@ -242,11 +242,17 @@ export default function MenuPildora({ abrir, cerrar, grupos }: Props) {
         </div>
       </motion.div>
 
-      {/* Un clic en cualquier otra parte cierra el panel. */}
+      {/* Un clic en cualquier otra parte cierra el panel.
+
+          `tabIndex={-1}`: cubre toda la ventana con z-index negativo, así que
+          al tabular tomaba el foco sin que se viera nada. Con teclado el panel
+          se cierra con Escape, que ya está resuelto arriba. */}
       <AnimatePresence>
         {abierto && (
           <motion.button
             type="button"
+            tabIndex={-1}
+            aria-hidden="true"
             aria-label={cerrar}
             onClick={cerrarPanel}
             className="pildora__telon"

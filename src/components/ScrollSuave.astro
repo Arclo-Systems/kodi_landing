@@ -74,6 +74,11 @@
       evento.preventDefault();
       const respiro = parseFloat(getComputedStyle(nodo).scrollMarginTop) || 0;
       lenis.scrollTo(nodo, { offset: -respiro });
+      // `preventDefault` también cancela el traslado del punto de tabulación,
+      // así que el atajo de salto dejaba el foco donde estaba. Se mueve a mano;
+      // sin `tabindex` el destino no puede recibirlo.
+      if (!nodo.hasAttribute('tabindex')) nodo.setAttribute('tabindex', '-1');
+      nodo.focus({ preventScroll: true });
     });
   }
 </script>
