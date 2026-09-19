@@ -162,11 +162,14 @@ const ScrollReveal: React.FC<ScrollRevealProps> = ({
   ]);
 
   return (
-    <h2 ref={containerRef} className={`my-5 ${containerClassName}`}>
+    // MODIFICADO. Era un `h2` que envolvía un `p`: marcado inválido, y metía un
+    // párrafo entero en el esquema de encabezados como el h2 de más peso de la
+    // página. El tamaño lo da el CSS, no la etiqueta.
+    <div ref={containerRef} className={`my-5 ${containerClassName}`}>
       <p className={`text-[clamp(1.6rem,4vw,3rem)] leading-[1.5] font-semibold ${textClassName}`}>
         {splitText}
       </p>
-    </h2>
+    </div>
   );
 };
 

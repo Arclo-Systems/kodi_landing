@@ -411,12 +411,22 @@ const raiz = sobria ? 'lista-hero' : 'lista';
   const CORREO = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
   const ESPERA_MAX_MS = 8000;
 
-  const formulario = document.querySelector<HTMLFormElement>('[data-lista]');
-  const campo = formulario?.querySelector<HTMLInputElement>('[data-campo]');
-  const boton = formulario?.querySelector<HTMLButtonElement>('[data-boton]');
-  const salida = document.querySelector<HTMLParagraphElement>('[data-estado]');
+  // Se recorren TODOS los formularios de la página, no el primero: el
+  // componente ya deriva sus identificadores por variante justamente porque
+  // puede haber dos instancias. Con `querySelector` en singular, el segundo
+  // formulario recargaba la página y el correo se perdía sin avisar.
+  for (const formulario of document.querySelectorAll<HTMLFormElement>('[data-lista]')) {
+    const campo = formulario.querySelector<HTMLInputElement>('[data-campo]');
+    const boton = formulario.querySelector<HTMLButtonElement>('[data-boton]');
+    // La salida la nombra el propio formulario con `aria-describedby`, así que
+    // cada instancia encuentra la suya.
+    const idSalida = formulario.getAttribute('aria-describedby');
+    const salida = idSalida
+      ? document.getElementById(idSalida)
+      : formulario.parentElement?.querySelector<HTMLElement>('[data-estado]');
 
-  if (formulario && campo && boton && salida) {
+    if (!campo || !boton || !salida) continue;
+
     const mensaje = (estado: Estado): string => formulario.dataset[estado] ?? '';
 
     const mostrar = (estado: Estado): void => {
