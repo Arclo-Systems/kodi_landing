@@ -13,7 +13,6 @@ import type { Examen } from '../../data/examenes';
 
 interface Props {
   examenes: readonly Examen[];
-  nuevo: string;
 }
 
 // Los tres muelles de la referencia, leídos de su bundle: uno por eje para
@@ -45,7 +44,7 @@ function listar(materias: readonly string[]): string {
  * interpolación a mano se sentía rígida. Con movimiento reducido no hay
  * tarjeta, como allá.
  */
-export default function Examenes({ examenes, nuevo }: Props) {
+export default function Examenes({ examenes }: Props) {
   const seco = useReducedMotion();
   const marco = useRef<HTMLDivElement>(null);
   const [activa, setActiva] = useState<number | null>(null);
@@ -128,10 +127,7 @@ export default function Examenes({ examenes, nuevo }: Props) {
             <span className="examen__numero">{String(i + 1).padStart(2, '0')}</span>
 
             <div className="examen__cuerpo">
-              <h3 className="examen__nombre">
-                {examen.nombre}
-                {examen.nuevo && <span className="examen__nuevo">{nuevo}</span>}
-              </h3>
+              <h3 className="examen__nombre">{examen.nombre}</h3>
               {/* Dos redacciones del mismo dato: el CSS enciende la corta en teléfono,
                   donde la lista entera de materias se iba a cuatro líneas. */}
               <p className="examen__detalle">

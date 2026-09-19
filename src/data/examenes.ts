@@ -14,7 +14,6 @@ export interface Examen {
   /** Materias del módulo, en el orden del panel. */
   readonly materias: readonly string[];
   readonly icono: string;
-  readonly nuevo?: boolean;
 }
 
 export const EXAMENES: readonly Examen[] = [

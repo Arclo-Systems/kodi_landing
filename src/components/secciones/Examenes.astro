@@ -20,7 +20,7 @@ const { examenes } = COPY;
     <p class="examenes__bajada bajada-seccion">{examenes.bajada}</p>
   </div>
 
-  <Examenes client:visible examenes={EXAMENES} nuevo={examenes.nuevo} />
+  <Examenes client:visible examenes={EXAMENES} />
 </section>
 
 <style>
@@ -161,17 +161,6 @@ const { examenes } = COPY;
     }
   }
 
-  .examen__nuevo {
-    padding: 4px 8px;
-    border-radius: 9999px;
-    background: rgb(155 203 108 / 0.18);
-    color: var(--lima-texto);
-    font-family: var(--fuente-texto, inherit);
-    font-size: 0.6875rem;
-    font-weight: 700;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-  }
 
   .examen__detalle {
     max-width: 28rem;
@@ -337,10 +326,6 @@ const { examenes } = COPY;
       font-size: 1.125rem;
     }
 
-    .examen__nuevo {
-      padding: 2px 6px;
-      font-size: 0.625rem;
-    }
 
     .examen__detalle {
       grid-area: det;

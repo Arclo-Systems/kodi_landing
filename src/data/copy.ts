@@ -223,7 +223,6 @@ export const COPY = {
     // estatal que Kodi no administra.
     bajada:
       'Cada módulo se arma con el material oficial vigente: el mismo temario y el mismo formato que el examen real.',
-    nuevo: 'nuevo',
   },
 
   // ─── 4. Cómo funciona ─────────────────────────────────────────────────────

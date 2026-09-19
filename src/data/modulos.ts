@@ -30,8 +30,6 @@ interface Modulo {
    * fuente oficial, no un número que además envejece con cada banco nuevo.
    */
   readonly cubre: string;
-  /** Solo en los que el producto acaba de estrenar. Se borra cuando dejan de ser noticia. */
-  readonly etiqueta?: 'nuevo';
   /** El mismo arte que se ve dentro de la app. */
   readonly arte: ImageMetadata;
   /** `colorHex` del panel: el color de identidad del módulo. */
@@ -53,7 +51,6 @@ export const MODULOS: readonly Modulo[] = [
     slug: 'cosevi_auto',
     nombre: 'COSEVI Auto',
     cubre: 'Teórico B1 — señales, prioridades, mecánica y ley de tránsito',
-    etiqueta: 'nuevo',
     arte: coseviAuto,
     color: '#e3b23c',
     icono: '/app/chico/modulo-cosevi-auto.webp',
@@ -62,7 +59,6 @@ export const MODULOS: readonly Modulo[] = [
     slug: 'cosevi_moto',
     nombre: 'COSEVI Moto',
     cubre: 'Prueba A1 — señales, maniobras, equipo y mantenimiento',
-    etiqueta: 'nuevo',
     arte: coseviMoto,
     color: '#5db7e8',
     icono: '/app/chico/modulo-cosevi-moto.webp',
