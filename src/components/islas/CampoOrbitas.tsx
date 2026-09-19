@@ -290,8 +290,6 @@ export default function CampoOrbitas() {
 
   const { scrollY } = useScroll();
   const velocidad = useVelocity(scrollY);
-  /** Lo publica el efecto de GL para que el resto pueda pedir un cuadro. */
-  const pedirCuadro = useRef<() => void>(() => {});
 
   // El bucle no se reinicia cuando cambia ninguno de estos: los lee de acá.
   const vivo = useRef({ seco: false, imagenes: [] as readonly HTMLImageElement[], velocidad });
@@ -353,7 +351,6 @@ export default function CampoOrbitas() {
     const pedir = () => {
       pendiente = true;
     };
-    pedirCuadro.current = pedir;
 
     const redimensionar = () => {
       const ancho = nodo.offsetWidth;
@@ -432,9 +429,14 @@ export default function CampoOrbitas() {
         malla.rotation.z = -(angulo + Math.PI / 2);
 
         if (!ficha.uniforms.uMap.value) {
+          const img = artes[ficha.imagen];
+          // Mientras la imagen siga en camino se pide cuadro, o el campo se
+          // queda en el primero y sin una sola ficha. Si falló, no: si no, el
+          // bucle no descansaría nunca.
+          const fallo = img?.complete === true && img.naturalWidth === 0;
+          if (img && !fallo) pedir();
           let textura = texturas[ficha.imagen];
           if (!textura) {
-            const img = artes[ficha.imagen];
             if (img?.complete && img.naturalWidth > 0) {
               textura = texturaConMargen(img);
               // Sin decodificar: este shader no hace cuentas de luz y three solo
@@ -506,15 +508,6 @@ export default function CampoOrbitas() {
       renderizador.dispose();
     };
   }, []);
-
-  // Las texturas llegan después del montaje: cada imagen que carga pide su
-  // cuadro, que es lo único que dibuja cuando se pidió menos movimiento.
-  useEffect(() => {
-    if (imagenes.length === 0) return;
-    const avisar = () => pedirCuadro.current();
-    imagenes.forEach((img) => img.addEventListener('load', avisar));
-    return () => imagenes.forEach((img) => img.removeEventListener('load', avisar));
-  }, [imagenes]);
 
   return (
     <div ref={contenedor} className="campo" aria-hidden="true">
