@@ -42,6 +42,21 @@ import { COPY } from '../../data/copy';
       filter: none !important;
     }
   }
+
+  /* Las palabras arrancan apagadas ya en el HTML. Sin esto, el párrafo se ve
+     entero hasta que la isla hidrata y GSAP lo apaga de un golpe, que se lee
+     como si el efecto se reiniciara al llegar a la sección. El 0.12 es el
+     mismo `baseOpacity` que recibe el componente. */
+  .manifiesto__texto .word {
+    opacity: 0.12;
+  }
+
+  /* Sin JavaScript nadie las enciende: se leen y punto. */
+  @media (scripting: none) {
+    .manifiesto__texto .word {
+      opacity: 1;
+    }
+  }
 </style>
 
 <style>

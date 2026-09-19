@@ -1,5 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
-import { Canvas, useFrame, useThree } from '@react-three/fiber';
+import { useEffect, useRef, useState } from 'react';
 import { useReducedMotion, useScroll, useVelocity } from 'motion/react';
 import * as THREE from 'three';
 
@@ -158,6 +157,7 @@ interface Ficha {
   anillo: number;
   /** Ángulo propio dentro del anillo; no cambia. */
   angulo: number;
+  /** Fracción del lado de la ficha, no píxeles: así encoge con ella. */
   redondeo: number;
   imagen: number;
   uniforms: Record<string, THREE.IUniform>;
@@ -206,202 +206,44 @@ function leerColor(elemento: HTMLElement): [number, number, number, number] {
   return [r / 255, g / 255, b / 255, a / 255];
 }
 
-function Fichas({ imagenes }: { imagenes: readonly HTMLImageElement[] }) {
-  const seco = useReducedMotion();
-  const { scrollY } = useScroll();
-  const velocidad = useVelocity(scrollY);
-  const { size, gl, invalidate } = useThree();
-
-  const mallas = useRef<(THREE.Mesh | null)[]>([]);
-  const texturas = useRef<(THREE.Texture | undefined)[]>([]);
-  const giro = useRef({
-    angulos: ANILLOS.map(() => 0),
-    empujes: ANILLOS.map(() => 0),
-  });
-
-  const geometria = useMemo(() => new THREE.PlaneGeometry(1, 1), []);
-  useEffect(() => () => geometria.dispose(), [geometria]);
-  useEffect(() => {
-    const guardadas = texturas.current;
-    return () => guardadas.forEach((t) => t?.dispose());
-  }, []);
-
-  const fichas = useMemo<Ficha[]>(
-    () =>
-      ANILLOS.flatMap((anillo, i) =>
-        Array.from({ length: anillo.cantidad }, (_, j) => {
-          const semilla = 53 * i + 17 * j;
-          // La ficha se reparte pareja en su anillo, corrida por la fase del
-          // anillo para que no queden alineadas de un anillo al otro. La
-          // semilla no da la posición: da el redondeo de las esquinas.
-          const angulo = ((360 / anillo.cantidad) * j + anillo.fase) * GRADO;
-          const uniforms: Record<string, THREE.IUniform> = {
-            uMap: { value: null },
-            uHasMap: { value: 0 },
-            uAparicion: { value: 0 },
-            uQuadSize: { value: new THREE.Vector2(1, 1) },
-            uTileHalf: { value: new THREE.Vector2(1, 1) },
-            uRadius: { value: 20 },
-            uImgSize: { value: 1 },
-            uBorder: { value: new THREE.Vector4(0, 0, 0, 0.15) },
-            uFade: { value: new THREE.Vector4(1, 1, 0, 0) },
-            uBottomFade: { value: new THREE.Vector2(0, 1) },
-          };
-          return {
-            anillo: i,
-            angulo,
-            redondeo: 20 + (semilla % 14),
-            imagen: (PRIMERA_ARTE[i] ?? 0) + (j % anillo.artes),
-            uniforms,
-            material: new THREE.ShaderMaterial({
-              uniforms,
-              vertexShader: VERTEX,
-              fragmentShader: FRAGMENT,
-              transparent: true,
-              depthWrite: false,
-            }),
-          };
+/** Las sesenta fichas con su material. La posición se calcula en cada cuadro. */
+function crearFichas(): Ficha[] {
+  return ANILLOS.flatMap((anillo, i) =>
+    Array.from({ length: anillo.cantidad }, (_, j) => {
+      const semilla = 53 * i + 17 * j;
+      // La ficha se reparte pareja en su anillo, corrida por la fase del
+      // anillo para que no queden alineadas de un anillo al otro. La semilla
+      // no da la posición: da el redondeo de las esquinas.
+      const angulo = ((360 / anillo.cantidad) * j + anillo.fase) * GRADO;
+      const uniforms: Record<string, THREE.IUniform> = {
+        uMap: { value: null },
+        uHasMap: { value: 0 },
+        uAparicion: { value: 0 },
+        uQuadSize: { value: new THREE.Vector2(1, 1) },
+        uTileHalf: { value: new THREE.Vector2(1, 1) },
+        uRadius: { value: 20 },
+        uImgSize: { value: 1 },
+        uBorder: { value: new THREE.Vector4(0, 0, 0, 0.15) },
+        uFade: { value: new THREE.Vector4(1, 1, 0, 0) },
+        uBottomFade: { value: new THREE.Vector2(0, 1) },
+      };
+      return {
+        anillo: i,
+        angulo,
+        // Los números originales (20 a 33) estaban medidos sobre la ficha de
+        // 131, así que se guardan como fracción de ese lado.
+        redondeo: (20 + (semilla % 14)) / 131,
+        imagen: (PRIMERA_ARTE[i] ?? 0) + (j % anillo.artes),
+        uniforms,
+        material: new THREE.ShaderMaterial({
+          uniforms,
+          vertexShader: VERTEX,
+          fragmentShader: FRAGMENT,
+          transparent: true,
+          depthWrite: false,
         }),
-      ),
-    [],
-  );
-
-  useEffect(() => () => fichas.forEach((f) => f.material.dispose()), [fichas]);
-
-  const medidas = useMemo(() => {
-    const vmax = Math.max(size.width, window.innerHeight) / 100;
-    const lado = Math.min(131, 0.128 * size.width);
-    return {
-      radios: ANILLOS.map((a) => Math.min(a.radioVmax * vmax, a.radioMax)),
-      ancho: lado,
-      alto: lado,
-      // La ventana abarca el lienzo entero, margen incluido: el Koko queda a
-      // su tamaño natural, ocupando la ficha, sin recorte.
-      arte: lado * MARGEN,
-    };
-  }, [size.width, size.height]);
-
-  useEffect(() => {
-    const { ancho, alto, arte } = medidas;
-    const anchoDifuminado = 1.2 * Math.min(size.width, 1800);
-    const altoDifuminado = 1.05 * size.height;
-    const alturaPie = Math.min(340, 0.28 * size.height);
-    const bordeInferior = -size.height / 2;
-
-    fichas.forEach((f) => {
-      (f.uniforms.uQuadSize.value as THREE.Vector2).set(ancho + 2, alto + 2);
-      (f.uniforms.uTileHalf.value as THREE.Vector2).set(ancho / 2, alto / 2);
-      f.uniforms.uRadius.value = Math.min(f.redondeo, alto / 2);
-      f.uniforms.uImgSize.value = arte;
-      (f.uniforms.uFade.value as THREE.Vector4).set(anchoDifuminado, altoDifuminado, 0, 0);
-      (f.uniforms.uBottomFade.value as THREE.Vector2).set(bordeInferior, alturaPie);
-    });
-  }, [fichas, medidas, size.width, size.height]);
-
-  // El filete sigue al tema. Se escucha el cambio en vez de consultarlo cada
-  // segundo: con el reloj, al apretar el botón las fichas se quedaban hasta un
-  // segundo con el borde del tema anterior y se veía roto.
-  useEffect(() => {
-    const raiz = document.documentElement;
-    const oscuroDelSistema = window.matchMedia('(prefers-color-scheme: dark)');
-
-    const pintar = () => {
-      const color = leerColor(gl.domElement);
-      fichas.forEach((f) => (f.uniforms.uBorder.value as THREE.Vector4).set(...color));
-      invalidate();
-    };
-
-    pintar();
-    const vigia = new MutationObserver(pintar);
-    vigia.observe(raiz, { attributes: true, attributeFilter: ['data-tema'] });
-    oscuroDelSistema.addEventListener('change', pintar);
-    return () => {
-      vigia.disconnect();
-      oscuroDelSistema.removeEventListener('change', pintar);
-    };
-  }, [fichas, gl, invalidate]);
-
-  // Con movimiento reducido el lienzo dibuja por pedido: hay que pedirle un
-  // cuadro cada vez que llega una textura nueva.
-  useEffect(() => {
-    if (!seco) return;
-    invalidate();
-    const avisar = () => invalidate();
-    imagenes.forEach((img) => img.addEventListener('load', avisar));
-    return () => imagenes.forEach((img) => img.removeEventListener('load', avisar));
-  }, [seco, imagenes, invalidate]);
-
-  useFrame((_, delta) => {
-    const paso = Math.min(delta, 0.064);
-    const objetivo = seco ? 0 : Math.min(Math.abs(velocidad.get()) / 300, 14);
-    const { angulos, empujes } = giro.current;
-
-    ANILLOS.forEach((anillo, i) => {
-      const previo = empujes[i] ?? 0;
-      // Cada anillo reacciona más lento que el de adentro.
-      const empuje = previo + (objetivo - previo) * (1 - Math.exp(-paso / (0.1 + 0.14 * i)));
-      empujes[i] = empuje;
-      if (seco) return;
-      const porSegundo = (360 / anillo.duracion) * GRADO;
-      angulos[i] = (angulos[i] ?? 0) + paso * porSegundo * (1 + empuje * (1 + 0.6 * i));
-    });
-
-    fichas.forEach((ficha, i) => {
-      const malla = mallas.current[i];
-      if (!malla) return;
-
-      const empuje = empujes[ficha.anillo] ?? 0;
-      const estiron = 1 + (empuje / 14) * (0.08 + 0.06 * ficha.anillo);
-      const radio = (medidas.radios[ficha.anillo] ?? 0) * estiron;
-      const angulo = (angulos[ficha.anillo] ?? 0) + ficha.angulo;
-      const x = radio * Math.sin(angulo);
-      const y = radio * Math.cos(angulo);
-
-      malla.position.set(x, y, 0);
-      malla.rotation.z = -(angulo + Math.PI / 2);
-
-      if (!ficha.uniforms.uMap.value) {
-        let textura = texturas.current[ficha.imagen];
-        if (!textura) {
-          const img = imagenes[ficha.imagen];
-          if (img?.complete && img.naturalWidth > 0) {
-            textura = texturaConMargen(img);
-            // Sin decodificar: este shader no hace cuentas de luz y three solo
-            // vuelve a codificar a sRGB en sus propios materiales.
-            textura.colorSpace = THREE.NoColorSpace;
-            textura.anisotropy = Math.min(4, gl.capabilities.getMaxAnisotropy());
-            textura.needsUpdate = true;
-            texturas.current[ficha.imagen] = textura;
-          }
-        }
-        if (textura) {
-          ficha.uniforms.uMap.value = textura;
-          ficha.uniforms.uHasMap.value = 1;
-        }
-      }
-
-      const aparicion = ficha.uniforms.uAparicion.value as number;
-      if (ficha.uniforms.uHasMap.value === 1 && aparicion < 1) {
-        ficha.uniforms.uAparicion.value = seco ? 1 : Math.min(1, aparicion + paso / 0.36);
-      }
-    });
-  });
-
-  return (
-    <>
-      {fichas.map((ficha, i) => (
-        <mesh
-          key={i}
-          geometry={geometria}
-          frustumCulled={false}
-          ref={(m: THREE.Mesh | null) => {
-            mallas.current[i] = m;
-          }}
-        >
-          <primitive object={ficha.material} attach="material" />
-        </mesh>
-      ))}
-    </>
+      };
+    }),
   );
 }
 
@@ -424,23 +266,41 @@ function techoDpr(): number {
   return Math.min(window.devicePixelRatio, Math.max(1.5, Math.sqrt(PRESUPUESTO / area)));
 }
 
+/** Techo del paso de tiempo: al volver de una pausa, el delta es enorme. */
+const PASO_MAX = 0.064;
+
+/**
+ * Se monta three a mano, sin `@react-three/fiber`.
+ *
+ * De esa librería solo hacían falta tres cosas —el lienzo, el gancho del bucle
+ * y la medida de la ventana— y de todo lo demás que trae, nada: este campo ya
+ * construye sus sesenta mallas, las mueve él mismo y se ocupa de crear y
+ * destruir sus materiales y texturas. Medido con el mismo código de ejemplo,
+ * la librería costaba 373 kB en bruto y 90 comprimidos sobre three pelado.
+ *
+ * Lo que sí hay que replicar con cuidado es la cámara: ortográfica con los
+ * bordes en la mitad del lienzo, que es lo que hace que una unidad del mundo
+ * sea un píxel. Los radios y los lados de las fichas están escritos en píxeles.
+ */
 export default function CampoOrbitas() {
   const seco = useReducedMotion();
   const contenedor = useRef<HTMLDivElement>(null);
-  const [enCuadro, setEnCuadro] = useState(false);
+  const lienzo = useRef<HTMLCanvasElement>(null);
   const [imagenes, setImagenes] = useState<readonly HTMLImageElement[]>([]);
-  const [techo, setTecho] = useState(techoDpr);
 
-  // Al girar el teléfono cambia el área y con ella el techo.
-  useEffect(() => {
-    const revisar = () => setTecho(techoDpr());
-    window.addEventListener('resize', revisar);
-    return () => window.removeEventListener('resize', revisar);
-  }, []);
+  const { scrollY } = useScroll();
+  const velocidad = useVelocity(scrollY);
+  /** Lo publica el efecto de GL para que el resto pueda pedir un cuadro. */
+  const pedirCuadro = useRef<() => void>(() => {});
+
+  // El bucle no se reinicia cuando cambia ninguno de estos: los lee de acá.
+  const vivo = useRef({ seco: false, imagenes: [] as readonly HTMLImageElement[], velocidad });
+  vivo.current.seco = seco === true;
+  vivo.current.imagenes = imagenes;
+  vivo.current.velocidad = velocidad;
 
   // Las 27 descargas van en un efecto y no en el cuerpo: ahí se disparaban en
-  // cada render, y en un teléfono —donde el campo está en `display: none`—
-  // también.
+  // cada render.
   useEffect(() => {
     setImagenes(
       IMAGENES.map((url) => {
@@ -452,31 +312,220 @@ export default function CampoOrbitas() {
     );
   }, []);
 
-  // Fuera de cuadro no se dibuja: el hero es una pantalla y debajo hay seis
-  // más, y el lienzo recorría sus 60 fichas en todas.
   useEffect(() => {
     const nodo = contenedor.current;
-    if (!nodo) return;
-    const vigia = new IntersectionObserver(([e]) => setEnCuadro(e.isIntersecting));
-    vigia.observe(nodo);
-    return () => vigia.disconnect();
+    const canvas = lienzo.current;
+    if (!nodo || !canvas) return;
+
+    const renderizador = new THREE.WebGLRenderer({
+      canvas,
+      alpha: true,
+      antialias: false,
+      powerPreference: 'high-performance',
+    });
+    // Los dos ajustes que ponía la librería: sin mapeo de tonos, y la salida en
+    // sRGB. El shader escribe el color final y las texturas van sin decodificar.
+    renderizador.toneMapping = THREE.NoToneMapping;
+    renderizador.outputColorSpace = THREE.SRGBColorSpace;
+
+    const escena = new THREE.Scene();
+    const camara = new THREE.OrthographicCamera(-1, 1, 1, -1, 0.1, 1000);
+    camara.position.z = 100;
+
+    const geometria = new THREE.PlaneGeometry(1, 1);
+    const fichas = crearFichas();
+    const mallas = fichas.map((ficha) => {
+      const malla = new THREE.Mesh(geometria, ficha.material);
+      malla.frustumCulled = false;
+      escena.add(malla);
+      return malla;
+    });
+
+    const texturas: (THREE.Texture | undefined)[] = [];
+    const giro = { angulos: ANILLOS.map(() => 0), empujes: ANILLOS.map(() => 0) };
+    let radios: number[] = [];
+    let enCuadro = false;
+    let pendiente = true;
+    let anterior = performance.now();
+    let bucle = 0;
+
+    /** Pide UN cuadro. Con movimiento reducido es la única forma de dibujar. */
+    const pedir = () => {
+      pendiente = true;
+    };
+    pedirCuadro.current = pedir;
+
+    const redimensionar = () => {
+      const ancho = nodo.offsetWidth;
+      const alto = nodo.offsetHeight;
+      if (ancho === 0 || alto === 0) return;
+
+      renderizador.setPixelRatio(Math.min(Math.max(1, window.devicePixelRatio), techoDpr()));
+      renderizador.setSize(ancho, alto, false);
+
+      // Una unidad de mundo, un píxel: es lo que daba la librería y de lo que
+      // dependen todos los números de los anillos.
+      camara.left = -ancho / 2;
+      camara.right = ancho / 2;
+      camara.top = alto / 2;
+      camara.bottom = -alto / 2;
+      camara.updateProjectionMatrix();
+
+      const vmax = Math.max(ancho, window.innerHeight) / 100;
+      const lado = Math.min(131, 0.128 * ancho);
+      radios = ANILLOS.map((a) => Math.min(a.radioVmax * vmax, a.radioMax));
+
+      const anchoDifuminado = 1.2 * Math.min(ancho, 1800);
+      const altoDifuminado = 1.05 * alto;
+      const alturaPie = Math.min(340, 0.28 * alto);
+      const bordeInferior = -alto / 2;
+      // La ventana abarca el lienzo entero, margen incluido: el Koko queda a su
+      // tamaño natural, ocupando la ficha, sin recorte.
+      const arte = lado * MARGEN;
+
+      fichas.forEach((f) => {
+        (f.uniforms.uQuadSize.value as THREE.Vector2).set(lado + 2, lado + 2);
+        (f.uniforms.uTileHalf.value as THREE.Vector2).set(lado / 2, lado / 2);
+        f.uniforms.uRadius.value = Math.min(f.redondeo * lado, lado / 2);
+        f.uniforms.uImgSize.value = arte;
+        (f.uniforms.uFade.value as THREE.Vector4).set(anchoDifuminado, altoDifuminado, 0, 0);
+        (f.uniforms.uBottomFade.value as THREE.Vector2).set(bordeInferior, alturaPie);
+      });
+
+      pedir();
+    };
+
+    // El filete sigue al tema. Se escucha el cambio en vez de consultarlo cada
+    // segundo: con el reloj, al apretar el botón las fichas se quedaban hasta un
+    // segundo con el borde del tema anterior y se veía roto.
+    const pintarFilete = () => {
+      const color = leerColor(canvas);
+      fichas.forEach((f) => (f.uniforms.uBorder.value as THREE.Vector4).set(...color));
+      pedir();
+    };
+
+    const avanzar = (paso: number) => {
+      const { seco: quieto, imagenes: artes, velocidad: v } = vivo.current;
+      const objetivo = quieto ? 0 : Math.min(Math.abs(v.get()) / 300, 14);
+      const { angulos, empujes } = giro;
+
+      ANILLOS.forEach((anillo, i) => {
+        const previo = empujes[i] ?? 0;
+        // Cada anillo reacciona más lento que el de adentro.
+        const empuje = previo + (objetivo - previo) * (1 - Math.exp(-paso / (0.1 + 0.14 * i)));
+        empujes[i] = empuje;
+        if (quieto) return;
+        const porSegundo = (360 / anillo.duracion) * GRADO;
+        angulos[i] = (angulos[i] ?? 0) + paso * porSegundo * (1 + empuje * (1 + 0.6 * i));
+      });
+
+      fichas.forEach((ficha, i) => {
+        const malla = mallas[i];
+        if (!malla) return;
+
+        const empuje = empujes[ficha.anillo] ?? 0;
+        const estiron = 1 + (empuje / 14) * (0.08 + 0.06 * ficha.anillo);
+        const radio = (radios[ficha.anillo] ?? 0) * estiron;
+        const angulo = (angulos[ficha.anillo] ?? 0) + ficha.angulo;
+
+        malla.position.set(radio * Math.sin(angulo), radio * Math.cos(angulo), 0);
+        malla.rotation.z = -(angulo + Math.PI / 2);
+
+        if (!ficha.uniforms.uMap.value) {
+          let textura = texturas[ficha.imagen];
+          if (!textura) {
+            const img = artes[ficha.imagen];
+            if (img?.complete && img.naturalWidth > 0) {
+              textura = texturaConMargen(img);
+              // Sin decodificar: este shader no hace cuentas de luz y three solo
+              // vuelve a codificar a sRGB en sus propios materiales.
+              textura.colorSpace = THREE.NoColorSpace;
+              textura.anisotropy = Math.min(4, renderizador.capabilities.getMaxAnisotropy());
+              textura.needsUpdate = true;
+              texturas[ficha.imagen] = textura;
+            }
+          }
+          if (textura) {
+            ficha.uniforms.uMap.value = textura;
+            ficha.uniforms.uHasMap.value = 1;
+          }
+        }
+
+        const aparicion = ficha.uniforms.uAparicion.value as number;
+        if (ficha.uniforms.uHasMap.value === 1 && aparicion < 1) {
+          ficha.uniforms.uAparicion.value = quieto ? 1 : Math.min(1, aparicion + paso / 0.36);
+          pedir();
+        }
+      });
+    };
+
+    const latido = (ahora: number) => {
+      bucle = requestAnimationFrame(latido);
+      const paso = Math.min((ahora - anterior) / 1000, PASO_MAX);
+      anterior = ahora;
+
+      // Fuera de cuadro no se dibuja: el hero es una pantalla y debajo hay seis
+      // más, y el lienzo recorría sus 60 fichas en todas. Con movimiento
+      // reducido tampoco: solo los cuadros que se piden.
+      const anima = !vivo.current.seco && enCuadro;
+      if (!anima && !pendiente) return;
+
+      avanzar(paso);
+      renderizador.render(escena, camara);
+      pendiente = false;
+    };
+
+    const vigiaTamano = new ResizeObserver(redimensionar);
+    vigiaTamano.observe(nodo);
+
+    const vigiaCuadro = new IntersectionObserver(([e]) => {
+      enCuadro = e.isIntersecting;
+      if (enCuadro) anterior = performance.now();
+    });
+    vigiaCuadro.observe(nodo);
+
+    const raiz = document.documentElement;
+    const oscuroDelSistema = window.matchMedia('(prefers-color-scheme: dark)');
+    const vigiaTema = new MutationObserver(pintarFilete);
+    vigiaTema.observe(raiz, { attributes: true, attributeFilter: ['data-tema'] });
+    oscuroDelSistema.addEventListener('change', pintarFilete);
+
+    redimensionar();
+    pintarFilete();
+    bucle = requestAnimationFrame(latido);
+
+    return () => {
+      cancelAnimationFrame(bucle);
+      vigiaTamano.disconnect();
+      vigiaCuadro.disconnect();
+      vigiaTema.disconnect();
+      oscuroDelSistema.removeEventListener('change', pintarFilete);
+      texturas.forEach((t) => t?.dispose());
+      fichas.forEach((f) => f.material.dispose());
+      geometria.dispose();
+      renderizador.dispose();
+    };
   }, []);
+
+  // Las texturas llegan después del montaje: cada imagen que carga pide su
+  // cuadro, que es lo único que dibuja cuando se pidió menos movimiento.
+  useEffect(() => {
+    if (imagenes.length === 0) return;
+    const avisar = () => pedirCuadro.current();
+    imagenes.forEach((img) => img.addEventListener('load', avisar));
+    return () => imagenes.forEach((img) => img.removeEventListener('load', avisar));
+  }, [imagenes]);
 
   return (
     <div ref={contenedor} className="campo" aria-hidden="true">
-      <Canvas
-        orthographic
-        flat
-        dpr={[1, techo]}
-        // Quieto: un cuadro por pedido, el justo para dejar el campo dibujado.
-        frameloop={seco ? 'demand' : enCuadro ? 'always' : 'never'}
-        camera={{ position: [0, 0, 100], zoom: 1, near: 0.1, far: 1000 }}
-        gl={{ alpha: true, antialias: false, powerPreference: 'high-performance' }}
-        resize={{ scroll: false, offsetSize: true }}
-        style={{ position: 'absolute', inset: 0 }}
-      >
-        <Fichas imagenes={imagenes} />
-      </Canvas>
+      {/* Alto y ancho al 100% y no `inset: 0`: un canvas es elemento reemplazado,
+          así que con el ancho en `auto` toma su tamaño INTRÍNSECO —el de sus
+          atributos, que van en píxeles de dispositivo— en vez de estirarse. En
+          un teléfono a triple densidad se dibujaba tres veces más grande. */}
+      <canvas
+        ref={lienzo}
+        style={{ position: 'absolute', inset: 0, display: 'block', width: '100%', height: '100%' }}
+      />
     </div>
   );
 }

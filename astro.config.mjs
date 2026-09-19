@@ -45,7 +45,6 @@ export default defineConfig({
         'react/jsx-runtime',
         'motion/react',
         'three',
-        '@react-three/fiber',
         'gsap',
         'gsap/ScrollTrigger',
         'lenis',
