@@ -1,5 +1,6 @@
 ---
-export type IconoName = 'appstore' | 'googleplay' | 'tiktok' | 'instagram' | 'facebook' | 'whatsapp';
+export type IconoName =
+  'appstore' | 'googleplay' | 'tiktok' | 'instagram' | 'facebook' | 'whatsapp';
 
 interface Props {
   name: IconoName;
@@ -23,26 +24,36 @@ const PATHS: Record<IconoName, string> = {
 };
 
 /**
- * Google Play va a CUATRO colores, que es como se reconoce el logo. En un solo
- * trazo gris se lee como un triángulo con una muesca y nadie lo identifica.
- *
- * Son cuatro caras del mismo sólido, no cuatro formas sueltas: el orden importa
- * porque comparten aristas y dibujarlas al revés deja costuras a la vista.
- */
+   * Google Play va a CUATRO colores, que es como se reconoce el logo. En un solo
+   * trazo gris se lee como un triángulo con una muesca y nadie lo identifica.
+   *
+   * Son cuatro caras del mismo sólido, no cuatro formas sueltas: el orden importa
+   * porque comparten aristas y dibujarlas al revés deja costuras a la vista.
+   */
 const GOOGLE_PLAY = [
-  { d: 'M1.784 2.635c-.03.13-.048.27-.048.415v17.9c0 .145.018.285.048.415L10.897 12 1.784 2.635z', fill: '#34a853' },
-  { d: 'M17.35 6.174L4.412 1.05c-.877-.351-1.797.052-2.19.822l7.25 7.212L17.35 6.174z', fill: '#4285f4' },
-  { d: 'M22.018 13.298c1.302-.736 1.302-2.858 0-3.594l-3.891-2.202-3.543 3.521 3.515 3.493 3.919-2.218z', fill: '#fbbc04' },
-  { d: 'M17.35 17.826l-7.878-2.91-7.25 7.212c.393.77 1.313 1.173 2.19.822l12.938-5.124z', fill: '#ea4335' },
+  {
+    d: 'M1.784 2.635c-.03.13-.048.27-.048.415v17.9c0 .145.018.285.048.415L10.897 12 1.784 2.635z',
+    fill: '#34a853',
+  },
+  {
+    d: 'M17.35 6.174L4.412 1.05c-.877-.351-1.797.052-2.19.822l7.25 7.212L17.35 6.174z',
+    fill: '#4285f4',
+  },
+  {
+    d: 'M22.018 13.298c1.302-.736 1.302-2.858 0-3.594l-3.891-2.202-3.543 3.521 3.515 3.493 3.919-2.218z',
+    fill: '#fbbc04',
+  },
+  {
+    d: 'M17.35 17.826l-7.878-2.91-7.25 7.212c.393.77 1.313 1.173 2.19.822l12.938-5.124z',
+    fill: '#ea4335',
+  },
 ];
 ---
 
 <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-  {
-    name === 'googleplay' ? (
-      GOOGLE_PLAY.map((cara) => <path d={cara.d} fill={cara.fill} />)
-    ) : (
-      <path d={PATHS[name]} />
-    )
-  }
+  {name === 'googleplay' ? (
+    GOOGLE_PLAY.map((cara) => <path d={cara.d} fill={cara.fill} />)
+  ) : (
+    <path d={PATHS[name]} />
+  )}
 </svg>

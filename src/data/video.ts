@@ -33,23 +33,23 @@ export interface VideoApp {
   readonly portada: string | null;
   /** El rótulo chico de arriba. */
   readonly rotulo: string;
+  /** La píldora dentro del recuadro, una vez que llena la pantalla. */
+  readonly aviso: string;
   /** Descripción para quien no puede ver el video. */
   readonly descripcion: string;
 }
 
 export const VIDEO: VideoApp = {
+  // Apagada mientras se hace la pieza en Remotion. Los archivos de prueba
+  // siguen en `public/video/` (`prueba.mp4`, `prueba-portada.jpg`).
   archivo: null,
-  // Apagada hasta que exista la pieza de Remotion.
-  //
-  // Se probó con una captura del teléfono de relleno y NO funciona: el marco es
-  // apaisado y una pantalla vertical adentro deja dos franjas negras enormes
-  // con una tirita en el medio. Ningún ajuste de tamaño arregla eso — hace
-  // falta material 16:9 de verdad.
   portada: null,
   // Misma estructura que la referencia: acción, raya, y de qué se trata.
   // No dice "grabación de la app" porque el video va a ser una pieza
   // promocional hecha en Remotion, no una captura de pantalla.
   rotulo: 'Mirá el video — todo lo que trae Kodi',
-  descripcion:
-    'Video de Kodi: los exámenes que cubre, cómo se practica y cómo se compite.',
+  // Se lee dentro del recuadro negro, así que va en voseo y corto: la píldora
+  // mide menos de 140 px y el texto va en versalitas.
+  aviso: 'Seguí bajando',
+  descripcion: 'Video de Kodi: los exámenes que cubre, cómo se practica y cómo se compite.',
 };

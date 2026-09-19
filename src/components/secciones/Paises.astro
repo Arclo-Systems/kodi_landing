@@ -1,0 +1,116 @@
+---
+import Paises from '../islas/Paises';
+import { COPY } from '../../data/copy';
+
+// La sección de "integraciones" de la referencia, con los países del plan de
+// lanzamiento en vez de apps: dos filas de chips que se desplazan con el
+// scroll en sentidos opuestos. Los países salen de `data/paises.ts`, que es
+// copia de la tabla `country_rollouts` de producción.
+const { paises } = COPY;
+---
+
+<section class="paises" id="paises">
+  <div class="paises__cabeza">
+    <h2 class="paises__titular titular-seccion">{paises.titular}</h2>
+    <p class="paises__bajada">{paises.bajada}</p>
+  </div>
+
+  <Paises client:visible disponible={paises.disponible} pronto={paises.pronto} />
+</section>
+
+<style>
+  .paises {
+    padding-bottom: var(--aire-seccion);
+    scroll-margin-top: calc(var(--alto-cabecera) + var(--respiro-ancla));
+  }
+
+  .paises__cabeza {
+    display: flex;
+    max-width: 42rem;
+    flex-direction: column;
+    align-items: center;
+    margin-inline: auto;
+    padding-inline: 20px;
+    text-align: center;
+  }
+
+  .paises__bajada {
+    max-width: 36rem;
+    margin-top: 20px;
+    color: var(--tinta-suave);
+    font-size: 1rem;
+    line-height: 1.625;
+  }
+</style>
+
+<style is:global>
+  /* Global porque lo dibuja la isla de React, que no lleva el atributo de
+     alcance de este archivo. Prefijo propio para no cruzarse con nada. */
+
+  /* Las filas van de canto a canto y recortan lo que se sale por los lados:
+     las pistas miden más que la pantalla y además se desplazan. */
+  .paises-filas {
+    display: flex;
+    flex-direction: column;
+    margin-top: 56px;
+    overflow: hidden;
+    gap: 12px;
+  }
+
+  .paises-fila {
+    display: flex;
+    justify-content: center;
+  }
+
+  .paises-pista {
+    display: flex;
+    width: max-content;
+    gap: 12px;
+  }
+
+  .paises-copia {
+    display: contents;
+  }
+
+  /* Píldora de la referencia: 50 de alto, más aire a la derecha que a la
+     izquierda porque el rótulo pesa menos que la insignia. */
+  .paises-chip {
+    display: flex;
+    flex: none;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 20px 14px 16px;
+    border: 1px solid var(--borde);
+    border-radius: 9999px;
+    background: var(--tarjeta);
+    white-space: nowrap;
+  }
+
+  /* Bandera redonda de 20, con un filo del borde para que las claras (Perú,
+     Honduras) no se fundan con la tarjeta. */
+  .paises-chip__bandera {
+    width: 20px;
+    height: 20px;
+    flex: none;
+    border-radius: 50%;
+    box-shadow: 0 0 0 1px var(--borde);
+  }
+
+  .paises-chip__nombre {
+    color: var(--tinta);
+    font-size: 0.875rem;
+    font-weight: 500;
+  }
+
+  .paises-chip__rotulo {
+    color: var(--tinta-suave);
+    font-size: 0.75rem;
+  }
+
+  /* El único país vivo lleva el estado en lima, igual que el "Live" del
+     panel. */
+  .paises-chip--live .paises-chip__rotulo {
+    color: var(--lima-texto);
+    font-weight: 500;
+  }
+</style>

@@ -21,11 +21,15 @@ describe('diasRestantes', () => {
   });
 
   it('da 0 el mismo día del examen', () => {
-    expect(diasRestantes('2026-10-03T07:00:00-06:00', new Date('2026-10-03T05:00:00-06:00'))).toBe(0);
+    expect(diasRestantes('2026-10-03T07:00:00-06:00', new Date('2026-10-03T05:00:00-06:00'))).toBe(
+      0,
+    );
   });
 
   it('da negativo cuando el examen ya pasó', () => {
-    expect(diasRestantes('2026-09-01T07:00:00-06:00', new Date('2026-09-15T12:00:00-06:00'))).toBe(-14);
+    expect(diasRestantes('2026-09-01T07:00:00-06:00', new Date('2026-09-15T12:00:00-06:00'))).toBe(
+      -14,
+    );
   });
 });
 

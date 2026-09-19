@@ -1,0 +1,1901 @@
+/**
+ * Las seis pantallas de la app, dentro del teléfono de la sección de pasos.
+ *
+ * Se dibujan a 390 px de ancho, que es el ancho lógico de un teléfono, y se
+ * encogen con una escala para entrar en el marco. Por eso TODAS las medidas de
+ * este archivo son las del código de la app, copiadas sin recalcular: 14 px
+ * acá es 14 px allá. Si el marco cambia de tamaño, cambia la escala y nada más.
+ *
+ * Las fuentes también son las de la app: Poppins para todo y Fredoka para el
+ * número de racha y el marcador de Partida Kodi. NO son las de la landing
+ * (Geist y Nunito): adentro del teléfono manda la app.
+ *
+ * Los colores salen de las variables `--app-*`, que declara `Pasos.astro` a
+ * partir del tema de la app y siguen el modo claro u oscuro de la página.
+ */
+
+/* Solo los pesos que las pantallas usan de verdad, y solo el subconjunto
+   latino: cada peso extra es una descarga más. */
+@import '@fontsource/poppins/latin-400.css';
+@import '@fontsource/poppins/latin-500.css';
+@import '@fontsource/poppins/latin-600.css';
+@import '@fontsource/poppins/latin-700.css';
+@import '@fontsource-variable/fredoka/index.css';
+
+.ap {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 390px;
+  height: 823px;
+  padding: 44px 20px 0;
+  background: var(--app-fondo);
+  color: var(--app-texto);
+  font-family: var(--app-fuente);
+  transform: scale(var(--escala, 0.728));
+  transform-origin: top left;
+}
+
+/* ── Piezas compartidas ───────────────────────────────────────────────── */
+.ap-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  /* La barra tiene su propio margen lateral (16), más angosto que el de la
+     pantalla (20): por eso se sale con margen negativo. */
+  margin-inline: -20px;
+  padding: 8px 16px 12px;
+}
+
+/* Los chips se reparten el espacio libre y quedan centrados en él. */
+.ap-chips {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.ap-chip {
+  display: inline-flex;
+  height: 34px;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px;
+  border: 1.5px solid var(--app-borde-2);
+  border-radius: 9999px;
+  background: var(--app-elevado);
+  color: var(--app-texto);
+}
+
+/* El de Kolones se distingue por el borde dorado, no por el relleno. */
+.ap-chip--kolones {
+  border-color: var(--app-dorado);
+}
+
+.ap-chip__insignia {
+  width: 26px;
+  height: 26px;
+  object-fit: contain;
+}
+
+.ap-chip__moneda {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+}
+
+.ap-chip__liga {
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 22px;
+  letter-spacing: 0.2px;
+}
+
+.ap-chip__punto {
+  width: 3px;
+  height: 3px;
+  border-radius: 1.5px;
+  background: var(--app-texto-3);
+  opacity: 0.6;
+}
+
+.ap-chip__cifra {
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 22px;
+}
+
+.ap-acciones {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.ap-accion {
+  position: relative;
+  display: flex;
+  width: 32px;
+  height: 44px;
+  align-items: center;
+  justify-content: center;
+  color: var(--app-texto-2);
+}
+
+.ap-accion--tienda {
+  color: var(--app-dorado);
+}
+
+/* El punto de aviso lleva un anillo del fondo de la pantalla: sin él se pega
+   al ícono. Coral para la tienda (novedades), teal para lo no leído. */
+.ap-accion__punto {
+  position: absolute;
+  top: 10px;
+  right: 6px;
+  width: 8px;
+  height: 8px;
+  border: 1.5px solid var(--app-fondo);
+  border-radius: 4px;
+  background: var(--app-teal);
+}
+
+/* Badge con número: fondo del color del texto y el número en el del fondo. */
+.ap-accion__cuenta {
+  position: absolute;
+  top: 4px;
+  right: -3px;
+  display: flex;
+  min-width: 16px;
+  height: 16px;
+  align-items: center;
+  justify-content: center;
+  padding-inline: 3px;
+  border: 1.5px solid var(--app-fondo);
+  border-radius: 8px;
+  background: var(--app-texto);
+  color: var(--app-fondo);
+  font-size: 9px;
+  font-weight: 700;
+}
+
+.ap-accion__punto--nuevo {
+  background: var(--app-coral);
+}
+
+/* ── Piezas compartidas ───────────────────────────────────────────────── */
+.ap-header {
+  display: flex;
+  justify-content: center;
+  padding-bottom: 12px;
+}
+
+.ap-chips {
+  display: flex;
+  gap: 6px;
+}
+
+.ap-chip {
+  display: inline-flex;
+  height: 34px;
+  align-items: center;
+  padding: 0 10px;
+  border: 1.5px solid var(--app-borde-2);
+  border-radius: 9999px;
+  background: var(--app-elevado);
+  color: var(--app-texto);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.ap-chip--kolones {
+  border-color: var(--app-dorado);
+}
+
+/* ── 1 · Hoy ──────────────────────────────────────────────────────────── */
+/* Siete columnas iguales: los discos quedan repartidos a lo ancho, no
+   apelotonados a la izquierda. */
+.ap-semana {
+  display: grid;
+  gap: 6px;
+  grid-template-columns: repeat(7, 1fr);
+}
+
+/* El día en curso: aro dibujado en SVG (punta redondeada) con el disco de la
+   superficie elevada adentro, como el CircularProgress de la app. */
+.ap-anillo {
+  position: relative;
+  display: flex;
+  width: 36px;
+  height: 36px;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  margin-inline: auto;
+}
+
+.ap-anillo svg {
+  position: absolute;
+  inset: -2px;
+  width: 40px;
+  height: 40px;
+  overflow: visible;
+}
+
+/* Relativo para que quede por encima del SVG, que va absoluto y ahora pinta
+   su propio relleno de fondo (el que mata la costura contra el anillo). */
+.ap-anillo__interior {
+  position: relative;
+  display: flex;
+  width: 31px;
+  height: 31px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--app-elevado);
+}
+
+.ap-dia__letra {
+  color: var(--app-texto);
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 18px;
+  letter-spacing: 0.2px;
+}
+
+.ap-dia {
+  display: flex;
+  width: 36px;
+  height: 36px;
+  align-items: center;
+  justify-content: center;
+  margin-inline: auto;
+  border-radius: 18px;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 18px;
+  letter-spacing: 0.2px;
+}
+
+.ap-dia--hecho {
+  background: var(--app-lima);
+  color: #fefefe;
+}
+
+/* Hoy no es un disco lleno: es un anillo de progreso. El arco lima marca lo
+   que va de la meta y el resto del aro queda en lima al 20%. El relleno de
+   adentro es la superficie elevada, con la letra en el texto del tema. */
+/* El día que todavía no llega no lleva disco: es la letra sola. */
+.ap-dia--futuro {
+  color: var(--app-texto-3);
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 16px;
+  letter-spacing: 0.4px;
+}
+
+.ap-vercal {
+  display: block;
+  margin-top: 12px;
+  color: var(--app-lima);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 16px;
+  letter-spacing: 1.4px;
+}
+
+/* El fondo sale de mezclar el color del módulo con la pizarra, que es lo que
+   hace la app. Para admisión: coral sobre #0F191E al 45 %. */
+.ap-hero {
+  position: relative;
+  overflow: hidden;
+  margin-top: 16px;
+  padding: 24px 24px 20px;
+  border-radius: 28px;
+  background: #8d4f48;
+  color: #fefefe;
+}
+
+/* 360 de lado, asomando por la esquina: -32% a la derecha y -18% abajo. */
+.ap-hero__personaje {
+  position: absolute;
+  right: -115px;
+  bottom: -65px;
+  width: 360px;
+  height: 360px;
+  opacity: 0.14;
+  object-fit: contain;
+  pointer-events: none;
+}
+
+.ap-hero > :not(.ap-hero__personaje) {
+  position: relative;
+}
+
+.ap-hero__fecha {
+  color: rgb(254 254 254 / 0.55);
+  font-size: 13px;
+  line-height: 16px;
+  letter-spacing: 0.3px;
+}
+
+/* Poppins, no Fredoka: el "Hoy." de la app va en Poppins_700Bold. */
+/* Poppins, no Fredoka: el "Hoy." de la app va en Poppins_700Bold. */
+.ap-hero__titulo {
+  margin-top: 8px;
+  font-size: 64px;
+  font-weight: 700;
+  line-height: 70px;
+  letter-spacing: -2.6px;
+}
+
+.ap-hero__punto {
+  color: var(--app-coral);
+}
+
+.ap-hero__modulo {
+  margin-top: 8px;
+  color: rgb(254 254 254 / 0.78);
+  font-size: 14px;
+  line-height: 20px;
+  letter-spacing: 0.05px;
+}
+
+/* Las dos líneas llevan 16 arriba y abajo; la de abajo, 20 antes del botón. */
+.ap-hero__linea {
+  height: 1px;
+  margin: 16px 0;
+  background: rgb(254 254 254 / 0.24);
+}
+
+.ap-hero__linea--baja {
+  margin-bottom: 20px;
+}
+
+/* Las dos columnas se reparten el ancho y las separa una línea vertical de
+   1px, no un hueco. */
+.ap-hero__stats {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.ap-hero__stats > div {
+  flex: 1;
+}
+
+.ap-hero__division {
+  width: 1px;
+  align-self: stretch;
+  background: rgb(254 254 254 / 0.24);
+}
+
+.ap-hero__rotulo {
+  color: rgb(254 254 254 / 0.55);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.8px;
+}
+
+.ap-hero__cifra {
+  display: flex;
+  align-items: baseline;
+  margin-top: 6px;
+  font-size: 38px;
+  font-weight: 700;
+  line-height: 42px;
+  letter-spacing: -1.4px;
+}
+
+.ap-hero__cifra span {
+  margin-left: 4px;
+  color: rgb(254 254 254 / 0.55);
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0;
+}
+
+.ap-hero__pie {
+  margin-top: 2px;
+  color: rgb(254 254 254 / 0.78);
+  font-size: 12px;
+  line-height: 16px;
+  letter-spacing: 0.1px;
+}
+
+/* El rótulo a la izquierda y la flecha a la derecha, no centrado. */
+.ap-hero__cta {
+  display: flex;
+  height: 56px;
+  align-items: center;
+  justify-content: space-between;
+  padding-inline: 20px;
+  border-radius: 12px;
+  background: #fefefe;
+  color: #8d4f48;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+}
+
+/* Tarjeta de vidrio: fondo oscuro translúcido MÁS un degradado diagonal, que
+   es lo que le da el tinte dorado o morado. Sin el degradado quedaba un gris
+   sucio que no se parece a nada de la app. */
+/* ── Tarjetas de feature (LockableFeatureCard) ────────────────────────── */
+/* El rótulo vive ARRIBA de la tarjeta, no adentro: adentro van el tema y su
+   frase. Entre el rótulo y la tarjeta hay 10. */
+.ap-feature {
+  margin-top: 16px;
+}
+
+/* La primera cuelga 20 del hero (`rutaBlock`); la siguiente, 16. */
+.ap-hero + .ap-feature {
+  margin-top: 20px;
+}
+
+.ap-feature__rotulo {
+  margin-bottom: 10px;
+  color: var(--app-texto-2);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.6px;
+}
+
+/* Las dos features son Plus, así que las dos llevan el mismo acento dorado y
+   el mismo degradado. El vidrio de abajo SÍ cambia con el tema: oscuro fijo
+   dejaba una tarjeta negra entre tarjetas claras. */
+.ap-tarjeta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  overflow: hidden;
+  padding: 12px;
+  border: 1px solid rgb(227 178 60 / 0.32);
+  border-radius: 16px;
+  background:
+    linear-gradient(135deg, rgb(227 178 60 / 0.18), rgb(244 124 107 / 0.14), rgb(64 141 153 / 0.1)),
+    rgb(255 255 255 / 0.72);
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.05);
+}
+
+:root[data-tema='oscuro'] .ap-tarjeta {
+  background:
+    linear-gradient(135deg, rgb(227 178 60 / 0.18), rgb(244 124 107 / 0.14), rgb(64 141 153 / 0.1)),
+    rgb(20 31 37 / 0.6);
+}
+
+/* Pro: el acento pasa a morado, en la tarjeta y en el disco del ícono. */
+.ap-tarjeta--pro {
+  border-color: rgb(183 154 232 / 0.32);
+  background:
+    linear-gradient(135deg, rgb(183 154 232 / 0.2), rgb(93 183 232 / 0.15), rgb(64 141 153 / 0.1)),
+    rgb(255 255 255 / 0.72);
+}
+
+:root[data-tema='oscuro'] .ap-tarjeta--pro {
+  background:
+    linear-gradient(135deg, rgb(183 154 232 / 0.2), rgb(93 183 232 / 0.15), rgb(64 141 153 / 0.1)),
+    rgb(20 31 37 / 0.6);
+}
+
+.ap-tarjeta--pro .ap-tarjeta__circulo {
+  border-color: rgb(183 154 232 / 0.4);
+  background: rgb(183 154 232 / 0.16);
+  color: #b79ae8;
+}
+
+.ap-tarjeta__circulo {
+  display: flex;
+  width: 44px;
+  height: 44px;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgb(227 178 60 / 0.4);
+  border-radius: 22px;
+  background: rgb(227 178 60 / 0.16);
+  color: var(--app-dorado);
+}
+
+.ap-tarjeta__stack {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+/* Sobre el vidrio el texto no es blanco fijo: en claro es el texto del tema. */
+.ap-tarjeta__titulo {
+  overflow: hidden;
+  color: var(--app-sobre-vidrio);
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 18px;
+  letter-spacing: -0.2px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ap-tarjeta__sub {
+  color: color-mix(in srgb, var(--app-sobre-vidrio) 70%, transparent);
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 14px;
+  letter-spacing: 0.1px;
+}
+
+/* Desbloqueada: la flecha va SUELTA, sin círculo. El círculo con candado solo
+   aparece cuando la tarjeta está bloqueada. */
+.ap-tarjeta__flecha {
+  flex: none;
+  margin-left: auto;
+  color: color-mix(in srgb, var(--app-sobre-vidrio) 70%, transparent);
+}
+
+/* ── 2 · El error ─────────────────────────────────────────────────────── */
+.ap--error {
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 0;
+}
+
+.ap-err-header {
+  display: flex;
+  justify-content: space-between;
+  padding-bottom: 12px;
+  color: var(--app-texto-2);
+  font-size: 18px;
+}
+
+.ap-err-marcas {
+  display: flex;
+  gap: 12px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.ap-err-marcas span {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.ap-err-ok {
+  color: var(--app-lima);
+}
+
+.ap-err-mal {
+  color: var(--app-coral);
+}
+
+/* El acento de la pizarra es el color de identidad de la MATERIA, no el de la
+   marca: sale de `subjects.colorHex` en el panel. Normas de Circulación va en
+   #7C9CC4. Tiñe el borde (al 30%), el rótulo y la línea de tiza. */
+.ap-pizarra {
+  --materia: #7c9cc4;
+  padding: 24px 20px;
+  border: 1.5px solid color-mix(in srgb, var(--materia) 30%, transparent);
+  border-bottom-width: 3px;
+  border-radius: 20px;
+  background: var(--app-tarjeta);
+}
+
+/* En oscuro la pizarra no es la tarjeta del tema: es el slate del enunciado. */
+:root[data-tema='oscuro'] .ap-pizarra {
+  background: #0f191e;
+}
+
+.ap-pizarra__materia {
+  color: var(--materia);
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 16px;
+  letter-spacing: 1.4px;
+}
+
+/* 8 bajo el rótulo (van juntos como una unidad) y 16 hasta el enunciado. */
+.ap-pizarra__tiza {
+  display: block;
+  width: 40px;
+  height: 2px;
+  margin: 8px 0 16px;
+  border-radius: 9999px;
+  background: var(--materia);
+  opacity: 0.85;
+}
+
+.ap-pizarra__texto {
+  color: var(--app-texto);
+  font-size: 18px;
+  line-height: 26px;
+}
+
+:root[data-tema='oscuro'] .ap-pizarra__texto {
+  color: #edf2f4;
+}
+
+.ap-opciones {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.ap-opcion {
+  display: flex;
+  min-height: 56px;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  border: 1.5px solid var(--app-borde);
+  border-radius: 16px;
+  background: var(--app-tarjeta);
+}
+
+/* Elegida, NO incorrecta: en práctica la opción solo refleja la selección, y
+   el veredicto vive en el panel de abajo. */
+.ap-opcion--elegida {
+  border-color: var(--app-teal);
+  background: rgb(64 141 153 / 0.06);
+}
+
+.ap-opcion__letra {
+  width: 16px;
+  color: var(--app-texto-3);
+  text-align: center;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.ap-opcion--elegida .ap-opcion__letra {
+  color: var(--app-marca);
+}
+
+.ap-opcion__texto {
+  font-size: 15px;
+}
+
+/* El panel vive pegado al borde de abajo, como el bottom sheet de la app: lo
+   que sobra de alto queda arriba, no debajo del botón. */
+.ap-panel {
+  margin: 24px -20px 0;
+  margin-top: auto;
+  padding: 16px 20px 20px;
+  border-top: 1px solid var(--app-borde);
+  border-radius: 24px 24px 0 0;
+  background: var(--app-elevado);
+}
+
+.ap-panel__titulo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  color: var(--app-coral);
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 26px;
+}
+
+.ap-panel__titulo > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Reportar la pregunta. Sobre fondo claro el coral no pasa AA, así que ahí va
+   el coral oscuro. */
+.ap-panel__reportar {
+  flex: none;
+  color: #b34734;
+}
+
+:root[data-tema='oscuro'] .ap-panel__reportar {
+  color: var(--app-coral);
+}
+
+.ap-panel__icono {
+  display: flex;
+  width: 24px;
+  height: 24px;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid currentcolor;
+  border-radius: 12px;
+  font-size: 12px;
+}
+
+.ap-panel__rotulo {
+  margin-top: 12px;
+  color: var(--app-coral);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.ap-panel__rotulo--gris {
+  color: var(--app-texto-3);
+}
+
+.ap-panel__correcta {
+  color: var(--app-coral);
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.ap-panel__texto {
+  font-size: 15px;
+  line-height: 22px;
+}
+
+.ap-panel__botones {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.ap-boton {
+  display: flex;
+  height: 56px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  font-size: 16px;
+}
+
+.ap-boton--linea {
+  border: 1px solid var(--app-coral);
+  color: var(--app-coral);
+  font-weight: 500;
+}
+
+.ap-boton--lleno {
+  background: var(--app-coral);
+  color: #fefefe;
+  font-weight: 600;
+}
+
+/* ── 3 · Partida Kodi ─────────────────────────────────────────────────── */
+.ap--partida {
+  padding: 0;
+}
+
+.ap-pk-escena {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top;
+}
+
+/* Velo del color del tema sobre la escena: 0.82 en claro, 0.93 en oscuro. */
+.ap-pk-velo {
+  position: absolute;
+  inset: 0;
+  background: rgb(239 241 243 / 0.82);
+}
+
+:root[data-tema='oscuro'] .ap-pk-velo {
+  background: rgb(20 31 37 / 0.93);
+}
+
+.ap-pk-header {
+  position: relative;
+  padding: 56px 20px 12px;
+  color: var(--app-texto);
+}
+
+.ap-pk-contenido {
+  position: relative;
+  display: flex;
+  height: calc(100% - 112px);
+  flex-direction: column;
+  padding-inline: 20px;
+  gap: 16px;
+}
+
+.ap-pk-marcador {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.ap-pk-lado {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+/* El aro es blanco y de 4: la identidad la da la propia foto, no un color. */
+.ap-pk-aro {
+  display: block;
+  padding: 4px;
+  border-radius: 46px;
+  background: #fefefe;
+  box-shadow: 0 4px 10px -3px rgb(66 38 34 / 0.35);
+}
+
+.ap-pk-aro img {
+  display: block;
+  width: 84px;
+  height: 84px;
+  border-radius: 42px;
+  object-fit: cover;
+}
+
+/* En Fredoka, no en Poppins: los hombros redondos acuerdan con el círculo de
+   la foto y con los números del tanteo. */
+.ap-pk-nombre {
+  align-self: stretch;
+  overflow: hidden;
+  color: var(--app-texto-2);
+  font-family: var(--app-display);
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 20px;
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* El conteo se centra contra los avatares, no contra los nombres. */
+.ap-pk-tanteo {
+  display: flex;
+  height: 92px;
+  align-items: center;
+}
+
+.ap-pk-pastilla {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  overflow: hidden;
+  padding: 8px 20px;
+  border: 1px solid color-mix(in srgb, var(--app-texto) 12%, transparent);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--app-tarjeta) 62%, transparent);
+  backdrop-filter: blur(12px);
+}
+
+.ap-pk-num {
+  font-family: var(--app-display);
+  font-size: 34px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  line-height: 38px;
+}
+
+.ap-pk-num--yo {
+  color: var(--app-teal);
+}
+
+.ap-pk-num--rival {
+  color: var(--app-coral);
+}
+
+.ap-pk-vs {
+  color: var(--app-texto-3);
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.ap-pk-zona {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding-bottom: 56px;
+  gap: 16px;
+}
+
+/* Sin este rótulo la ruleta apagada se lee como un botón roto. */
+.ap-pk-turno {
+  color: var(--app-texto-2);
+  font-size: 15px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.ap-pk-ruleta {
+  position: relative;
+}
+
+.ap-pk-arte {
+  position: absolute;
+  object-fit: contain;
+}
+
+/* Aro blanco por encima del borde de los sectores, con un filo gris a cada
+   lado: el blanco solo se funde con los fondos claros del escenario. */
+.ap-pk-anillo {
+  position: absolute;
+  inset: 0;
+  border: solid #fefefe;
+  border-radius: 50%;
+}
+
+.ap-pk-filo {
+  position: absolute;
+  inset: 0;
+  border: 1px solid #dde1e4;
+  border-radius: 50%;
+}
+
+.ap-pk-girar {
+  position: absolute;
+}
+
+/* En la app el pie suma el inset de la zona segura del teléfono (home
+   indicator) a sus 8 de aire. Acá no hay inset, así que se reserva uno
+   equivalente para que el botón no quede pegado al canto de la pantalla. */
+.ap-pk-pie {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+  padding-bottom: 16px;
+}
+
+/* Contorno hueco continuo con los divisores cruzándolo; solo se rellena de
+   dorado lo ya ganado. En claro el contorno es blanco con un filo café por
+   fuera, porque sobre el escenario velado el blanco solo se perdería. */
+.ap-pk-barra {
+  position: absolute;
+  bottom: 33px;
+  /* 48 del botón + 20 de aire, a CADA lado: simétrico para que el centro de la
+     barra sea el de la pantalla, y con la distancia al botón que evita que se
+     toquen. */
+  left: 68px;
+  right: 68px;
+  height: 18px;
+  overflow: hidden;
+  border: 2px solid #fefefe;
+  border-radius: 9999px;
+  box-shadow: 0 0 0 1.5px rgb(66 38 34 / 0.2);
+}
+
+:root[data-tema='oscuro'] .ap-pk-barra {
+  border-color: var(--app-borde-2);
+  box-shadow: 0 0 0 1.5px rgb(254 254 254 / 0.07);
+}
+
+.ap-pk-barra__lleno {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  background: var(--app-dorado);
+}
+
+.ap-pk-barra__div {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  margin-left: -1px;
+  background: #fefefe;
+}
+
+:root[data-tema='oscuro'] .ap-pk-barra__div {
+  background: var(--app-borde-2);
+}
+
+/* Cuadrado con canto: relleno teal, bandera blanca inclinada. */
+.ap-pk-reportar {
+  position: relative;
+  display: flex;
+  width: 48px;
+  height: 48px;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid #356f78;
+  border-radius: 12px;
+  background: var(--app-teal);
+  box-shadow: 0 4px 0 #356f78;
+  color: #fefefe;
+}
+
+.ap-pk-reportar svg {
+  rotate: -12deg;
+}
+
+/* ── 4 · La liga ──────────────────────────────────────────────────────── */
+.ap--liga {
+  padding-inline: 0;
+}
+
+.ap-lg-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 20px 12px;
+}
+
+.ap-lg-insignia {
+  width: 52px;
+  height: 52px;
+  flex: none;
+  object-fit: contain;
+}
+
+.ap-lg-identidad {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.ap-lg-tier {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--app-texto);
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+}
+
+/* El acento del desplegable es el teal de texto del tema, no el puro. */
+.ap-lg-tier svg {
+  color: var(--app-marca);
+}
+
+.ap-lg-tiempo {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--app-texto-2);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: -0.1px;
+}
+
+.ap-lg-tiempo svg {
+  color: var(--app-texto-3);
+}
+
+.ap-lg-accion {
+  display: flex;
+  width: 44px;
+  height: 44px;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  color: var(--app-texto);
+}
+
+.ap-lg-tabs {
+  display: flex;
+}
+
+.ap-lg-tab {
+  flex: 1;
+  padding: 12px 0;
+  color: var(--app-texto-3);
+  font-size: 16px;
+  text-align: center;
+}
+
+/* Subrayado teal de 3, no pastilla. */
+.ap-lg-tab--activa {
+  border-bottom: 3px solid var(--app-teal);
+  color: var(--app-texto);
+}
+
+.ap-lg-columnas {
+  display: flex;
+  justify-content: space-between;
+  padding: 12px 20px;
+  border-bottom: 1px solid var(--app-borde);
+  color: var(--app-texto-3);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.4px;
+}
+
+/* Vivo sobre fondo oscuro; tono profundo sobre fondo claro, por contraste. */
+.ap-lg-zona {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 20px;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+}
+
+.ap-lg-zona--sube {
+  color: #5f8f33;
+}
+
+.ap-lg-zona--baja {
+  color: #b34734;
+}
+
+:root[data-tema='oscuro'] .ap-lg-zona--sube {
+  color: var(--app-lima);
+}
+
+:root[data-tema='oscuro'] .ap-lg-zona--baja {
+  color: var(--app-coral);
+}
+
+.ap-lg-fila {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 20px;
+}
+
+/* Mi fila: el mismo realce teal del ranking por modo. Sube el alfa en oscuro
+   porque el tinte rinde menos ahí. */
+.ap-lg-fila--yo {
+  background: rgb(64 141 153 / 0.1);
+}
+
+:root[data-tema='oscuro'] .ap-lg-fila--yo {
+  background: rgb(64 141 153 / 0.2);
+}
+
+.ap-lg-puesto {
+  display: flex;
+  width: 30px;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+}
+
+.ap-lg-keycap {
+  display: flex;
+  width: 28px;
+  height: 28px;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid var(--app-borde-2);
+  border-radius: 8px;
+  background: var(--app-campo);
+  color: var(--app-texto-2);
+  font-size: 12px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Facetado del podio: la mitad inferior-derecha en el color del aro al 22%.
+   La luz se infiere de dos tonos del mismo tono, no se pinta con blanco. */
+.ap-lg-keycap--podio {
+  position: relative;
+  overflow: hidden;
+}
+
+.ap-lg-keycap--podio::before {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom left,
+    color-mix(in srgb, var(--faceta) 22%, transparent) 0 50%,
+    transparent 50% 100%
+  );
+  content: '';
+}
+
+.ap-lg-cara {
+  display: flex;
+  width: 36px;
+  height: 36px;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  border-radius: 18px;
+  object-fit: cover;
+}
+
+.ap-lg-cara--inicial {
+  color: #fefefe;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.ap-lg-nombre {
+  flex: 1;
+  overflow: hidden;
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: -0.1px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ap-lg-fila--yo .ap-lg-nombre {
+  font-weight: 700;
+}
+
+/* El EXP habla teal —el dorado quedó para rachas y logros— y el número, no. */
+.ap-lg-exp {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: -0.1px;
+}
+
+.ap-lg-exp b {
+  color: var(--app-marca);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: -0.6px;
+}
+
+/* Arranca donde arranca el nombre, no en el borde: 20 + 30 + 12. */
+.ap-lg-divisor {
+  display: block;
+  height: 0.5px;
+  margin-left: 62px;
+  background: var(--app-borde);
+}
+
+/* ── 5 · La racha ─────────────────────────────────────────────────────── */
+.ap--racha {
+  padding-inline: 0;
+}
+
+.ap-rc-header {
+  display: flex;
+  min-height: 44px;
+  align-items: center;
+  padding-inline: 16px;
+}
+
+.ap-rc-hbtn {
+  display: flex;
+  width: 44px;
+  height: 44px;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  color: var(--app-texto);
+}
+
+.ap-rc-hbtn--info {
+  color: var(--app-texto-3);
+}
+
+.ap-rc-titulo {
+  flex: 1;
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 22px;
+  letter-spacing: 0.5px;
+  text-align: center;
+}
+
+/* Pestañas a ancho completo, con la línea del borde abajo y el subrayado teal
+   encima. El rótulo va en versalitas de 13 con 1 de espaciado. */
+.ap-rc-tabs {
+  display: flex;
+  border-bottom: 1px solid var(--app-borde);
+}
+
+.ap-rc-tab {
+  flex: 1;
+  padding: 12px 0;
+  color: var(--app-texto-3);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-align: center;
+}
+
+.ap-rc-tab--activa {
+  margin-bottom: -1px;
+  border-bottom: 3px solid var(--app-teal);
+  color: var(--app-teal);
+}
+
+.ap-rc-cuerpo {
+  padding: 20px 20px 32px;
+}
+
+.ap-rc-hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-top: 10px;
+  gap: 4px;
+}
+
+/* El número va en Fredoka 600 lima con una silueta sellada en lima oscuro
+   detrás. Dos copias: la de atrás lleva el contorno de 13 y la de adelante el
+   relleno, así los ojos del número muestran el verde oscuro y nunca el fondo. */
+.ap-rc-numero {
+  position: relative;
+  display: inline-block;
+  font-family: var(--app-display);
+  font-size: 76px;
+  font-weight: 600;
+  line-height: 88px;
+}
+
+.ap-rc-numero__borde {
+  position: absolute;
+  inset: 0;
+  color: #4b742b;
+  -webkit-text-stroke: 13px #4b742b;
+}
+
+.ap-rc-numero__cara {
+  position: relative;
+  color: var(--app-lima);
+}
+
+.ap-rc-pie {
+  color: var(--app-texto-3);
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 20px;
+}
+
+.ap-rc-pills {
+  display: flex;
+  align-items: stretch;
+  margin-bottom: 16px;
+  gap: 12px;
+}
+
+.ap-rc-pill {
+  flex: 1;
+  padding: 10px 14px;
+  border: 1.5px solid var(--app-borde);
+  border-radius: 16px;
+}
+
+.ap-rc-pill__alto {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ap-rc-pill__dato {
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 22px;
+}
+
+/* Solo la meta se toca, así que solo ella lleva el chevron, y pegado al borde. */
+.ap-rc-pill__chevron {
+  margin-left: auto;
+  color: var(--app-texto-3);
+}
+
+/* Sangrado al ancho del ícono: la etiqueta cuelga del dato, no del borde. */
+.ap-rc-pill__rotulo {
+  margin-top: 2px;
+  margin-left: 8px;
+  overflow: hidden;
+  color: var(--app-texto-3);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 16px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ap-rc-cal {
+  margin-bottom: 16px;
+  padding: 12px;
+  border: 1px solid var(--app-borde);
+  border-radius: 20px;
+}
+
+.ap-rc-cal__cabeza {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  padding-block: 8px;
+}
+
+.ap-rc-cal__nav {
+  display: flex;
+  width: 44px;
+  height: 44px;
+  align-items: center;
+  justify-content: center;
+  color: var(--app-texto);
+}
+
+.ap-rc-mes {
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 22px;
+  letter-spacing: -0.2px;
+}
+
+.ap-rc-cabecera {
+  display: grid;
+  margin-bottom: 8px;
+  grid-template-columns: repeat(7, 1fr);
+  color: var(--app-texto-3);
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 14px;
+  letter-spacing: 1.2px;
+  text-align: center;
+}
+
+.ap-rc-grilla {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+}
+
+.ap-rc-grilla .ap-anillo {
+  margin-block: 4px;
+}
+
+/* Los mismos discos de la semana del hub: el calendario reusa `StreakDay`. */
+.ap-rc-dia {
+  display: flex;
+  width: 36px;
+  height: 36px;
+  align-items: center;
+  justify-content: center;
+  margin: 4px auto;
+  border-radius: 18px;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 18px;
+  letter-spacing: 0.2px;
+}
+
+.ap-rc-dia--hecho {
+  background: var(--app-lima);
+  color: #fefefe;
+}
+
+/* Protegido: aro cielo y la llama congelada adentro, sin número. */
+.ap-rc-dia--frio {
+  border: 1.5px solid #5db7e8;
+  background: rgb(93 183 232 / 0.13);
+}
+
+/* El día del examen lleva el anillo del color de SU examen, a medio camino. */
+/* Fuera de la semana en curso no hay dato: el día va sin disco, solo su
+   número, en el tono más suave. */
+.ap-rc-dia--futuro {
+  color: var(--app-texto-3);
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 16px;
+  letter-spacing: 0.4px;
+}
+
+.ap-rc-examenes {
+  margin-bottom: 12px;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 22px;
+  letter-spacing: -0.2px;
+}
+
+.ap-rc-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Fondo y borde del color del examen, al 8% y al 25%. */
+.ap-rc-examen {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border: 1px solid rgb(59 130 246 / 0.25);
+  border-radius: 16px;
+  background: rgb(59 130 246 / 0.08);
+  color: var(--app-texto-3);
+}
+
+.ap-rc-examen__disco {
+  display: flex;
+  width: 36px;
+  height: 36px;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  border-radius: 18px;
+  background: rgb(59 130 246 / 0.15);
+  /* En claro el azul puro no pasa AA: el ícono va en la variante profunda. */
+  color: #2b579f;
+}
+
+:root[data-tema='oscuro'] .ap-rc-examen__disco {
+  color: #3b82f6;
+}
+
+.ap-rc-examen__texto {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.ap-rc-examen__nombre {
+  color: var(--app-texto);
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 18px;
+  letter-spacing: -0.2px;
+}
+
+.ap-rc-examen__meta {
+  color: var(--app-texto-3);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 16px;
+  letter-spacing: 0.1px;
+}
+
+/* ── 6 · Los cupones ──────────────────────────────────────────────────── */
+.ap--benef {
+  padding-inline: 0;
+}
+
+.ap--benef .ap-header {
+  margin-inline: 0;
+}
+
+/* ── El destacado ─────────────────────────────────────────────────────── */
+.ap-bf-destacado {
+  position: relative;
+  height: 220px;
+  margin: 12px 20px 0;
+  overflow: hidden;
+  border-radius: 24px;
+}
+
+.ap-bf-destacado__portada {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-end;
+}
+
+.ap-bf-destacado__inicial {
+  position: absolute;
+  top: -56px;
+  right: -40px;
+  color: #fefefe;
+  font-size: 260px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -10px;
+  opacity: 0.13;
+}
+
+/* Arranca al 35% del alto: el titular de abajo necesita base oscura, la
+   portada de arriba no. */
+.ap-bf-destacado__velo {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, rgb(0 0 0 / 0) 35%, rgb(0 0 0 / 0.62) 100%);
+}
+
+.ap-bf-destacado__contenido {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 16px;
+  color: #fefefe;
+}
+
+.ap-bf-destacado__pastilla {
+  align-self: flex-start;
+  padding: 5px 10px;
+  border: 1px solid rgb(255 255 255 / 0.3);
+  border-radius: 9999px;
+  background: rgb(255 255 255 / 0.22);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+}
+
+.ap-bf-destacado__marca {
+  color: rgb(255 255 255 / 0.78);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 1.2px;
+}
+
+.ap-bf-destacado__beneficio {
+  margin-top: 2px;
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 26px;
+  letter-spacing: -0.6px;
+}
+
+.ap-bf-destacado__linea {
+  display: block;
+  height: 0.5px;
+  margin: 12px 0 10px;
+  background: rgb(255 255 255 / 0.28);
+}
+
+.ap-bf-destacado__pie {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.ap-bf-destacado__precio {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 19px;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+}
+
+/* El botón es de contorno, no relleno: sobre la portada un botón sólido tapa
+   el arte. */
+.ap-bf-destacado__cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border: 1px solid rgb(255 255 255 / 0.45);
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.4px;
+}
+
+/* El punto activo se alarga; los otros se quedan redondos. */
+.ap-bf-puntos {
+  display: flex;
+  justify-content: center;
+  margin-top: 10px;
+  gap: 6px;
+}
+
+.ap-bf-punto {
+  display: block;
+  width: 6px;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--app-borde-2);
+}
+
+.ap-bf-punto--activo {
+  width: 20px;
+  background: var(--app-texto);
+}
+
+/* Hundido en el fondo de la pantalla, con su propio margen lateral. */
+.ap-bf-buscador {
+  display: flex;
+  height: 44px;
+  align-items: center;
+  gap: 8px;
+  margin: 16px 20px 0;
+  padding-inline: 12px;
+  border: 1px solid var(--app-borde);
+  border-radius: 12px;
+  background: var(--app-campo);
+  color: var(--app-texto-3);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.ap-bf-chips {
+  display: flex;
+  margin-top: 12px;
+  padding-inline: 20px;
+  gap: 6px;
+  overflow: hidden;
+}
+
+.ap-bf-chip {
+  display: inline-flex;
+  height: 34px;
+  flex: none;
+  align-items: center;
+  padding-inline: 12px;
+  border: 1px solid var(--app-borde-2);
+  border-radius: 9999px;
+  background: var(--app-elevado);
+  color: var(--app-texto-2);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.1px;
+}
+
+/* El chip activo invierte: se rellena con el color del texto y su rótulo toma
+   el del fondo de la pantalla. */
+.ap-bf-chip--activo {
+  border-color: var(--app-texto);
+  background: var(--app-texto);
+  color: var(--app-fondo);
+}
+
+.ap-bf-rotulo {
+  margin-top: 20px;
+  margin-bottom: 12px;
+  padding-inline: 20px;
+  color: var(--app-texto-3);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.4px;
+}
+
+.ap-bf-grid {
+  display: flex;
+  flex-wrap: wrap;
+  padding-inline: 20px;
+  gap: 12px;
+}
+
+/* La forma la dibuja el SVG de adentro; la caja solo da tamaño y apila el
+   contenido encima. Alto fijo porque la silueta es un path con medidas. */
+.ap-bf-card {
+  position: relative;
+  width: 47.5%;
+  height: 255px;
+}
+
+.ap-bf-forma {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* El SVG es absoluto, así que todo lo demás de la tarjeta necesita posición
+   para pintarse encima de él: sin esto, la línea y el pie del precio quedaban
+   debajo de la silueta blanca. */
+.ap-bf-card > :not(.ap-bf-forma) {
+  position: relative;
+}
+
+.ap-bf-forma__cuerpo {
+  fill: var(--app-elevado);
+}
+
+/* El borde va por dentro de la silueta: un trazo de 2 recortado por la misma
+   forma deja exactamente 1px hacia adentro, sin asomar por fuera. */
+.ap-bf-forma__borde {
+  fill: none;
+  stroke: var(--app-borde-2);
+  stroke-width: 1;
+}
+
+/* Guiones de 4 con 3,68 de aire: veinte entre mordida y mordida. */
+.ap-bf-forma__perfo {
+  stroke: var(--app-borde-2);
+  stroke-width: 2;
+  stroke-dasharray: 4 3.68;
+}
+
+/* La portada es 5:4 y lleva la marca centrada. Ya no pinta el color: eso lo
+   hace el rect del SVG, recortado por la silueta. */
+.ap-bf-banda {
+  position: relative;
+  display: flex;
+  aspect-ratio: 5 / 4;
+  align-items: center;
+  justify-content: center;
+}
+
+.ap-bf-inicial {
+  color: #fff;
+  font-family: var(--app-display);
+  font-size: 44px;
+  font-weight: 600;
+}
+
+/* A 12 del canto: la mordida llega a 8 y a 8 le comía la esquina al badge. */
+.ap-bf-tier {
+  position: absolute;
+  bottom: 8px;
+  left: 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 6px;
+  border: 1px solid rgb(255 255 255 / 0.32);
+  border-radius: 9999px;
+  background: rgb(255 255 255 / 0.22);
+  color: #fefefe;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+}
+
+.ap-bf-tier i {
+  display: block;
+  width: 6px;
+  height: 6px;
+  border-radius: 3px;
+}
+
+.ap-bf-cuerpo {
+  padding: 12px 12px 0;
+}
+
+.ap-bf-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--app-texto-3);
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.ap-bf-marca {
+  overflow: hidden;
+  letter-spacing: 0.8px;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.ap-bf-meta__punto {
+  display: block;
+  width: 3px;
+  height: 3px;
+  flex: none;
+  border-radius: 1.5px;
+  background: currentcolor;
+  opacity: 0.6;
+}
+
+.ap-bf-stock {
+  flex: none;
+  letter-spacing: 0.4px;
+}
+
+/* Alto mínimo para que dos tarjetas vecinas con beneficios de largo distinto
+   dejen su pie a la misma altura. */
+.ap-bf-beneficio {
+  min-height: 36px;
+  margin-top: 4px;
+  color: var(--app-texto);
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 18px;
+  letter-spacing: -0.2px;
+}
+
+.ap-bf-linea {
+  display: block;
+  height: 1px;
+  margin: 10px 12px 8px;
+  background: var(--app-borde-2);
+}
+
+.ap-bf-pie {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 12px 12px;
+  color: var(--app-texto-3);
+}
+
+.ap-bf-precio {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--app-texto);
+  font-size: 16px;
+  font-weight: 700;
+}

@@ -22,7 +22,7 @@ compatibility: >
   blocks (they use v4 utility names). Node.js 18+ for the shadcn CLI.
 metadata:
   author: reactbits
-  version: "3.1"
+  version: '3.1'
 ---
 
 # React Bits Pro Integration
@@ -184,13 +184,13 @@ Items are written into the codebase as editable source files. They are **not** n
 **Marketing blocks vs App UI blocks.** Both are Pro, both install to the same directory,
 and both are full sections rather than primitives. The difference is what they are _for_:
 
-|             | Marketing block                        | App UI block                                       |
-| ----------- | -------------------------------------- | -------------------------------------------------- |
-| Purpose     | Public landing/marketing page          | Signed-in product interface                        |
-| Examples    | hero, pricing, FAQ, testimonials       | app shell, sidebar, data table, dashboard, AI chat |
-| Root height | Heroes may fill the viewport; content sections use `--rb-section-min-h`; Bento tiles fill grid cells | `h-full min-h-[Npx]` (fills its container) |
-| Density     | Generous, large type                   | Dense, `text-[13px]` body scale                    |
-| Exports     | **Mixed**: always verify               | **Always `export default`**                        |
+|             | Marketing block                                                                                      | App UI block                                       |
+| ----------- | ---------------------------------------------------------------------------------------------------- | -------------------------------------------------- |
+| Purpose     | Public landing/marketing page                                                                        | Signed-in product interface                        |
+| Examples    | hero, pricing, FAQ, testimonials                                                                     | app shell, sidebar, data table, dashboard, AI chat |
+| Root height | Heroes may fill the viewport; content sections use `--rb-section-min-h`; Bento tiles fill grid cells | `h-full min-h-[Npx]` (fills its container)         |
+| Density     | Generous, large type                                                                                 | Dense, `text-[13px]` body scale                    |
+| Exports     | **Mixed**: always verify                                                                             | **Always `export default`**                        |
 
 If the user is building a landing page, reach for marketing blocks. If they are building
 a dashboard, admin panel, settings screen or an AI/agent surface, reach for App UI.
@@ -238,8 +238,8 @@ Confirm the project has all of the following before installing:
    ```
 2. **The `cn()` helper at `lib/utils.ts`** (required by every `-tw` component):
    ```typescript
-   import { clsx, type ClassValue } from "clsx";
-   import { twMerge } from "tailwind-merge";
+   import { clsx, type ClassValue } from 'clsx';
+   import { twMerge } from 'tailwind-merge';
 
    export function cn(...inputs: ClassValue[]) {
      return twMerge(clsx(inputs));
@@ -350,8 +350,8 @@ This is the step agents most often get wrong. Get the export style right and the
 (no braces):
 
 ```tsx
-import SilkWaves from "@/components/react-bits/silk-waves";
-import AnimatedList from "@/components/react-bits/animated-list";
+import SilkWaves from '@/components/react-bits/silk-waves';
+import AnimatedList from '@/components/react-bits/animated-list';
 ```
 
 ### App UI blocks: always a default export
@@ -361,8 +361,8 @@ is derived from the slug (`ai-chat-1` exports `AiChat1`, `data-table-3` exports
 `DataTable3`), but since it is a default export the local name is yours to choose:
 
 ```tsx
-import AiChat from "@/components/blocks/ai-chat-1";
-import Dashboard from "@/components/blocks/dashboard-4";
+import AiChat from '@/components/blocks/ai-chat-1';
+import Dashboard from '@/components/blocks/dashboard-4';
 ```
 
 This is the one case where you do **not** need to read the export line first.
@@ -390,13 +390,13 @@ Examples:
 
 ```tsx
 // hero-1.tsx contains:  export function Hero1()      -> NAMED import, exact identifier
-import { Hero1 } from "@/components/blocks/hero-1";
+import { Hero1 } from '@/components/blocks/hero-1';
 
 // 404-3.tsx contains:   export default function NotFound3()  -> DEFAULT import, free name
-import ErrorPage from "@/components/blocks/404-3";
+import ErrorPage from '@/components/blocks/404-3';
 
 // pricing-2.tsx contains: export default function Pricing2()  -> DEFAULT import
-import Pricing from "@/components/blocks/pricing-2";
+import Pricing from '@/components/blocks/pricing-2';
 ```
 
 ### Marketing block import reference (verified)
@@ -451,7 +451,7 @@ file's own name, shown for reference). Watch the irregular casing.
 ### Using an installed component
 
 ```tsx
-import SilkWaves from "@/components/react-bits/silk-waves";
+import SilkWaves from '@/components/react-bits/silk-waves';
 
 export default function Page() {
   return (
@@ -461,14 +461,14 @@ export default function Page() {
         speed={1}
         scale={2}
         colors={[
-          "#0d1326",
-          "#162a52",
-          "#1e407e",
-          "#2657aa",
-          "#2e6ed5",
-          "#3785ff",
-          "#5092ff",
-          "#69a0ff",
+          '#0d1326',
+          '#162a52',
+          '#1e407e',
+          '#2657aa',
+          '#2e6ed5',
+          '#3785ff',
+          '#5092ff',
+          '#69a0ff',
         ]}
       />
     </div>
@@ -479,7 +479,7 @@ export default function Page() {
 ### Using an installed block
 
 ```tsx
-import { Hero1 } from "@/components/blocks/hero-1"; // named export → braces
+import { Hero1 } from '@/components/blocks/hero-1'; // named export → braces
 
 export default function LandingPage() {
   return (
@@ -511,14 +511,14 @@ npx shadcn@latest add \
 
 ```tsx
 // Imports below mix default and named: verified per the reference table above.
-import Navigation1 from "@/components/blocks/navigation-1"; // default export
-import { Hero1 } from "@/components/blocks/hero-1"; // named export
-import { Features1 } from "@/components/blocks/features-1"; // named export
-import SocialProof1 from "@/components/blocks/social-proof-1"; // default export
-import Pricing1 from "@/components/blocks/pricing-1"; // default export
-import Faq1 from "@/components/blocks/faq-1"; // default export (file identifier: FAQ1)
-import CTA1 from "@/components/blocks/cta-1"; // default export (file identifier: CTA1)
-import Footer1 from "@/components/blocks/footer-1"; // default export
+import Navigation1 from '@/components/blocks/navigation-1'; // default export
+import { Hero1 } from '@/components/blocks/hero-1'; // named export
+import { Features1 } from '@/components/blocks/features-1'; // named export
+import SocialProof1 from '@/components/blocks/social-proof-1'; // default export
+import Pricing1 from '@/components/blocks/pricing-1'; // default export
+import Faq1 from '@/components/blocks/faq-1'; // default export (file identifier: FAQ1)
+import CTA1 from '@/components/blocks/cta-1'; // default export (file identifier: CTA1)
+import Footer1 from '@/components/blocks/footer-1'; // default export
 
 export default function LandingPage() {
   return (
@@ -708,8 +708,8 @@ Standalone components can sit behind or alongside blocks (e.g. an animated backg
 The same harmonization rule applies: the component must serve the block, not compete with it.
 
 ```tsx
-import SilkWaves from "@/components/react-bits/silk-waves";
-import { Hero1 } from "@/components/blocks/hero-1";
+import SilkWaves from '@/components/react-bits/silk-waves';
+import { Hero1 } from '@/components/blocks/hero-1';
 
 export default function LandingPage() {
   return (
@@ -800,10 +800,10 @@ picked two blocks for the same job.
 A typical screen is a shell plus content:
 
 ```tsx
-"use client";
+'use client';
 
-import AppShell from "@/components/blocks/app-shell-1";
-import Dashboard from "@/components/blocks/dashboard-4";
+import AppShell from '@/components/blocks/app-shell-1';
+import Dashboard from '@/components/blocks/dashboard-4';
 
 export default function Page() {
   return (
@@ -849,14 +849,14 @@ Everything installs as editable source: customize freely.
   curve={1.2}
   contrast={1}
   colors={[
-    "#1a0533",
-    "#2d1b69",
-    "#4a2c8a",
-    "#6b3fa0",
-    "#8b52b8",
-    "#ab65d0",
-    "#cb78e8",
-    "#eb8bff",
+    '#1a0533',
+    '#2d1b69',
+    '#4a2c8a',
+    '#6b3fa0',
+    '#8b52b8',
+    '#ab65d0',
+    '#cb78e8',
+    '#eb8bff',
   ]}
   rotation={45}
   brightness={1.2}
@@ -880,7 +880,7 @@ provider toggles a `dark` class on `<html>` (e.g. `next-themes`):
 
 ```tsx
 // app/layout.tsx
-import { ThemeProvider } from "next-themes";
+import { ThemeProvider } from 'next-themes';
 
 export default function RootLayout({
   children,
@@ -1041,22 +1041,22 @@ Templates with a **Buy template** button can also be purchased individually thro
 linked on their page. An individual purchase is separate from Ultimate access; do not imply it
 unlocks the full library or the Ultimate download API. Portfolio remains free.
 
-| Template           | Slug                 | Tier     |
-| ------------------ | -------------------- | -------- |
-| SaaS Landing       | `saas-landing`       | Ultimate |
-| AI SaaS Landing    | `ai-saas-landing`    | Ultimate |
-| Minimal Landing    | `minimal-landing`    | Ultimate |
-| Finance Landing    | `finance-landing`    | Ultimate |
-| Agency Site        | `agency-site`        | Ultimate |
-| Shader Template    | `shader-template`    | Ultimate |
-| Wireframe Template | `wireframe-template` | Ultimate |
-| 8 Bit Template     | `8-bit-template`     | Ultimate |
-| AI App Template    | `ai-app-template`    | Ultimate |
-| Security Template  | `security-template`  | Ultimate |
-| Portfolio Template | `portfolio-template` | **Free** |
-| Agentframe Template | `agentframe-template` | Ultimate |
-| Cloudlight Template | `cloudlight-template` | Ultimate |
-| Imageworks Template | `imageworks-template` | Ultimate |
+| Template             | Slug                   | Tier     |
+| -------------------- | ---------------------- | -------- |
+| SaaS Landing         | `saas-landing`         | Ultimate |
+| AI SaaS Landing      | `ai-saas-landing`      | Ultimate |
+| Minimal Landing      | `minimal-landing`      | Ultimate |
+| Finance Landing      | `finance-landing`      | Ultimate |
+| Agency Site          | `agency-site`          | Ultimate |
+| Shader Template      | `shader-template`      | Ultimate |
+| Wireframe Template   | `wireframe-template`   | Ultimate |
+| 8 Bit Template       | `8-bit-template`       | Ultimate |
+| AI App Template      | `ai-app-template`      | Ultimate |
+| Security Template    | `security-template`    | Ultimate |
+| Portfolio Template   | `portfolio-template`   | **Free** |
+| Agentframe Template  | `agentframe-template`  | Ultimate |
+| Cloudlight Template  | `cloudlight-template`  | Ultimate |
+| Imageworks Template  | `imageworks-template`  | Ultimate |
 | Sparkdesign Template | `sparkdesign-template` | Ultimate |
 
 If a user on Starter/Pro asks to "install a template," explain that templates are website downloads:
@@ -1096,9 +1096,9 @@ header or a `?license_key=<key>` query parameter.
    reserve `-css` for non-Tailwind projects.
 3. **Wrap WebGL components in a sized container**, and lazy-load heavy ones below the fold:
    ```tsx
-   import dynamic from "next/dynamic";
+   import dynamic from 'next/dynamic';
    const SilkWaves = dynamic(
-     () => import("@/components/react-bits/silk-waves"),
+     () => import('@/components/react-bits/silk-waves'),
      { ssr: false },
    );
    ```

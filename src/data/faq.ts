@@ -1,49 +1,59 @@
+/**
+ * Las preguntas frecuentes de la landing.
+ *
+ * NO son las mismas que las de la app (`frontend/app/(tabs)/perfil/ayuda.tsx`,
+ * ocho preguntas). Aquellas son de soporte para quien ya instaló: cómo
+ * funcionan las ligas, cómo proteger la racha, qué hacer si falló un pago. Acá
+ * el que lee todavía no descargó nada, así que las dudas son otras: si le
+ * sirve, si puede confiar, y qué le va a costar.
+ *
+ * Reglas de este archivo:
+ *   · Ninguna respuesta promete una fecha que no esté confirmada.
+ *   · Ninguna respuesta dice cantidades de preguntas.
+ *   · Si un dato cambia en producción, cambia acá: no se adivina.
+ */
 export interface ItemFaq {
+  readonly id: string;
   readonly pregunta: string;
   readonly respuesta: string;
 }
 
-/**
- * Las seis dudas que frenan la instalación, en el orden en que aparecen en la
- * cabeza de quien está por instalar.
- *
- * Es además el único contenido de la landing que Google puede indexar con las
- * palabras que la gente de verdad busca ("examen COSEVI", "prueba de admisión
- * UCR"), así que las preguntas se escriben como las escribiría una persona, no
- * como las escribiría la empresa.
- *
- * Regla: ninguna respuesta promete una fecha que no esté confirmada, y ninguna
- * garantiza el contenido del examen real.
- */
 export const FAQ: readonly ItemFaq[] = [
   {
-    pregunta: '¿Me sirve si mi examen es en dos semanas?',
-    respuesta:
-      'Sí. Elegís el examen, ponés la fecha y Kodi reparte los temas hasta ese día. Cada día sabés exactamente qué practicar, sin decidirlo vos.',
-  },
-  {
-    pregunta: '¿De dónde salen las preguntas?',
-    respuesta:
-      'Del material oficial de cada examen: los manuales nuevos del COSEVI, el material que publica el MEP para las Pruebas Nacionales, y el temario que publican la UCR, la UNA y el TEC para admisión. En admisión las universidades publican el temario y no las preguntas, así que esas las escribe el equipo de contenido de Kodi a partir de ese temario.',
-  },
-  {
-    pregunta: '¿Es gratis de verdad?',
-    respuesta:
-      'Sí. La app se descarga y se estudia gratis. Tiene anuncios y compras opcionales, y no hay que pagar nada para practicar.',
-  },
-  {
+    id: 'sin-internet',
     pregunta: '¿Funciona sin internet?',
+    // Sin fecha a propósito: prometer un mes concreto para algo que todavía no
+    // está construido es la clase de promesa que después hay que borrar.
     respuesta:
-      'Por ahora no: hace falta conexión para practicar. Estamos trabajando en que se pueda sin internet.',
+      'Por ahora no: necesitás conexión para practicar. Estamos trabajando en que se pueda sin internet.',
   },
   {
+    id: 'quien-escribe',
+    pregunta: '¿Quién hace las preguntas?',
+    // El matiz de admisión NO se puede omitir: la UCR, la UNA y el TEC
+    // publican temario, no banco de preguntas. Decir "preguntas oficiales de
+    // admisión" sería falso.
+    respuesta:
+      'El equipo de contenido de Kodi, a partir del material oficial de cada examen: los manuales del COSEVI, el material que publica el MEP para las Pruebas Nacionales, y el temario de la UCR, la UNA y el TEC. Las universidades publican temario y no preguntas, así que las de admisión las escribimos nosotros desde ese temario. Cada una lleva su explicación.',
+  },
+  {
+    id: 'iphone',
+    pregunta: '¿Cuándo sale para iPhone?',
+    // ⚠️ Vence el 30 de setiembre de 2026. Si ese día la app no salió, esta
+    // línea se cambia el mismo día.
+    respuesta:
+      'A finales de este mes. Dejanos tu correo en la sección de descarga y te escribimos el día que salga.',
+  },
+  {
+    id: 'auto-moto',
     pregunta: 'Si ya tengo licencia de auto, ¿me sirve para moto?',
     respuesta:
-      'Son dos módulos distintos. La prueba A1 de moto tiene sus propias preguntas, con las maniobras, el equipo de protección y el mantenimiento que el examen de auto no toca.',
+      'Son dos exámenes distintos: la prueba A1 tiene sus propias preguntas, sus propias señales y su propio manual. En Kodi son dos módulos separados.',
   },
   {
-    pregunta: '¿Cuándo sale para iPhone?',
+    id: 'kolones',
+    pregunta: '¿Los Kolones son plata de verdad?',
     respuesta:
-      'A finales de este mes. Dejanos tu correo y te escribimos el día que salga.',
+      'No. Los Kolones son puntos de la app: se ganan practicando y se cambian por cupones de marcas aliadas, que mostrás con un código en el negocio. Nunca se convierten en efectivo.',
   },
 ];

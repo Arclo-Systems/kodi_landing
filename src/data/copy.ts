@@ -15,6 +15,8 @@
  *   · ningún corchete `[...]` puede llegar a producción
  */
 
+import { SOCIAL } from './social';
+
 /** La URL viva, para que el copy del CTA y el destino no se separen nunca. */
 export const URL_PLAY = 'https://play.google.com/store/apps/details?id=com.holakodi.app';
 
@@ -47,6 +49,144 @@ export const COPY = {
   titular: 'Practicá tu examen hasta que sea fácil',
   bajada:
     'COSEVI auto y moto, admisión UCR · UNA · TEC y Pruebas Nacionales. Preguntas hechas desde el material oficial, cada una con su explicación.',
+
+  // ─── Manifiesto ────────────────────────────────────────────────────────────
+  // Un solo párrafo que se enciende palabra por palabra con el scroll. Es el
+  // único lugar de la página donde Kodi dice para qué existe, así que va en
+  // primera persona del producto y sin listas.
+  //
+  // Largo: entre 180 y 260 caracteres. Por debajo, la animación no alcanza a
+  // notarse; por encima, la última línea queda apagada cuando ya pasaste.
+  //
+  // El tema es la desigualdad, no las funciones del producto: prepararse bien
+  // cuesta plata y un examen decide demasiado. Lo que hace Kodi se cuenta en
+  // las otras secciones; acá se dice por qué existe.
+  //
+  // El remate va al final a propósito. Como las palabras se encienden en
+  // orden, la última frase se lee cuando el resto ya está prendido, y es la
+  // que tiene que quedar.
+  manifiesto:
+    'Prepararse bien casi siempre cuesta: cursos, tutores, material. Y un examen puede decidir lo que viene después. Kodi nació para cambiar eso: que aprobar dependa de cuántas ganas le ponés, no de cuánto podés pagar.',
+
+  // ─── Planes ────────────────────────────────────────────────────────────────
+  // ⚠️ TODOS los montos salen de producción (tablas `subscription_prices` y
+  // `promo_offer_prices`), leídos el 2026-09-15. Son los de Costa Rica para UN
+  // examen: es el caso del estudiante que prepara un solo examen, y el más
+  // barato de cada plan. Los packs de hasta cuatro se mencionan en la letra
+  // chica, no se listan: cuatro planes por tres períodos por cuatro tamaños son
+  // cuarenta y ocho números, y esta página vende, no cotiza.
+  //
+  // Los beneficios son el copy literal de la app (`plansData.ts`), no un
+  // resumen: si cambian allá, cambian acá.
+  //
+  // Lo que NO se muestra y es decisión pendiente del founder: la Oferta
+  // Fundador (precio congelado, 300 cupos). Los cupos se agotan y esta página
+  // es estática, así que anunciarlos sin dato en vivo es prometer algo que
+  // puede ya no existir.
+  precios: {
+    // El sujeto se cae a propósito: en la sección de precios ya se sabe de qué
+    // se está hablando, y la comparación es lo único que tiene que quedar.
+    titular: 'Menos que una hora de tutor',
+    bajada:
+      'Todos los planes abren el examen completo. Vas subiendo cuando querés simulacros, ruta de estudio o que Pixel te explique cada error.',
+    etiquetaSelector: 'Cada cuánto pagás',
+    insignia: 'Recomendado',
+    moneda: '₡',
+    // `meses` no es decoración: con él la sección calcula el ahorro de cada
+    // período contra el mensual, igual que la app. Una tabla de porcentajes
+    // fija queda mintiendo en cuanto se toca un precio.
+    periodos: [
+      { id: 'mes', etiqueta: 'Mensual', meses: 1 },
+      { id: 'trimestre', etiqueta: 'Trimestral', meses: 3 },
+      { id: 'anio', etiqueta: 'Anual', meses: 12 },
+    ],
+    planes: [
+      {
+        nombre: 'Free',
+        resumen: 'Probá el examen sin pagar nada.',
+        gratis: true,
+        destacado: false,
+        precios: {
+          mes: { monto: 'Gratis', unidad: '', nota: 'Para siempre' },
+          trimestre: { monto: 'Gratis', unidad: '', nota: 'Para siempre' },
+          anio: { monto: 'Gratis', unidad: '', nota: 'Para siempre' },
+        },
+        incluye: [
+          'Práctica diaria',
+          'Rankings y ligas',
+          'Partida Kodi 1v1',
+          'Arena de Supervivencia',
+          'Estadísticas básicas',
+        ],
+        cta: 'Descargar gratis',
+        href: URL_PLAY,
+      },
+      {
+        nombre: 'Básico',
+        resumen: 'Empezá a prepararte.',
+        gratis: false,
+        destacado: false,
+        precios: {
+          mes: { monto: '2.500', unidad: '/ mes', nota: 'Se cobra cada mes' },
+          trimestre: { monto: '6.000', unidad: '/ trimestre', nota: 'Se cobra cada tres meses' },
+          anio: { monto: '18.000', unidad: '/ año', nota: 'Se cobra una vez al año' },
+        },
+        incluye: [
+          'Práctica ilimitada',
+          'Modos rápidos ilimitados',
+          'Partida Kodi ilimitada',
+          'Sin publicidad',
+        ],
+        cta: 'Empezar con Básico',
+        href: URL_PLAY,
+      },
+      {
+        nombre: 'Plus',
+        resumen: 'Preparación seria.',
+        gratis: false,
+        destacado: true,
+        precios: {
+          mes: { monto: '4.500', unidad: '/ mes', nota: 'Se cobra cada mes' },
+          trimestre: { monto: '10.800', unidad: '/ trimestre', nota: 'Se cobra cada tres meses' },
+          anio: { monto: '32.400', unidad: '/ año', nota: 'Se cobra una vez al año' },
+        },
+        incluye: [
+          'Simulacros completos',
+          'Ruta de estudio adaptativa',
+          'Examen sorpresa',
+          'Todo lo de Básico',
+          // Verificado en producción: la prueba existe SOLO en Plus, dura siete
+          // días y se puede usar una vez por examen.
+          'Siete días de prueba gratis',
+        ],
+        cta: 'Empezar con Plus',
+        href: URL_PLAY,
+      },
+      {
+        nombre: 'Pro',
+        resumen: 'Todo incluido.',
+        gratis: false,
+        destacado: false,
+        precios: {
+          mes: { monto: '7.000', unidad: '/ mes', nota: 'Se cobra cada mes' },
+          trimestre: { monto: '16.800', unidad: '/ trimestre', nota: 'Se cobra cada tres meses' },
+          anio: { monto: '50.400', unidad: '/ año', nota: 'Se cobra una vez al año' },
+        },
+        incluye: [
+          'Plan de estudio',
+          'Profesor IA personal',
+          'Predictor de nota',
+          'Todo lo de Plus',
+        ],
+        cta: 'Empezar con Pro',
+        href: URL_PLAY,
+      },
+    ],
+    // Las dos primeras frases son las condiciones reales de compra, tomadas de
+    // la hoja de términos de la app.
+    legal:
+      'Precios en colones, por un examen. Con dos o más exámenes en el mismo plan el precio por examen baja. Los pagos los procesa la tienda, no Kodi, y cancelás cuando querrás: mantenés el acceso hasta el final del período que ya pagaste.',
+  },
 
   hero: {
     ceja: 'Costa Rica · COSEVI · Admisión · Pruebas Nacionales',
@@ -84,15 +224,14 @@ export const COPY = {
   fuentes: {
     titular: 'Con el material oficial, no con apuntes de internet',
     columnas: [
-      { examen: 'COSEVI auto y moto', fuente: 'Los manuales nuevos del COSEVI' },
-      { examen: 'Admisión', fuente: 'El temario que publican la UCR, la UNA y el TEC' },
+      { examen: 'COSEVI', fuente: 'Los manuales nuevos de auto y moto' },
+      { examen: 'Admisión', fuente: 'El temario que publican las universidades' },
       { examen: 'Pruebas Nacionales', fuente: 'El material oficial que publica el MEP' },
     ],
-    // El matiz de admisión NO se puede omitir: las universidades publican
-    // temario, no banco de preguntas. Decir "preguntas oficiales de admisión"
-    // sería falso.
+    // Se dice quién las escribe y de qué material: ninguna institución publica
+    // su banco de preguntas y llamarlas "oficiales" sería falso.
     autoria:
-      'Las preguntas las escribe el equipo de contenido de Kodi a partir de ese material: del manual cuando el examen tiene manual, y del temario oficial cuando la universidad publica el temario y no las preguntas. Cada una lleva su explicación.',
+      'Las preguntas las escribe el equipo de contenido de Kodi con ese material: el manual del COSEVI, el temario que publican las universidades y el que publica el MEP. Mismo temario y mismo formato que el examen real, con la explicación de cada respuesta.',
     deslinde:
       'Kodi es un producto independiente. No está afiliada ni respaldada por estas instituciones.',
   },
@@ -100,7 +239,6 @@ export const COPY = {
   // ─── 3. Exámenes ──────────────────────────────────────────────────────────
   modulos: 'Exámenes',
   examenes: {
-    ceja: 'Exámenes',
     titular: 'Cinco exámenes, el temario completo de cada uno',
     // "el mismo temario y el mismo formato" en vez de "lo que practicás es lo
     // que te van a preguntar", que garantizaba el contenido de un examen
@@ -114,116 +252,122 @@ export const COPY = {
   // ─── 4. Cómo funciona ─────────────────────────────────────────────────────
   como: {
     ceja: 'Cómo funciona',
-    titular: 'De la primera pregunta al día del examen',
-    bajada: 'Cuatro pasos. Diez minutos al día alcanzan.',
+    // No es un recorrido de principio a fin: son seis funciones sueltas de la
+    // app. El titular anterior ("De la primera pregunta al día del examen")
+    // prometía una secuencia que estas pantallas no cuentan.
+    titular: 'No es solo responder preguntas',
+    bajada:
+      'Estas seis son una muestra de lo que trae Kodi: practicar, entender por qué fallaste, jugar con amigos, competir cada semana y llevarte algo por hacerlo.',
+    // Cada paso lleva, además del texto, la ficha que aparece al lado del
+    // teléfono. `rotulo` es el título chico de la ficha, `dato` la línea
+    // fuerte, `detalle` la de abajo, y `pastilla` el chip suelto.
+    // El orden y los títulos son los de las seis capturas de la ficha de Play,
+    // que el founder ya aprobó. Cada paso describe LO QUE SE VE en su pantalla,
+    // no una función suelta.
     pasos: [
       {
         numero: '01',
-        titulo: 'Elegí tu examen',
+        titulo: 'Aprobá sin quemarte',
         texto:
-          'COSEVI, admisión o Pruebas Nacionales. Podés llevar más de uno a la vez y cambiar cuando querrás.',
+          'No hace falta encerrarse a estudiar. Diez minutos al día, ordenados por tema, y llegás listo sin haber sufrido.',
+        ficha: {
+          rotulo: 'Hoy',
+          dato: 'Tu meta del día',
+          detalle: 'Un poco todos los días, no todo la noche antes',
+        },
+        pastilla: 'Diez minutos alcanzan',
       },
       {
         numero: '02',
-        titulo: 'Practicá por tema',
+        // NO nombra a Pixel: esta es la explicación que trae CADA pregunta, y
+        // la tienen todos los planes. Pixel es el tutor con IA y es de Pro.
+        titulo: 'Fallá, entendé, aprobá',
         texto:
-          'Preguntas del material oficial, ordenadas por tema. Cada acierto suma EXP y te acerca a la meta del día.',
+          'Respondés mal y en el momento sabés por qué. La explicación viene con la pregunta: no hay que pedirla ni buscarla.',
+        ficha: {
+          rotulo: 'Explicación',
+          dato: 'Por qué esta y no la otra',
+          detalle: 'Escrita junto con la pregunta',
+        },
+        pastilla: 'En el momento, no después',
       },
       {
         numero: '03',
-        titulo: 'Pixel te explica el error',
+        titulo: 'Retá a tus amigos',
+        // Partida Kodi es POR TURNOS, no contrarreloj: el turno dura horas y
+        // cada quien responde cuando puede. Los modos con reloj son otros.
         texto:
-          'Respondés mal y en el momento sabés por qué, paso a paso, con la trampa en la que cae casi todo el mundo.',
+          'Elegís a un amigo y juegan uno contra uno, materia por materia. No hay que coincidir: cada quien responde cuando puede.',
+        ficha: {
+          rotulo: 'Partida Kodi',
+          dato: 'Uno contra uno',
+          detalle: 'Materia por materia',
+        },
+        pastilla: 'Sin tener que coincidir',
       },
       {
         numero: '04',
-        titulo: 'Medite en la liga',
-        // Describe la LIGA, no a los jugadores. La versión anterior decía
-        // "competís contra gente de tu mismo examen", que es una afirmación
-        // sobre quién está del otro lado.
+        titulo: 'Subí de liga cada semana',
         texto:
           'Cada semana arranca una liga nueva de tu examen. El domingo, los primeros de la división ascienden y los últimos bajan.',
+        ficha: {
+          rotulo: 'Liga',
+          dato: 'Arranca de nuevo cada lunes',
+          detalle: 'Los primeros suben, los últimos bajan',
+        },
+        pastilla: 'Tu EXP te sube o te baja',
+      },
+      {
+        numero: '05',
+        titulo: 'No rompás la racha',
+        // Verificado en la app: un protector gratis por semana, que se renueva
+        // los lunes.
+        texto:
+          'Cada día que practicás suma a la racha. Si un día no podés, tenés un protector gratis por semana.',
+        ficha: {
+          rotulo: 'Racha',
+          dato: 'Un día a la vez',
+          detalle: 'Un protector gratis cada semana',
+        },
+        pastilla: 'Se corta si faltás un día',
+      },
+      {
+        numero: '06',
+        titulo: 'Estudiar tiene premio',
+        // Los Kolones NO se pagan por acierto suelto: salen de cumplir las
+        // misiones del día y de sostener la racha. Y las misiones se cumplen
+        // justamente practicando y jugando, así que la frase las agrupa sin
+        // prometer que cada respuesta pague.
+        texto:
+          'Practicás, jugás, cumplís las misiones del día: todo eso te deja Kolones. Se juntan y se cambian por cupones que mostrás en el negocio.',
+        ficha: {
+          rotulo: 'Kolones',
+          dato: 'No son plata de verdad',
+          detalle: 'Se cambian por cupones',
+        },
+        pastilla: 'Se canjean en el negocio',
       },
     ],
     cta: 'Hacé la primera pregunta hoy',
   },
 
-  // ─── 5. Jugá ──────────────────────────────────────────────────────────────
-  jugar: {
-    ceja: 'Jugá',
-    // "volvé cada día" era el objetivo de Kodi, no el del estudiante. Nadie
-    // instala una app para volver todos los días; instala para aprobar.
-    titular: 'Ligas, racha y Kolones en cada acierto',
-    bajada:
-      'Kodi no te pide fuerza de voluntad: te pide volver mañana. Una liga cada semana, una racha cada día y Kolones que se canjean.',
-    cajas: {
-      amigos: {
-        titulo: 'Retá a tus amigos',
-        texto:
-          'Girás la ruleta, cae una materia y respondés. Tres aciertos seguidos y la corona es tuya. O entrá a Arena y empezá a jugar al instante.',
-      },
-      liga: {
-        titulo: 'Una liga cada semana',
-        texto:
-          'Cada respuesta suma EXP. El domingo, los primeros de tu división ascienden y los últimos bajan. Cuatro divisiones.',
-        cabecera: 'Aprendiz',
-        cierra: 'Termina en 2 días 20 h',
-        zona: 'Zona de ascenso',
-        vos: 'vos',
-      },
-      racha: {
-        titulo: 'La racha te sostiene',
-        texto:
-          'Cumplí la meta del día y la racha sigue viva. Kodi te avisa antes de que se te vaya el día.',
-        unidad: 'días de racha',
-      },
-      kolones: {
-        titulo: 'Los Kolones se canjean',
-        // La aclaración va en la MISMA frase, no en otra sección: "Kolones"
-        // está a una letra de la moneda nacional y el mecanismo se lee como
-        // "la app le paga a mi hijo".
-        texto:
-          'Cada acierto suma Kolones, la moneda de Kodi: no es dinero real. Se juntan y se cambian por cupones que mostrás con un QR en el negocio.',
-        // Cupón simulado SIN marca inventada. Lleva la palabra "ejemplo" a la
-        // vista: un negocio falso con QR es lo que hace que una página se lea
-        // como no terminada.
-        ejemplo: 'ejemplo',
-        marca: 'Cupón de una marca aliada',
-        costo: 'Se canjea con Kolones',
-      },
-    },
-    cta: 'Empezá a sumar EXP hoy',
-  },
-
-  // ─── 6. Antes de instalar ─────────────────────────────────────────────────
-  // La sección que le habla al papá o la mamá que aprieta "Instalar". Sin
-  // ilustración y sin adornos: es información, no venta.
-  antes: {
-    titular: 'Lo que un papá quiere saber antes',
-    puntos: [
-      {
-        pregunta: '¿Quién hace las preguntas?',
-        respuesta:
-          'El equipo de contenido de Kodi, a partir del material oficial vigente de cada examen. Cada pregunta lleva su explicación.',
-      },
-      { pregunta: '¿Desde qué edad?', respuesta: 'Desde los 13 años.' },
-      {
-        pregunta: '¿Cuánto cuesta?',
-        respuesta:
-          'La app es gratis. Tiene anuncios y compras opcionales; no hay que pagar nada para estudiar.',
-      },
-      {
-        pregunta: '¿Los Kolones son plata?',
-        respuesta:
-          'No. Son puntos de la app y se canjean por cupones, nunca por efectivo.',
-      },
-    ],
-    privacidad: 'Leé la política de privacidad',
+  // ─── Países ───────────────────────────────────────────────────────────────
+  // Los países viven en `paises.ts` (copia de `country_rollouts`); acá solo el
+  // encabezado y los dos rótulos de estado. BORRADOR: el founder afina el copy.
+  paises: {
+    titular: 'Pronto en más países',
+    bajada: 'Kodi ya está en Costa Rica. Estos son los que siguen.',
+    disponible: 'Disponible',
+    pronto: 'Muy pronto',
   },
 
   // ─── 7. Preguntas frecuentes ──────────────────────────────────────────────
   faq: {
     titular: 'Preguntas que nos hacen siempre',
+    // Las preguntas viven en `faq.ts`, no acá: las consume también el bloque de
+    // datos estructurados que lee Google.
+    bajada: 'Si te queda otra, escribinos a',
+    correo: 'soporte@holakodi.com',
   },
 
   // ─── 8. Descargá ──────────────────────────────────────────────────────────
@@ -231,7 +375,10 @@ export const COPY = {
     // El mejor titular de la página, que antes estaba enterrado al final.
     // Se queda acá porque es el cierre, y el hero ya tiene el suyo.
     titular: ['Estudiá.', 'Competí.', 'Aprobá.'],
-    bajada: 'Gratis en Android. Elegí tu examen y hacé la primera pregunta hoy.',
+    // Dos líneas llenas a 28rem: la versión corta dejaba "hoy." colgando solo
+    // en la segunda.
+    bajada:
+      'Gratis en Android. Elegí tu examen entre los cinco que hay, hacé la primera pregunta hoy y empezá a ver cuánto te falta.',
     redes: 'Redes sociales',
   },
   redes: 'Redes sociales',
@@ -272,7 +419,53 @@ export const COPY = {
     marca: 'Arclo Systems',
     marcaUrl: 'https://www.arclosystems.com/es',
     expansion: 'Hoy en Costa Rica. Pronto, en la región.',
-    deslinde:
-      'Kodi es un producto independiente de Arclo Systems. No está afiliada ni respaldada por el MOPT, el COSEVI, el MEP, la UCR, la UNA ni el TEC.',
+    // El deslinde de no afiliación con MOPT, COSEVI, MEP, UCR, UNA y TEC se
+    // quitó del pie por decisión del founder el 2026-09-15. El texto sigue en
+    // el spec (§4.9) por si hay que volver a ponerlo.
+
+    // Lo que acompaña al logotipo en la columna de la izquierda. Dos líneas
+    // como mucho: la columna mide 20rem y abajo va el botón.
+    frase: 'Practicá para tu examen desde el teléfono, con preguntas hechas del material oficial.',
+    boton: 'Descargar la app',
+
+    // Cuatro columnas de enlaces. `href` en `null` significa que el destino
+    // todavía no existe: se dibuja el rótulo apagado y sin enlace, porque un
+    // enlace muerto en el pie es peor que no ofrecerlo.
+    columnas: [
+      {
+        titulo: 'Producto',
+        enlaces: [
+          { texto: 'Exámenes', href: '/#examenes' },
+          { texto: 'Cómo funciona', href: '/#como' },
+          { texto: 'Descargar', href: URL_PLAY },
+        ],
+      },
+      {
+        titulo: 'Kodi',
+        enlaces: [
+          { texto: 'Kodi para empresas', href: null },
+          { texto: 'Soporte', href: 'mailto:soporte@holakodi.com' },
+          { texto: 'Arclo Systems', href: 'https://www.arclosystems.com/es' },
+        ],
+      },
+      {
+        titulo: 'Legal',
+        enlaces: [
+          { texto: 'Términos de uso', href: '/terminos' },
+          { texto: 'Política de privacidad', href: '/privacidad' },
+          { texto: 'Bases de premiaciones', href: '/bases' },
+          { texto: 'Eliminar cuenta', href: '/eliminar-cuenta' },
+        ],
+      },
+      {
+        titulo: 'Redes',
+        enlaces: [
+          { texto: 'Instagram', href: SOCIAL.instagram.href },
+          { texto: 'TikTok', href: SOCIAL.tiktok.href },
+          { texto: 'Facebook', href: SOCIAL.facebook.href },
+          { texto: 'WhatsApp', href: SOCIAL.whatsapp.href },
+        ],
+      },
+    ],
   },
 } as const;

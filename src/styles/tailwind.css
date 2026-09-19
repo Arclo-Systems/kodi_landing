@@ -17,6 +17,15 @@
  *    `utilities`: nuestro CSS sigue mandando sobre el tema, y las utilidades
  *    mandan sobre nuestro CSS, que es justo lo que hace falta.
  *
+ * 3. LA VARIANTE `dark:` SIGUE NUESTRO TEMA, NO EL DEL SISTEMA. De fábrica,
+ *    `dark:` de Tailwind se activa con `prefers-color-scheme`. Los componentes
+ *    que vienen del registro de React Bits usan `dark:bg-neutral-900` y
+ *    compañía, así que con alguien que tiene el sistema en oscuro y elige el
+ *    tema claro en la página, esos componentes se dibujaban oscuros sobre
+ *    fondo claro. Se ata la variante al mismo atributo que usa el resto del
+ *    sitio para que no puedan separarse.
+ *    Fuente: https://tailwindcss.com/docs/dark-mode ("Using a data attribute")
+ *
  * El orden de la primera línea es el que manda en todo el archivo.
  * `global.css` no se toca por dentro: solo cambia quién lo importa.
  */
@@ -25,3 +34,5 @@
 @import 'tailwindcss/theme.css' layer(theme);
 @import './global.css' layer(kodi);
 @import 'tailwindcss/utilities.css' layer(utilities);
+
+@custom-variant dark (&:where([data-tema='oscuro'], [data-tema='oscuro'] *));

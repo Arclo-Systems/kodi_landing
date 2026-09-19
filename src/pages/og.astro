@@ -1,12 +1,18 @@
 ---
 import '@fontsource-variable/nunito/wght.css';
+import '@fontsource-variable/geist/wght.css';
 import '../styles/global.css';
 import Wordmark from '../components/Wordmark.astro';
 import { COPY } from '../data/copy';
+
+// La tarjeta social. Se captura a mano a 1200x630 y se guarda en `public/og.png`;
+// el texto sale del copy, así que hay que recapturarla cuando el titular cambie.
 ---
 
 <!doctype html>
-<html lang="es-CR">
+<!-- El tema va fijo: sin esto la tarjeta salía clara u oscura según lo que
+     tuviera la máquina desde la que se captura. -->
+<html lang="es-CR" data-tema="claro">
   <head>
     <meta charset="utf-8" />
     <meta name="robots" content="noindex" />
@@ -30,23 +36,29 @@ import { COPY } from '../data/copy';
         color: var(--teal);
       }
 
+      /* Mismos rasgos que el titular del hero: Geist, peso 500 e interletrado
+         cerrado. En Nunito 900 la tarjeta no se parecía a la página. */
       .og-titular {
-        color: var(--teal);
-        font-size: 7rem;
-        font-weight: 900;
-        letter-spacing: -0.035em;
-        line-height: 0.9;
+        color: var(--tinta);
+        font-family: var(--fuente-titular);
+        font-size: 5.5rem;
+        font-weight: 500;
+        letter-spacing: -0.028em;
+        line-height: 1.02;
       }
 
       .og-bajada {
-        max-width: 40ch;
+        max-width: 44ch;
         color: var(--tinta-suave);
-        font-size: 2rem;
+        font-size: 1.75rem;
+        line-height: 1.5;
       }
     </style>
   </head>
   <body>
-    <div class="og-marca"><Wordmark /></div>
+    <div class="og-marca">
+      <Wordmark />
+    </div>
     <p class="og-titular">{COPY.titular}</p>
     <p class="og-bajada">{COPY.bajada}</p>
   </body>

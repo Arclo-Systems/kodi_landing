@@ -37,7 +37,11 @@ const {
   </a>
 
   {conMicrocopy && <p class="cta__micro">{COPY.hero.microcopy}</p>}
-  {conIphone && <a class="cta__iphone" href="#descargar">{COPY.hero.iphone}</a>}
+  {conIphone && (
+    <a class="cta__iphone" href="#descargar">
+      {COPY.hero.iphone}
+    </a>
+  )}
 </div>
 
 <style>

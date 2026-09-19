@@ -16,11 +16,7 @@ import penSecundaria from '../assets/modulos/pne-bachillerato.webp';
  * producción, se desincroniza todo en silencio.
  */
 export type ModuloSlug =
-  | 'paa'
-  | 'cosevi_auto'
-  | 'cosevi_moto'
-  | 'estandarizada_primaria'
-  | 'estandarizada_secundaria';
+  'paa' | 'cosevi_auto' | 'cosevi_moto' | 'estandarizada_primaria' | 'estandarizada_secundaria';
 
 export interface Modulo {
   readonly slug: ModuloSlug;
@@ -63,13 +59,13 @@ export const MODULOS: readonly Modulo[] = [
   },
   {
     slug: 'estandarizada_primaria',
-    nombre: 'PEN Primaria',
+    nombre: 'PNE Primaria',
     cubre: 'Sexto grado — Español, Matemática, Ciencias y Estudios Sociales',
     arte: penPrimaria,
   },
   {
     slug: 'estandarizada_secundaria',
-    nombre: 'PEN Secundaria',
+    nombre: 'PNE Secundaria',
     // Pendiente del founder: nombrar las cinco materias. Mientras tanto esta
     // frase es cierta y no lleva corchete, que es lo que no puede salir a prod.
     cubre: 'Quinto año — las cinco materias de la prueba',

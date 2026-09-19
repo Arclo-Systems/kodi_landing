@@ -1,0 +1,79 @@
+---
+// Scroll suavizado para toda la página.
+//
+// Es lo que hace que la referencia "se sienta" distinta, y no las curvas de las
+// animaciones: sin esto, la rueda del mouse mueve la página a saltos y todo lo
+// que depende del scroll avanza igual de duro. Con esto, un giro de rueda se
+// desliza durante medio segundo con inercia y cada animación hereda esa
+// suavidad sin cambiar una sola línea.
+//
+// Comprobado en la referencia: su etiqueta raíz lleva la clase `lenis`, y un
+// solo giro de rueda recorre 122 → 232 → 291 → 330 → 351 → 363 → 371 → 378 en
+// vez de saltar de una vez.
+---
+
+<script>
+  import Lenis from 'lenis';
+
+  // Quien pidió menos movimiento se queda con el scroll del sistema. Suavizar
+  // el scroll es justo el tipo de movimiento que esa preferencia apaga, y a
+  // algunas personas les provoca mareo.
+  const quiereMovimiento = window.matchMedia('(prefers-reduced-motion: no-preference)').matches;
+
+  if (quiereMovimiento) {
+    const lenis = new Lenis({
+      // Medido contra la referencia: un giro de rueda de 400 px recorre
+      // 122 → 232 → 291 → 330 → 351 → 363 → 371 → 378 en ocho décimas. Con 1.1
+      // la nuestra llegaba al final en ese mismo tiempo; con 1.7 la curva calza.
+      duration: 1.7,
+      // Frena al final sin rebotar.
+      easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      smoothWheel: true,
+      // El táctil NO se suaviza: el dedo ya arrastra la página, y agregarle
+      // inercia artificial se siente como si el teléfono estuviera trabado.
+      syncTouch: false,
+    });
+
+    const latido = (tiempo: number) => {
+      lenis.raf(tiempo);
+      requestAnimationFrame(latido);
+    };
+    requestAnimationFrame(latido);
+
+    // Aviso para lo que anime con el scroll. GSAP lleva su propio reloj y, si
+    // no se le avisa en el mismo momento en que Lenis mueve la página, sus
+    // animaciones llegan uno o dos cuadros tarde y se ven "pegajosas".
+    // Se emite un evento en vez de exponer la instancia para que solo las
+    // páginas que de verdad usan GSAP tengan que cargarlo.
+    lenis.on('scroll', () => {
+      window.dispatchEvent(new CustomEvent('scroll-suave'));
+    });
+
+    // Los enlaces de ancla viajan con el mismo deslizamiento; si no, la página
+    // salta de golpe y rompe la sensación que acabamos de construir.
+    //
+    // Dónde frena lo dice el `scroll-margin-top` YA RESUELTO del destino, que
+    // sale de `--alto-cabecera` + `--respiro-ancla`. Con un número escrito acá
+    // el ancla aterrizaba 16 px más arriba con Lenis que sin él.
+    // Por delegación y no enlace por enlace: los del menú y los de la grilla de
+    // exámenes los pinta React después de cargar, así que al recorrer el
+    // documento una sola vez se quedaban afuera y saltaban de golpe.
+    document.addEventListener('click', (evento) => {
+      const objetivo = evento.target;
+      if (!(objetivo instanceof Element)) return;
+      const enlace = objetivo.closest<HTMLAnchorElement>('a[href]');
+      if (!enlace) return;
+      // Se comparan rutas y no el texto del `href`: los del pie son absolutos
+      // (`/#examenes`) para que también funcionen desde las legales, y ahí no
+      // empiezan por almohadilla.
+      const url = new URL(enlace.href, location.href);
+      if (url.origin !== location.origin) return;
+      if (url.pathname !== location.pathname || !url.hash) return;
+      const nodo = document.querySelector<HTMLElement>(url.hash);
+      if (!nodo) return;
+      evento.preventDefault();
+      const respiro = parseFloat(getComputedStyle(nodo).scrollMarginTop) || 0;
+      lenis.scrollTo(nodo, { offset: -respiro });
+    });
+  }
+</script>

@@ -76,8 +76,7 @@ export const PREGUNTAS_MUESTRA: Partial<Record<ModuloSlug, PreguntaMuestra>> = {
       'Una población de venados cola blanca en Guanacaste tiene tasa de natalidad de 0,12 y tasa de mortalidad de 0,05 por año. ¿Cuál es la tasa de crecimiento neto de esta población?',
     opciones: ['0,17 por año', '0,05 por año', '0,07 por año', '0,12 por año'],
     correcta: 2,
-    explicacion:
-      'Tasa de crecimiento neto = natalidad − mortalidad = 0,12 − 0,05 = 0,07 por año.',
+    explicacion: 'Tasa de crecimiento neto = natalidad − mortalidad = 0,12 − 0,05 = 0,07 por año.',
   },
 };
 

@@ -9,8 +9,10 @@ import { COPY, URL_PLAY } from '../data/copy';
 
     Va en Astro y no en una isla de React: es un botón y dos observadores, y no
     vale un solo KB de JavaScript de framework. */}
-<div class="barra" id="barra-descarga" data-testid="barra-descarga" hidden>
-  <a class="barra__boton" href={URL_PLAY}>{COPY.hero.cta}</a>
+<div class="barra" id="barra-descarga" data-testid="barra-descarga" data-fuera>
+  <a class="barra__boton pulsable" href={URL_PLAY}>
+    {COPY.hero.cta}
+  </a>
   <p class="barra__micro">{COPY.hero.microcopy}</p>
 </div>
 
@@ -27,8 +29,17 @@ import { COPY, URL_PLAY } from '../data/copy';
     let heroFuera = false;
     let cierreDentro = false;
 
+    // Además de mostrarse, la barra avisa al resto de la página: el botón de
+    // tema vive en la misma esquina y quedaba debajo de ella. Publica su alto
+    // para que se aparte lo justo, sin números repetidos en dos archivos.
+    // `data-fuera` y no `hidden`: con `hidden` la barra desaparecía de golpe
+    // y volvía con un keyframe que no se podía interrumpir a medio camino.
     const pintar = () => {
-      barra.hidden = !(heroFuera && !cierreDentro);
+      const visible = heroFuera && !cierreDentro;
+      barra.toggleAttribute('data-fuera', !visible);
+      const raiz = document.documentElement;
+      raiz.classList.toggle('con-barra', visible);
+      if (visible) raiz.style.setProperty('--alto-barra', `${barra.offsetHeight}px`);
     };
 
     new IntersectionObserver(
@@ -64,7 +75,23 @@ import { COPY, URL_PLAY } from '../data/copy';
     backdrop-filter: blur(14px);
     -webkit-backdrop-filter: blur(14px);
     border-top: 1px solid var(--borde);
-    animation: barra-entra 300ms var(--salida);
+    transition:
+      transform 260ms var(--salida),
+      opacity 260ms var(--salida),
+      visibility 0s;
+  }
+
+  /* Sale más rápido de lo que entra, y es interrumpible: si el cierre aparece
+     y se vuelve atrás, la barra retoma desde donde iba. */
+  .barra[data-fuera] {
+    transform: translateY(100%);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition:
+      transform 180ms var(--salida),
+      opacity 180ms var(--salida),
+      visibility 0s 180ms;
   }
 
   /* Solo en móvil: en escritorio el botón vive en la cabecera, que está
@@ -94,15 +121,10 @@ import { COPY, URL_PLAY } from '../data/copy';
     color: var(--tinta-suave);
   }
 
-  @keyframes barra-entra {
-    from {
-      transform: translateY(100%);
-    }
-  }
-
   @media (prefers-reduced-motion: reduce) {
-    .barra {
-      animation: none;
+    .barra,
+    .barra[data-fuera] {
+      transition: visibility 0s;
     }
   }
 </style>

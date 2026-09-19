@@ -1,0 +1,369 @@
+---
+import Examenes from '../islas/Examenes';
+import { COPY } from '../../data/copy';
+import { EXAMENES } from '../../data/examenes';
+
+// La grilla numerada de la referencia ("Built for the last one percent"): una
+// fila por módulo, con el número a la izquierda, el nombre grande, las
+// materias a la derecha y, en escritorio, la tarjeta con el arte del módulo
+// que sigue al cursor. Las filas y la tarjeta viven en la isla; acá queda el
+// encabezado y el estilo.
+//
+// Los módulos salen de `data/examenes.ts`, copia de `modules` y `subjects` de
+// producción.
+const { examenes } = COPY;
+---
+
+<section class="examenes" id="examenes">
+  <div class="examenes__cabeza">
+    <h2 class="examenes__titular titular-seccion">{examenes.titular}</h2>
+    <p class="examenes__bajada">{examenes.bajada}</p>
+  </div>
+
+  <Examenes client:visible examenes={EXAMENES} nuevo={examenes.nuevo} />
+</section>
+
+<style>
+  .examenes {
+    padding-bottom: var(--aire-seccion);
+    scroll-margin-top: calc(var(--alto-cabecera) + var(--respiro-ancla));
+  }
+
+  .examenes__cabeza {
+    max-width: var(--caja);
+    margin-inline: auto;
+    padding-inline: var(--pad-seccion);
+  }
+
+  .examenes__titular {
+    max-width: 42rem;
+  }
+
+  .examenes__bajada {
+    max-width: 36rem;
+    margin-top: 20px;
+    color: var(--tinta-suave);
+    font-size: 1rem;
+    line-height: 1.625;
+  }
+</style>
+
+<style is:global>
+  /* Estilos de la isla: el marcado lo pinta React, así que no pueden ir
+     scoped. Las reglas van de canto a canto de la página; el contenido de
+     cada fila se alinea al mismo ancho de 1440 que el encabezado. */
+  /* Fluido: 64 fijos dejaban en teléfono una banda vacía más alta que la
+     bajada. A 390 da 40, el mismo aire que usa Fuentes. */
+  .examenes__filas {
+    position: relative;
+    margin-top: clamp(40px, 8vw, 64px);
+    border-top: 1px solid var(--borde);
+  }
+
+  /* Cada fila es un enlace al cierre de descarga y entra detrás de la anterior.
+     El escalón son 60ms; quién lleva cuál lo decide el observador de la isla.
+
+     Va con `--cajon` y no con `--salida`: esa segunda arranca casi de golpe
+     —el primer punto de control ya está arriba en 0,23— y a una fila entera
+     entrando se le notaba el golpe. La del cajón sale con peso y frena largo,
+     que es lo que hace que se sienta que la fila llega en vez de aparecer. */
+  .examen {
+    display: block;
+    border-bottom: 1px solid var(--borde);
+    color: inherit;
+    text-decoration: none;
+    opacity: 0;
+    transform: translateY(16px);
+    transition:
+      opacity 420ms var(--cajon),
+      transform 420ms var(--cajon);
+    transition-delay: calc(var(--i, 0) * 60ms);
+  }
+
+  .examen[data-dentro] {
+    opacity: 1;
+    transform: none;
+  }
+
+  /* Sin JavaScript la isla nunca monta y nadie pone el atributo: las filas se
+     ven, y punto. */
+  @media (scripting: none) {
+    .examen {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  .examen__interior {
+    display: flex;
+    max-width: var(--caja);
+    align-items: center;
+    margin-inline: auto;
+    padding: 32px var(--pad-seccion);
+    gap: 20px;
+  }
+
+  @media (min-width: 640px) {
+    .examen__interior {
+      padding-block: 48px;
+      gap: 32px;
+    }
+  }
+
+  .examen__numero {
+    width: 32px;
+    flex: none;
+    color: var(--tinta-suave);
+    font-family: ui-monospace, 'Cascadia Mono', 'Segoe UI Mono', monospace;
+    font-size: 0.75rem;
+    line-height: 1;
+  }
+
+  .examen__cuerpo {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  @media (min-width: 1024px) {
+    .examen__cuerpo {
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+      gap: 48px;
+    }
+  }
+
+  /* 24 en móvil, 36 en adelante; al pasar el mouse se corre 12px. Medio
+     segundo con la curva más floja se sentía arrastrado: 200 ms y `--salida`. */
+  .examen__nombre {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-family: var(--fuente-titular);
+    font-size: 1.5rem;
+    font-weight: 500;
+    letter-spacing: -0.025em;
+    color: var(--tinta);
+    transition: transform 200ms var(--salida);
+  }
+
+  @media (min-width: 640px) {
+    .examen__nombre {
+      font-size: 2.25rem;
+    }
+  }
+
+  @media (min-width: 1024px) and (hover: hover) and (pointer: fine) {
+    .examen:hover .examen__nombre {
+      transform: translateX(12px);
+    }
+  }
+
+  .examen__nuevo {
+    padding: 4px 8px;
+    border-radius: 9999px;
+    background: rgb(155 203 108 / 0.18);
+    color: var(--lima-texto);
+    font-family: var(--fuente-texto, inherit);
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .examen__detalle {
+    max-width: 28rem;
+    color: var(--tinta-suave);
+    font-size: 0.875rem;
+    line-height: 1.625;
+  }
+
+  @media (min-width: 1024px) {
+    .examen__detalle {
+      max-width: 20rem;
+    }
+  }
+
+  .examen__formato {
+    color: var(--tinta);
+    font-weight: 500;
+  }
+
+  /* La redacción corta solo existe en teléfono. */
+  .examen__corto {
+    display: none;
+  }
+
+  /* Miniatura con el ícono original del módulo, como lo dibuja la app; solo en
+     móvil. El radio sigue al que trae el arte. */
+  .examen__miniatura {
+    display: block;
+    width: 64px;
+    height: 64px;
+    flex: none;
+    border-radius: 12.5%;
+    object-fit: cover;
+  }
+
+  @media (min-width: 1024px) {
+    .examen__miniatura {
+      display: none;
+    }
+  }
+
+  /* La flecha vive oculta 8px a la izquierda y entra al pasar el mouse. */
+  .examen__flecha {
+    display: none;
+    flex: none;
+    color: var(--tinta);
+    opacity: 0;
+    transform: translateX(-8px);
+    transition:
+      opacity 200ms var(--salida),
+      transform 200ms var(--salida);
+  }
+
+  @media (min-width: 1024px) {
+    .examen__flecha {
+      display: block;
+    }
+  }
+
+  @media (min-width: 1024px) and (hover: hover) and (pointer: fine) {
+    .examen:hover .examen__flecha {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  /* ── Vista previa ───────────────────────────────────────────────────── */
+
+  /* El envoltorio lo mueve Motion con el cursor; la tarjeta cuelga 176 arriba
+     y 40 a la derecha del punto, como en la referencia. Solo en pantallas
+     anchas: en móvil cada fila lleva su miniatura. */
+  .previa {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 10;
+    display: none;
+    pointer-events: none;
+  }
+
+  @media (min-width: 1024px) {
+    .previa {
+      display: block;
+    }
+  }
+
+  /* Opacidad y escala las anima Motion (muelle 320/28). El arte es el ícono
+     original del módulo: cuadrado, con su fondo y sus esquinas. */
+  .previa__tarjeta {
+    position: relative;
+    width: 230px;
+    aspect-ratio: 1500 / 1522;
+    margin-top: -176px;
+    margin-left: 40px;
+    overflow: hidden;
+    border-radius: 12.5%;
+    box-shadow: 0 30px 70px -25px rgb(0 0 0 / 0.45);
+  }
+
+  /* Las cinco hojas apiladas; Motion funde la de la fila señalada. */
+  .previa__hoja {
+    position: absolute;
+    inset: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  /* Apagar solo la transición dejaba vivo el desplazamiento del hover: el
+     mismo salto de 12px, ahora en un cuadro. Se apaga el movimiento entero. */
+  @media (prefers-reduced-motion: reduce) {
+    .examen {
+      opacity: 1;
+      transform: none;
+      transition: none;
+    }
+
+    .examen__nombre,
+    .examen__flecha {
+      transition: none;
+    }
+
+    .examen:hover .examen__nombre {
+      transform: none;
+    }
+
+    .examen__flecha {
+      transform: none;
+    }
+  }
+
+  /* En teléfono la fila se lee como la lista de módulos de la app: el arte a la
+     izquierda con su relieve, y a la derecha el nombre y una sola línea de
+     detalle. Va al final del bloque a propósito: pisa las reglas base, que
+     tienen la misma especificidad. */
+  @media (max-width: 639px) {
+    .examen__interior {
+      display: grid;
+      grid-template-areas:
+        'arte num nombre'
+        'arte det det';
+      grid-template-columns: auto auto 1fr;
+      align-items: center;
+      padding-block: 20px;
+      gap: 6px 12px;
+    }
+
+    /* El nombre y la descripción caen directo en la grilla de arriba. */
+    .examen__cuerpo {
+      display: contents;
+    }
+
+    .examen__numero {
+      grid-area: num;
+      width: auto;
+      font-size: 0.6875rem;
+    }
+
+    .examen__nombre {
+      grid-area: nombre;
+      gap: 8px;
+      font-size: 1.125rem;
+    }
+
+    .examen__nuevo {
+      padding: 2px 6px;
+      font-size: 0.625rem;
+    }
+
+    .examen__detalle {
+      grid-area: det;
+      font-size: 0.8125rem;
+      line-height: 1.45;
+    }
+
+    .examen__largo {
+      display: none;
+    }
+
+    .examen__corto {
+      display: inline;
+    }
+
+    /* El arte suelto se veía plano: con filete y sombra vuelve a leerse como
+       el ícono de la app. */
+    .examen__miniatura {
+      grid-area: arte;
+      width: 56px;
+      height: 56px;
+      border: 1px solid var(--borde);
+      box-shadow: 0 10px 24px -14px rgb(0 0 0 / 0.55);
+    }
+  }
+</style>

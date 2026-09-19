@@ -1,5 +1,9 @@
 ---
+import Logotipo from './Logotipo.astro';
+import Tarjeta from './Tarjeta.astro';
+import Wordmark from './Wordmark.astro';
 import { COPY } from '../data/copy';
+import { TIENDAS, rotuloDeTienda } from '../data/tiendas';
 
 interface Props {
   class?: string;
@@ -8,127 +12,340 @@ interface Props {
 }
 
 const { class: className, style } = Astro.props;
+const { frase, columnas, copyright, marca, marcaUrl, expansion } = COPY.pie;
+
+// Los externos abren en pestaña nueva; los internos y el correo, no.
+const esExterno = (href: string) => href.startsWith('http');
 ---
 
 <footer class:list={['pie', className]} style={style}>
-  <nav class="pie__enlaces" aria-label="Legal">
-    <a href="/terminos">Términos de uso</a>
-    <a href="/privacidad">Política de privacidad</a>
-    <a href="/bases">Bases de premiaciones</a>
-    <a href="/eliminar-cuenta">Eliminar cuenta</a>
-    {/* Sin enlace hasta que empresas.holakodi.com exista: un enlace muerto en
-        el pie es peor que no ofrecerlo. */}
-    <span class="pie__pendiente">{COPY.empresas.enlace}</span>
-  </nav>
-  <p class="pie__legal">
-    {COPY.pie.copyright} ·{' '}
-    <a href={COPY.pie.marcaUrl} target="_blank" rel="noopener noreferrer">
-      {COPY.pie.marca}<span class="oculto"> (se abre en una pestaña nueva)</span>
-    </a>
-  </p>
-  {/* Nombrar seis instituciones sin aclarar que no hay relación implica un
-      respaldo que no existe. La línea es fina a propósito: es un deslinde, no
-      un argumento de venta. */}
-  <p class="pie__deslinde">{COPY.pie.deslinde}</p>
-  <p class="pie__expansion">{COPY.pie.expansion}</p>
+  <div class="pie__caja">
+    <div class="pie__fila">
+      <div class="pie__marca">
+        <a class="pie__logo" href="/#inicio" aria-label="Kodi, ir al inicio">
+          <Logotipo class="pie__wordmark" />
+        </a>
+        <p class="pie__frase">{frase}</p>
+
+        {/* Las mismas tarjetas del hero, no un botón aparte: son el badge que
+            el sitio ya usa, y la de iPhone cambia sola de "Muy pronto en" a
+            "Descargala en" el día que salga. Acá van apiladas y a menor
+            tamaño, porque la columna mide 20rem y el turno ya lo tuvo el
+            hero. */}
+        <div class="pie__tiendas">
+          {TIENDAS.map((tienda) => (
+            <Tarjeta
+              icono={tienda.icono}
+              rotulo={rotuloDeTienda(tienda)}
+              nombre={tienda.nombre}
+              href={tienda.url ?? undefined}
+            />
+          ))}
+        </div>
+      </div>
+
+      <nav class="pie__columnas" aria-label="Enlaces del pie">
+        {columnas.map((columna) => (
+          <div class="pie__columna">
+            <h2 class="pie__titulo">{columna.titulo}</h2>
+            <ul class="pie__lista">
+              {columna.enlaces.map((enlace) => (
+                <li>
+                  {enlace.href === null ? (
+                    <span class="pie__pendiente">{enlace.texto}</span>
+                  ) : (
+                    <a
+                      href={enlace.href}
+                      target={esExterno(enlace.href) ? '_blank' : undefined}
+                      rel={esExterno(enlace.href) ? 'noopener noreferrer' : undefined}
+                    >
+                      {enlace.texto}
+                      {esExterno(enlace.href) && (
+                        <span class="oculto"> (se abre en una pestaña nueva)</span>
+                      )}
+                    </a>
+                  )}
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
+      </nav>
+    </div>
+
+    <div class="pie__base">
+      <p>
+        {copyright} ·{' '}
+        <a href={marcaUrl} target="_blank" rel="noopener noreferrer">
+          {marca}
+          <span class="oculto"> (se abre en una pestaña nueva)</span>
+        </a>
+      </p>
+      <p>{expansion}</p>
+    </div>
+
+    {/* El logotipo enorme y recortado con el que cierra la página. Es el mismo
+        recurso de la cabecera, no un texto imitando la marca. */}
+    <div class="pie__sello" aria-hidden="true">
+      <Wordmark class="pie__sello-marca" />
+    </div>
+  </div>
 </footer>
 
+<style is:global>
+  /* El logotipo lo dibuja `Wordmark.astro`, así que no lleva el atributo de
+     alcance de este archivo y las reglas del bloque de abajo no le llegan.
+     Van acá, acotadas por las clases del pie para que no toquen otros SVG. */
+  /* Sin `color`: este logotipo trae sus propios colores de marca. */
+  /* `flex: none`: dentro de un contenedor flexible el SVG se dejaba encoger a
+     lo ancho y el punto del final quedaba cortado contra el borde. */
+  .pie__wordmark {
+    display: block;
+    height: 34px;
+    width: auto;
+    flex: none;
+  }
+
+  /* La referencia fija el TAMAÑO del sello, no el ancho: su texto llega a
+     300 px con interlínea 0.85, o sea 255 px de alto. Acá se fija esa misma
+     altura y el ancho sale solo, porque el logotipo es una imagen y estirarlo
+     a todo el ancho lo dejaba del doble de alto que el de ellos. */
+  .pie__sello svg {
+    display: block;
+    height: clamp(70px, 17.7vw, 255px);
+    width: auto;
+    margin-inline: auto;
+    /* Mismo hundimiento que la referencia. El color es el gris de los bordes:
+       en su tema el sello está apenas un tono por encima del fondo, y sobre
+       nuestra superficie clara ese mismo tono desaparecería del todo. */
+    translate: 0 22%;
+    color: var(--borde);
+  }
+</style>
+
 <style>
-  /* El pie reclama su propio espacio: antes toda la separación era el sobrante
-     de `flex: 1` en el contenido y en una pantalla baja quedaba a 1 px de la
-     última tarjeta. Ahora hay margen, regla y padding propios, así que el piso
-     no depende del alto del viewport. */
+  /* Todas las medidas salen del pie de la referencia, leídas de su código:
+     caja de 1440, márgenes laterales de 20, 32 y 40 según el ancho, y 64 de
+     respiro arriba que sube a 80. */
   .pie {
-    margin-top: var(--ritmo-seccion);
-    padding-block: var(--e-5);
-    padding-bottom: max(var(--e-5), env(safe-area-inset-bottom));
     border-top: 1px solid var(--borde);
-    color: var(--tinta-suave);
-    font-size: 0.875rem;
-    text-align: center;
   }
 
-  .pie__enlaces {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: var(--e-1) var(--e-5);
+  .pie__caja {
+    max-width: 1440px;
+    margin-inline: auto;
+    padding-inline: 20px;
+    padding-top: 64px;
   }
 
-  /* min-height 44 y no 24: los enlaces del pie medían 20 px de alto en la zona
-     del pulgar. El aire entre filas lo da el área táctil, no el gap. */
-  .pie__enlaces a {
-    display: inline-flex;
-    min-height: 44px;
-    align-items: center;
-    padding-inline: var(--e-1);
-    color: var(--tinta-suave);
-    text-decoration-color: var(--borde);
-    text-underline-offset: 3px;
-    transition: color 160ms ease;
-  }
-
-  @media (hover: hover) and (pointer: fine) {
-    .pie__enlaces a:hover {
-      color: var(--teal-texto);
-      text-decoration-color: currentColor;
+  @media (min-width: 640px) {
+    .pie__caja {
+      padding-inline: 32px;
+      padding-top: 80px;
     }
   }
 
-  .pie__legal {
+  @media (min-width: 1024px) {
+    .pie__caja {
+      padding-inline: 40px;
+    }
+  }
+
+  /* Apilado hasta 1024 y en dos bloques a partir de ahí: la marca a un lado y
+     las columnas al otro, separadas al máximo. */
+  .pie__fila {
+    display: flex;
+    flex-direction: column;
+    gap: 56px;
+  }
+
+  @media (min-width: 1024px) {
+    .pie__fila {
+      flex-direction: row;
+      justify-content: space-between;
+    }
+  }
+
+  .pie__marca {
+    max-width: 20rem;
+  }
+
+  .pie__logo {
+    display: inline-flex;
+  }
+
+  .pie__frase {
+    margin-top: 24px;
+    color: var(--tinta-suave);
+    font-size: 0.875rem;
+    line-height: 1.625;
+  }
+
+  /* Apiladas y no en fila: la columna mide 20rem y dos tarjetas lado a lado
+     entrarían recortadas. Encogidas con las mismas proporciones del hero, un
+     paso de la escala más chicas en cada medida. */
+  .pie__tiendas {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    margin-top: 24px;
+    gap: var(--e-2);
+  }
+
+  .pie__tiendas :global(.tarjeta) {
+    min-width: 0;
+    width: 100%;
+    max-width: 13rem;
+    gap: var(--e-2);
+    padding: var(--e-2) var(--e-3);
+    border-width: 1px;
+    border-radius: 0.75rem;
+  }
+
+  .pie__tiendas :global(.tarjeta svg) {
+    width: 1.375rem;
+    height: 1.375rem;
+  }
+
+  .pie__tiendas :global(.tarjeta__rotulo) {
+    font-size: 0.625rem;
+  }
+
+  .pie__tiendas :global(.tarjeta__nombre) {
     font-size: 0.8125rem;
   }
 
-  .pie__deslinde,
-  .pie__expansion {
-    max-width: 62ch;
-    margin-inline: auto;
-    font-size: 0.75rem;
-    line-height: 1.5;
+  /* Dos columnas en teléfono y cuatro desde 640. La separación horizontal
+     crece de 32 a 64 cuando hay ancho de sobra. */
+  .pie__columnas {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: 32px;
+    row-gap: 40px;
   }
 
-  .pie__deslinde {
-    margin-top: var(--e-3);
-  }
-
-  .pie__expansion {
-    margin-top: var(--e-2);
-  }
-
-  /* Mismo alto y mismo aire que un enlace, pero sin subrayado ni hover: se ve
-     que está ahí y se ve que todavía no lleva a ningún lado. */
-  .pie__pendiente {
-    display: inline-flex;
-    min-height: 44px;
-    align-items: center;
-    padding-inline: var(--e-1);
-    opacity: 0.5;
-  }
-
-  /* Mismo trato que los enlaces legales: mismo color, mismo hover, misma área
-     táctil. Solo la marca es enlace, no la línea entera. */
-  .pie__legal a {
-    display: inline-flex;
-    min-height: 44px;
-    align-items: center;
-    padding-inline: var(--e-1);
-    color: var(--tinta-suave);
-    text-decoration-color: var(--borde);
-    text-underline-offset: 3px;
-    vertical-align: middle;
-    transition: color 160ms ease;
-  }
-
-  @media (hover: hover) and (pointer: fine) {
-    .pie__legal a:hover {
-      color: var(--teal-texto);
-      text-decoration-color: currentColor;
+  @media (min-width: 640px) {
+    .pie__columnas {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
     }
   }
 
+  @media (min-width: 1024px) {
+    .pie__columnas {
+      column-gap: 64px;
+    }
+  }
+
+  /* En la grotesca de los titulares y no en la fuente de cuerpo: la
+     referencia usa una sola familia para todo el pie, así que sus rótulos se
+     ven firmes a peso 500. Nunito a ese peso queda blanda y el título no se
+     despega de su propia lista. */
+  .pie__titulo {
+    color: var(--tinta);
+    font-family: var(--fuente-titular);
+    font-size: 0.875rem;
+    font-weight: 600;
+    line-height: 1.43;
+    letter-spacing: -0.025em;
+  }
+
+  /* `padding-inline-start: 0`: la sangría que el navegador le da a toda lista
+     dejaba los enlaces 40 px a la derecha de su propio título. */
+  .pie__lista {
+    display: flex;
+    flex-direction: column;
+    margin-top: 16px;
+    padding-inline-start: 0;
+    gap: 12px;
+    list-style: none;
+  }
+
+  .pie__lista a,
+  .pie__pendiente {
+    color: var(--tinta-suave);
+    font-size: 0.875rem;
+    line-height: 1.43;
+  }
+
+  /* Sin subrayado en todo el pie: son listas de navegación, se leen como tal
+     por su posición, y subrayados convierten el pie en una maraña de rayas.
+     El aviso de que se pueden tocar es el cambio de color. */
+  .pie__lista a,
+  .pie__base a {
+    text-decoration: none;
+  }
+
+  .pie__lista a,
+  .pie__base a {
+    transition: color 160ms var(--salida);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .pie__lista a:hover,
+    .pie__base a:hover {
+      color: var(--tinta);
+    }
+  }
+
+  /* Con el dedo cada enlace medía 19px de alto con 12 de separación: la lista
+     entera pedía puntería. El relleno los engorda y la separación baja para
+     que el pie no crezca de más. */
+  @media (pointer: coarse) {
+    .pie__lista {
+      gap: 4px;
+    }
+
+    .pie__lista a,
+    .pie__pendiente {
+      display: inline-block;
+      padding-block: 8px;
+    }
+  }
+
+  /* Lo que todavía no existe se ve, pero no se puede tocar ni enfocar. */
+  .pie__pendiente {
+    opacity: 0.55;
+  }
+
+  /* En teléfono el orden se invierte para que el copyright quede al final de
+     todo, que es donde se lo busca. */
+  .pie__base {
+    display: flex;
+    flex-direction: column-reverse;
+    align-items: flex-start;
+    gap: 16px;
+    /* Menos que los 64 de la referencia: su bloque de la izquierda termina en
+       un botón de una línea y el nuestro en dos tarjetas apiladas, así que ya
+       baja más y con 64 quedaba un hueco muerto antes del copyright. */
+    margin-top: 32px;
+    padding-top: 24px;
+  }
+
+  .pie__base p,
+  .pie__base a {
+    color: var(--tinta-suave);
+    font-size: 0.75rem;
+  }
+
+  @media (min-width: 640px) {
+    .pie__base {
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+    }
+  }
+
+  /* El cierre: el logotipo a lo ancho, hundido para que se corte contra el
+     borde de la página. No se selecciona ni recibe el puntero porque es
+     decoración, no contenido. */
+  .pie__sello {
+    overflow: hidden;
+    pointer-events: none;
+    user-select: none;
+  }
+
   @media (prefers-reduced-motion: reduce) {
-    .pie__enlaces a,
-    .pie__legal a {
+    .pie__lista a {
       transition: none;
     }
   }

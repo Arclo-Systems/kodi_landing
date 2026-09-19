@@ -1,0 +1,226 @@
+---
+import { Plus } from '@lucide/astro';
+import { COPY } from '../../data/copy';
+import { FAQ } from '../../data/faq';
+
+// Estructura de la referencia, leída de su código: dos columnas con el
+// encabezado a la izquierda, cada pregunta separada por una línea, y el signo
+// de más que gira hasta volverse una equis al abrir.
+//
+// Lo que cambia es la mecánica. Ellos lo resuelven con React y estado; acá va
+// con `<details>` nativo, que abre y cierra SIN JavaScript, ya es accesible por
+// teclado y se anuncia solo en un lector de pantalla. El atributo `name` hace
+// que solo una quede abierta a la vez, que es justo el comportamiento de ellos.
+
+// El `<` no se escapa solo: si una respuesta llegara a contener `</script>`,
+// rompería la página entera.
+const datosFaq = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: FAQ.map((item) => ({
+    '@type': 'Question',
+    name: item.pregunta,
+    acceptedAnswer: { '@type': 'Answer', text: item.respuesta },
+  })),
+}).replace(/</g, '\\u003c');
+---
+
+<section class="faq" id="faq">
+  <div class="faq__reja">
+    <div class="faq__texto">
+      <h2 class="faq__titular titular-seccion">{COPY.faq.titular}</h2>
+      <p class="faq__bajada">
+        {COPY.faq.bajada} <a href={`mailto:${COPY.faq.correo}`}>{COPY.faq.correo}</a>.
+      </p>
+    </div>
+
+    <div class="faq__lista">
+      {FAQ.map((item, i) => (
+        <details class="faq__item" name="faq" open={i === 0}>
+          <summary class="faq__pregunta pulsable pulsable--texto">
+            <span>{item.pregunta}</span>
+            <Plus class="faq__signo" size={20} stroke-width={1.75} aria-hidden="true" />
+          </summary>
+          <div class="faq__cuerpo">
+            <p>{item.respuesta}</p>
+          </div>
+        </details>
+      ))}
+    </div>
+  </div>
+</section>
+
+{/* La página emite DOS bloques de datos estructurados: este y el de la
+    aplicación que pone el layout. Es válido y está bien así. */}
+<script is:inline type="application/ld+json" set:html={datosFaq}></script>
+<style>
+  .faq {
+    max-width: var(--caja);
+    margin-inline: auto;
+    padding-inline: var(--pad-seccion);
+    padding-bottom: var(--aire-seccion);
+    scroll-margin-top: calc(var(--alto-cabecera) + var(--respiro-ancla));
+  }
+
+  /* La columna de preguntas es más ancha que la del encabezado, como en la
+     referencia: el texto de la izquierda es una entrada, no un contenido. */
+  .faq__reja {
+    display: grid;
+    gap: 40px;
+  }
+
+  @media (min-width: 1024px) {
+    .faq__reja {
+      grid-template-columns: 0.9fr 1.1fr;
+      gap: 80px;
+    }
+  }
+
+  .faq__texto {
+    max-width: 42rem;
+  }
+
+  .faq__bajada {
+    max-width: 36rem;
+    margin-top: 20px;
+    color: var(--tinta-suave);
+    font-size: 1rem;
+    line-height: 1.625;
+  }
+
+  .faq__bajada a {
+    color: var(--teal-texto);
+  }
+
+  /* Una línea arriba de cada una y otra abajo de la última: así el bloque se
+     lee como una lista cerrada y no como cajas sueltas. */
+  .faq__item {
+    border-top: 1px solid var(--borde);
+  }
+
+  .faq__item:last-of-type {
+    border-bottom: 1px solid var(--borde);
+  }
+
+  .faq__pregunta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    padding-block: 24px;
+    cursor: pointer;
+    color: var(--tinta);
+    font-family: var(--fuente-titular);
+    font-size: 1rem;
+    font-weight: 500;
+    letter-spacing: -0.025em;
+    /* El triángulo que el navegador pone por su cuenta sobra: el signo de más
+       de la derecha ya dice que esto se abre. */
+    list-style: none;
+    transition: opacity 140ms var(--salida);
+  }
+
+  /* La fila entera era lo único pulsable del sitio sin ninguna señal: ni al
+     pasar el mouse ni al apretar. */
+  @media (hover: hover) and (pointer: fine) {
+    .faq__pregunta:hover {
+      opacity: 0.7;
+    }
+  }
+
+  .faq__pregunta::-webkit-details-marker {
+    display: none;
+  }
+
+  @media (min-width: 640px) {
+    .faq__pregunta {
+      font-size: 1.125rem;
+    }
+  }
+
+  /* El más se convierte en equis girando, no cambiando de ícono: así el gesto
+     de cerrar se ve, en vez de aparecer de golpe. */
+  .faq__signo {
+    flex: none;
+    color: var(--tinta-suave);
+    transition: rotate 240ms var(--salida);
+  }
+
+  .faq__item[open] .faq__signo {
+    rotate: 45deg;
+  }
+
+  .faq__cuerpo p {
+    max-width: 42rem;
+    padding-bottom: 28px;
+    color: var(--tinta-suave);
+    font-size: 0.875rem;
+    line-height: 1.625;
+  }
+
+  /* La apertura se anima donde el navegador sabe interpolar una altura
+     automática. Donde todavía no, abre y cierra de una: el contenido es el
+     mismo y nada se pierde.
+
+     `interpolate-size` va acá y no en el pseudoelemento: se hereda, y es lo
+     que habilita animar hacia `auto`. */
+  @supports selector(::details-content) {
+    .faq__lista {
+      interpolate-size: allow-keywords;
+    }
+
+    /* Con `--salida` la caja se abría de golpe: esa curva llega arriba al 23%
+       del recorrido, así que en 240ms el panel saltaba y después se arrastraba.
+       La del cajón sale con peso y frena largo, que es lo que se lee como que
+       algo se despliega. Misma curva que la escalera de exámenes. */
+    .faq__item::details-content {
+      block-size: 0;
+      overflow: hidden;
+      transition:
+        block-size 320ms var(--cajon),
+        content-visibility 320ms allow-discrete;
+    }
+
+    .faq__item[open]::details-content {
+      block-size: auto;
+    }
+
+    /* El texto entra por su cuenta, subiendo y fundiéndose, en vez de que la
+       caja lo destape recortado: eso era lo que se veía como un parpadeo.
+       Opacidad y transform, que no tocan el diseño y van por GPU. */
+    .faq__cuerpo {
+      opacity: 0;
+      transform: translateY(-6px);
+      transition:
+        opacity 140ms var(--salida),
+        transform 140ms var(--salida);
+    }
+
+    /* Al abrir espera a que la caja tenga sitio; al cerrar se va de una, que
+       es donde lo que manda es la respuesta del sistema y no la del lector. */
+    .faq__item[open] .faq__cuerpo {
+      opacity: 1;
+      transform: none;
+      transition-delay: 100ms;
+      transition-duration: 220ms;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .faq__pregunta,
+    .faq__signo {
+      transition: none;
+    }
+
+    @supports selector(::details-content) {
+      .faq__item::details-content,
+      .faq__cuerpo {
+        transition: none;
+      }
+
+      .faq__cuerpo {
+        transform: none;
+      }
+    }
+  }
+</style>
