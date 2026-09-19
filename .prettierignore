@@ -1,0 +1,12 @@
+dist
+node_modules
+.astro
+public
+coverage
+playwright-report
+test-results
+
+# prettier-plugin-astro no es idempotente con estos archivos: a cada pasada le
+# suma dos espacios a las líneas de continuación de los comentarios de CSS, así
+# que `--check` nunca pasaría. Los .astro se formatean a mano.
+*.astro
