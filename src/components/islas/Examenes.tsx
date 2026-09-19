@@ -120,7 +120,7 @@ export default function Examenes({ examenes }: Props) {
           className="examen"
           href="#descargar"
           data-dentro={escalones.has(i) ? '' : undefined}
-          style={{ '--i': escalones.get(i) ?? 0 } satisfies ConIndice}
+          style={{ '--i': escalones.get(i) ?? 0 } as ConIndice}
           onMouseEnter={() => setActiva(i)}
         >
           <div className="examen__interior">
