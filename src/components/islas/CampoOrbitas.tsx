@@ -2,6 +2,8 @@ import { useEffect, useRef, useState } from 'react';
 import { useReducedMotion, useScroll, useVelocity } from 'motion/react';
 import * as THREE from 'three';
 
+import { EMPUJE_MAX, empujeDeVelocidad } from '../../lib/movimiento';
+
 /**
  * El campo de órbitas del hero.
  *
@@ -289,12 +291,29 @@ export default function CampoOrbitas() {
 
   const { scrollY } = useScroll();
   const velocidad = useVelocity(scrollY);
+  // Con el dedo hace falta más recorrido para el mismo empujón: ver
+  // `empujeDeVelocidad`, que es donde vive la cuenta y su prueba.
+  const [punteroGrueso, setPunteroGrueso] = useState(false);
+
+  useEffect(() => {
+    const consulta = window.matchMedia('(pointer: coarse)');
+    const revisar = () => setPunteroGrueso(consulta.matches);
+    revisar();
+    consulta.addEventListener('change', revisar);
+    return () => consulta.removeEventListener('change', revisar);
+  }, []);
 
   // El bucle no se reinicia cuando cambia ninguno de estos: los lee de acá.
-  const vivo = useRef({ seco: false, imagenes: [] as readonly HTMLImageElement[], velocidad });
+  const vivo = useRef({
+    seco: false,
+    imagenes: [] as readonly HTMLImageElement[],
+    velocidad,
+    punteroGrueso: false,
+  });
   vivo.current.seco = seco === true;
   vivo.current.imagenes = imagenes;
   vivo.current.velocidad = velocidad;
+  vivo.current.punteroGrueso = punteroGrueso;
 
   // Las 27 descargas van en un efecto y no en el cuerpo: ahí se disparaban en
   // cada render.
@@ -401,8 +420,8 @@ export default function CampoOrbitas() {
     };
 
     const avanzar = (paso: number) => {
-      const { seco: quieto, imagenes: artes, velocidad: v } = vivo.current;
-      const objetivo = quieto ? 0 : Math.min(Math.abs(v.get()) / 300, 14);
+      const { seco: quieto, imagenes: artes, velocidad: v, punteroGrueso: grueso } = vivo.current;
+      const objetivo = quieto ? 0 : empujeDeVelocidad(v.get(), grueso);
       const { angulos, empujes } = giro;
 
       ANILLOS.forEach((anillo, i) => {
@@ -420,7 +439,7 @@ export default function CampoOrbitas() {
         if (!malla) return;
 
         const empuje = empujes[ficha.anillo] ?? 0;
-        const estiron = 1 + (empuje / 14) * (0.08 + 0.06 * ficha.anillo);
+        const estiron = 1 + (empuje / EMPUJE_MAX) * (0.08 + 0.06 * ficha.anillo);
         const radio = (radios[ficha.anillo] ?? 0) * estiron;
         const angulo = (angulos[ficha.anillo] ?? 0) + ficha.angulo;
 
