@@ -78,54 +78,45 @@ const ScrollReveal: React.FC<ScrollRevealProps> = ({
     const scroller =
       scrollContainerRef && scrollContainerRef.current ? scrollContainerRef.current : window;
 
+    // MODIFICADO. Se guardan los disparadores creados acá para matar SOLO esos
+    // al desmontar: `ScrollTrigger.getAll()` mata los de toda la página.
+    const mios: ScrollTrigger[] = [];
+    const anotar = (animacion: gsap.core.Tween) => {
+      const t = animacion.scrollTrigger;
+      if (t) mios.push(t);
+      return animacion;
+    };
+
     if (baseRotation !== 0) {
-      gsap.fromTo(
-        el,
-        { transformOrigin: '0% 50%', rotate: baseRotation },
-        {
-          ease: 'none',
-          rotate: 0,
-          scrollTrigger: {
-            trigger: el,
-            scroller,
-            start: 'top bottom',
-            end: rotationEnd,
-            scrub: true,
+      anotar(
+        gsap.fromTo(
+          el,
+          { transformOrigin: '0% 50%', rotate: baseRotation },
+          {
+            ease: 'none',
+            rotate: 0,
+            scrollTrigger: {
+              trigger: el,
+              scroller,
+              start: 'top bottom',
+              end: rotationEnd,
+              scrub: true,
+            },
           },
-        },
+        ),
       );
     }
 
     const wordElements = el.querySelectorAll<HTMLElement>('.word');
     const soltarCapas = () => gsap.set(wordElements, { clearProps: 'willChange' });
 
-    gsap.fromTo(
-      wordElements,
-      { opacity: baseOpacity, willChange: 'opacity' },
-      {
-        ease: 'none',
-        opacity: 1,
-        stagger: 0.05,
-        ...(wordDuration !== undefined && { duration: wordDuration }),
-        scrollTrigger: {
-          trigger: el,
-          scroller,
-          start: 'top bottom-=20%',
-          end: wordAnimationEnd,
-          scrub: true,
-          onLeave: soltarCapas,
-          onLeaveBack: soltarCapas,
-        },
-      },
-    );
-
-    if (enableBlur) {
+    anotar(
       gsap.fromTo(
         wordElements,
-        { filter: `blur(${blurStrength}px)` },
+        { opacity: baseOpacity, willChange: 'opacity' },
         {
           ease: 'none',
-          filter: 'blur(0px)',
+          opacity: 1,
           stagger: 0.05,
           ...(wordDuration !== undefined && { duration: wordDuration }),
           scrollTrigger: {
@@ -134,8 +125,32 @@ const ScrollReveal: React.FC<ScrollRevealProps> = ({
             start: 'top bottom-=20%',
             end: wordAnimationEnd,
             scrub: true,
+            onLeave: soltarCapas,
+            onLeaveBack: soltarCapas,
           },
         },
+      ),
+    );
+
+    if (enableBlur) {
+      anotar(
+        gsap.fromTo(
+          wordElements,
+          { filter: `blur(${blurStrength}px)` },
+          {
+            ease: 'none',
+            filter: 'blur(0px)',
+            stagger: 0.05,
+            ...(wordDuration !== undefined && { duration: wordDuration }),
+            scrollTrigger: {
+              trigger: el,
+              scroller,
+              start: 'top bottom-=20%',
+              end: wordAnimationEnd,
+              scrub: true,
+            },
+          },
+        ),
       );
     }
 
@@ -148,7 +163,7 @@ const ScrollReveal: React.FC<ScrollRevealProps> = ({
 
     return () => {
       window.removeEventListener('scroll-suave', avisar);
-      ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
+      mios.forEach((trigger) => trigger.kill());
     };
   }, [
     scrollContainerRef,

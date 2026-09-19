@@ -53,8 +53,14 @@ import { Moon, Sun } from '@lucide/astro';
       // La barra del navegador en el teléfono se pinta con esto. Sin
       // actualizarlo, el teléfono sigue mostrando la barra clara sobre una
       // página oscura.
+      // El color sale de `--superficie`, que es el que pinta la página: escrito
+      // a mano acá y en el layout, cualquier cambio de paleta dejaba la barra
+      // del navegador de un color que ya no existe.
       const barra = document.querySelector<HTMLMetaElement>('meta[name="theme-color"]');
-      if (barra) barra.content = oscuro ? '#0d1215' : '#fafafa';
+      const superficie = getComputedStyle(document.documentElement)
+        .getPropertyValue('--superficie')
+        .trim();
+      if (barra && superficie) barra.content = superficie;
     };
 
     boton.addEventListener('click', () => {

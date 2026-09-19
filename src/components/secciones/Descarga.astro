@@ -2,22 +2,16 @@
 import BounceCards from '../react-bits/BounceCards';
 import Tarjeta from '../Tarjeta.astro';
 import { COPY } from '../../data/copy';
+import { MODULOS } from '../../data/modulos';
 import { TIENDAS, rotuloDeTienda } from '../../data/tiendas';
 
 // El cierre de la referencia: un panel oscuro en los dos temas, con el abanico
 // de tarjetas arriba, el titular grande, una bajada corta y los botones.
 //
-// Las cinco tarjetas son los íconos de módulo del panel de administración (los
-// `iconUrl` reales de producción), cada uno sobre el color de identidad de su
-// módulo (`modules.colorHex`). Los módulos activos en Costa Rica son estos
-// cinco; si entra uno nuevo, se agrega acá con su ícono y su color.
-const MODULOS = [
-  { nombre: 'COSEVI Auto', color: '#e3b23c', icono: '/app/chico/modulo-cosevi-auto.webp' },
-  { nombre: 'COSEVI Moto', color: '#5db7e8', icono: '/app/chico/modulo-cosevi-moto.webp' },
-  { nombre: 'Prueba de Admisión', color: '#f47c6b', icono: '/app/chico/modulo-paa.webp' },
-  { nombre: 'PNE Primaria', color: '#9bcb6c', icono: '/app/chico/modulo-pen-primaria.webp' },
-  { nombre: 'PNE Secundaria', color: '#b79ae8', icono: '/app/chico/modulo-pen-secundaria.webp' },
-];
+// Las cinco tarjetas son los íconos de módulo del panel de administración
+// sobre su color de identidad. Salen de `data/modulos.ts`, que es donde vive
+// el catálogo: acá estaban copiados a mano y eran la tercera lista de lo
+// mismo que había que mantener sincronizada.
 
 // Los cinco lugares del abanico, medidos en la referencia: el del centro
 // derecho, los de al lado 112 afuera y 8 abajo con 6°, y los extremos 224
@@ -88,9 +82,11 @@ const { descarga } = COPY;
     {/* Las tres palabras del titular entran una por una desde abajo, cada una
         recortada por su propia caja: es el mismo revelado por palabra que usa
         la referencia en este cierre. */}
+    {/* El texto va UNA vez. Antes iba dos: una copia recortada para lectores de
+        pantalla y otra animada con `aria-hidden`. Como `.oculto` recorta pero no
+        saca del DOM, el encabezado salía con la frase repetida. */}
     <h2 class="cierre__titular">
-      <span class="oculto">{descarga.titular.join(' ')}</span>
-      <span class="cierre__palabras" aria-hidden="true">
+      <span class="cierre__palabras">
         {descarga.titular.map((palabra, i) => (
           <span class="cierre__caja">
             <span class="cierre__palabra" style={`--i: ${i}`}>
@@ -140,7 +136,6 @@ const { descarga } = COPY;
     margin-inline: auto;
     padding-inline: var(--pad-seccion);
     padding-bottom: var(--aire-seccion);
-    scroll-margin-top: calc(var(--alto-cabecera) + var(--respiro-ancla));
   }
 
   /* Oscuro en los dos temas, como la referencia: es la pizarra de la app, la

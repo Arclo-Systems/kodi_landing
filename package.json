@@ -14,7 +14,9 @@
     "test:e2e": "playwright test",
     "dev:limpio": "node -e \"require('node:fs').rmSync('node_modules/.vite',{recursive:true,force:true})\" && astro dev",
     "formato": "prettier --write .",
-    "formato:revisar": "prettier --check ."
+    "formato:revisar": "prettier --check .",
+    "verificar": "node scripts/sin-secretos.mjs",
+    "huella": "node scripts/huella.mjs"
   },
   "dependencies": {
     "@astrojs/react": "^6.0.5",

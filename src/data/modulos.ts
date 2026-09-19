@@ -18,7 +18,7 @@ import penSecundaria from '../assets/modulos/pne-bachillerato.webp';
 export type ModuloSlug =
   'paa' | 'cosevi_auto' | 'cosevi_moto' | 'estandarizada_primaria' | 'estandarizada_secundaria';
 
-export interface Modulo {
+interface Modulo {
   readonly slug: ModuloSlug;
   /** Como lo llama la gente, no como lo llama la base. */
   readonly nombre: string;
@@ -34,6 +34,10 @@ export interface Modulo {
   readonly etiqueta?: 'nuevo';
   /** El mismo arte que se ve dentro de la app. */
   readonly arte: ImageMetadata;
+  /** `colorHex` del panel: el color de identidad del módulo. */
+  readonly color: string;
+  /** El arte servido desde `public`, para quien no puede usar `astro:assets`. */
+  readonly icono: string;
 }
 
 export const MODULOS: readonly Modulo[] = [
@@ -42,6 +46,8 @@ export const MODULOS: readonly Modulo[] = [
     nombre: 'Admisión',
     cubre: 'UCR · UNA · TEC — razonamiento verbal y matemático',
     arte: paa,
+    color: '#f47c6b',
+    icono: '/app/chico/modulo-paa.webp',
   },
   {
     slug: 'cosevi_auto',
@@ -49,6 +55,8 @@ export const MODULOS: readonly Modulo[] = [
     cubre: 'Teórico B1 — señales, prioridades, mecánica y ley de tránsito',
     etiqueta: 'nuevo',
     arte: coseviAuto,
+    color: '#e3b23c',
+    icono: '/app/chico/modulo-cosevi-auto.webp',
   },
   {
     slug: 'cosevi_moto',
@@ -56,12 +64,16 @@ export const MODULOS: readonly Modulo[] = [
     cubre: 'Prueba A1 — señales, maniobras, equipo y mantenimiento',
     etiqueta: 'nuevo',
     arte: coseviMoto,
+    color: '#5db7e8',
+    icono: '/app/chico/modulo-cosevi-moto.webp',
   },
   {
     slug: 'estandarizada_primaria',
     nombre: 'PNE Primaria',
     cubre: 'Sexto grado — Español, Matemática, Ciencias y Estudios Sociales',
     arte: penPrimaria,
+    color: '#9bcb6c',
+    icono: '/app/chico/modulo-pen-primaria.webp',
   },
   {
     slug: 'estandarizada_secundaria',
@@ -70,11 +82,7 @@ export const MODULOS: readonly Modulo[] = [
     // frase es cierta y no lleva corchete, que es lo que no puede salir a prod.
     cubre: 'Quinto año — las cinco materias de la prueba',
     arte: penSecundaria,
+    color: '#b79ae8',
+    icono: '/app/chico/modulo-pen-secundaria.webp',
   },
 ];
-
-export function moduloDe(slug: ModuloSlug): Modulo {
-  const modulo = MODULOS.find((m) => m.slug === slug);
-  if (!modulo) throw new Error(`Módulo desconocido: ${slug}`);
-  return modulo;
-}

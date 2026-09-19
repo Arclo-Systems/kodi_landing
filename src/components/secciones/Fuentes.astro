@@ -15,7 +15,7 @@ const { fuentes } = COPY;
 <section class="fuentes" id="fuentes">
   <div class="fuentes__texto">
     <h2 class="fuentes__titular titular-seccion">{fuentes.titular}</h2>
-    <p class="fuentes__autoria">{fuentes.autoria}</p>
+    <p class="fuentes__autoria bajada-seccion">{fuentes.autoria}</p>
   </div>
 
   <div class="fuentes__maquina">
@@ -46,20 +46,12 @@ const { fuentes } = COPY;
     margin-inline: auto;
     padding-inline: var(--pad-seccion);
     padding-bottom: var(--aire-seccion);
-    scroll-margin-top: calc(var(--alto-cabecera) + var(--respiro-ancla));
   }
 
   .fuentes__texto {
     max-width: 42rem;
   }
 
-  .fuentes__autoria {
-    max-width: 36rem;
-    margin-top: 20px;
-    color: var(--tinta-suave);
-    font-size: 1rem;
-    line-height: 1.625;
-  }
 
   /* La máquina reserva su alto desde el primer pintado aunque la isla todavía
      no haya montado: si no, al aparecer empuja media página hacia abajo.

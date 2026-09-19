@@ -543,6 +543,22 @@ a.tarjeta:active {
   text-wrap: balance;
 }
 
+/* El párrafo que acompaña al titular. Las mismas cinco declaraciones estaban
+   copiadas en las seis secciones. */
+.bajada-seccion {
+  max-width: 36rem;
+  margin-top: 20px;
+  color: var(--tinta-suave);
+  font-size: 1rem;
+  line-height: 1.625;
+}
+
+/* El respiro de la cabecera al saltar a un ancla, una vez y no en cada
+   sección. */
+section[id] {
+  scroll-margin-top: calc(var(--alto-cabecera) + var(--respiro-ancla));
+}
+
 /* Al tocar, el navegador pinta encima su propio destello gris. El sitio ya
    tiene su señal de presión, y las dos juntas se ven como un parpadeo. */
 a,

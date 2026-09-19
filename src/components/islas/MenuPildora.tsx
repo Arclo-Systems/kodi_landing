@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   AnimatePresence,
   motion,
@@ -29,7 +29,7 @@ const SOMBRA = {
   cerrada: '0 30px 70px -24px rgba(0,0,0,0)',
 } as const;
 
-export interface Enlace {
+interface Enlace {
   readonly texto: string;
   readonly href: string;
   /** Los enlaces externos abren en otra pestaña. */
@@ -152,7 +152,19 @@ export default function MenuPildora({ abrir, cerrar, grupos }: Props) {
   }, [abierto]);
 
   const cerrarPanel = () => setAbierto(false);
-  let orden = 0;
+
+  // El escalón de entrada de cada pieza, calculado ANTES del marcado. Iba con
+  // un contador que se incrementaba durante el render: funciona porque vuelve
+  // a cero en cada pasada, pero se rompe en cuanto alguien memoice un trozo.
+  const escalones = useMemo(() => {
+    const mapa = new Map<string, number>();
+    let n = 0;
+    for (const grupo of grupos) {
+      mapa.set(`titulo:${grupo.titulo}`, n++);
+      for (const enlace of grupo.enlaces) mapa.set(`enlace:${enlace.href}`, n++);
+    }
+    return mapa;
+  }, [grupos]);
 
   return (
     <>
@@ -217,7 +229,7 @@ export default function MenuPildora({ abrir, cerrar, grupos }: Props) {
                         <motion.span
                           id={`menu-grupo-${g}`}
                           className="pildora__titulo"
-                          custom={orden++}
+                          custom={escalones.get(`titulo:${grupo.titulo}`) ?? 0}
                           variants={ENTRADA}
                         >
                           {grupo.titulo}
@@ -231,7 +243,7 @@ export default function MenuPildora({ abrir, cerrar, grupos }: Props) {
                               target={enlace.externo ? '_blank' : undefined}
                               rel={enlace.externo ? 'noopener noreferrer' : undefined}
                               className="pildora__enlace"
-                              custom={orden++}
+                              custom={escalones.get(`enlace:${enlace.href}`) ?? 0}
                               variants={ENTRADA}
                             >
                               {enlace.texto}

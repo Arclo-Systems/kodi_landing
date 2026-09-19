@@ -12,7 +12,7 @@
  *   · Ninguna respuesta dice cantidades de preguntas.
  *   · Si un dato cambia en producción, cambia acá: no se adivina.
  */
-export interface ItemFaq {
+interface ItemFaq {
   readonly id: string;
   readonly pregunta: string;
   readonly respuesta: string;

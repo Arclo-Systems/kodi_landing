@@ -83,9 +83,8 @@ const ANILLOS: readonly Anillo[] = [
 ];
 
 /** Dónde empieza el juego de cada anillo dentro de `IMAGENES`. */
-const PRIMERA_ARTE = ANILLOS.reduce<number[]>(
-  (acc, anillo, i) => [...acc, (acc[i] ?? 0) + anillo.artes],
-  [0],
+const PRIMERA_ARTE = ANILLOS.map((_, i) =>
+  ANILLOS.slice(0, i).reduce((suma, anillo) => suma + anillo.artes, 0),
 );
 
 const VERTEX = `

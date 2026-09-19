@@ -1,6 +1,6 @@
 import type { ModuloSlug } from './modulos';
 
-export interface FechaExamen {
+interface FechaExamen {
   /** ISO con offset de Costa Rica. */
   readonly fecha: string;
   /** Cómo se nombra el examen dentro de la cuenta regresiva. */

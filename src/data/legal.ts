@@ -7,7 +7,7 @@
 //
 // PENDIENTE revisión legal formal del founder.
 
-export interface LegalSection {
+interface LegalSection {
   title: string;
   body: string;
 }

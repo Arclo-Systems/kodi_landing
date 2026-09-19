@@ -26,7 +26,7 @@
  *     de liga.
  *   · Liviano: por encima de unos 3 MB, en datos móviles se nota.
  */
-export interface VideoApp {
+interface VideoApp {
   /** Ruta desde `public/`, o `null` mientras no exista. */
   readonly archivo: string | null;
   /** Fotograma que se ve antes de que el video arranque. */

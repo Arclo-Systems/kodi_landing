@@ -35,7 +35,7 @@ const descuentos = new Map<string, number>(
   <div class="planes__cabeza">
     <div class="planes__texto">
       <h2 class="planes__titular titular-seccion">{precios.titular}</h2>
-      <p class="planes__bajada">{precios.bajada}</p>
+      <p class="planes__bajada bajada-seccion">{precios.bajada}</p>
     </div>
 
     {/* Tres periodos y no dos: Kodi cobra por mes, por trimestre y por año.
@@ -155,7 +155,6 @@ const descuentos = new Map<string, number>(
     margin-inline: auto;
     padding-inline: var(--pad-seccion);
     padding-bottom: var(--aire-seccion);
-    scroll-margin-top: calc(var(--alto-cabecera) + var(--respiro-ancla));
   }
 
   /* El encabezado y el selector se alinean por abajo cuando hay ancho: el
@@ -185,13 +184,6 @@ const descuentos = new Map<string, number>(
 
   /* 576 y no el ancho completo del bloque: el párrafo cierra antes que el
      titular a propósito, y así rompe en dos líneas en vez de tres. */
-  .planes__bajada {
-    max-width: 36rem;
-    margin-top: 20px;
-    color: var(--tinta-suave);
-    font-size: 1rem;
-    line-height: 1.625;
-  }
 
   /* ── Selector de periodo ──────────────────────────────────────────────── */
   /* Columnas iguales y no al ancho del texto: la pastilla se desliza de una a
@@ -434,7 +426,8 @@ const descuentos = new Map<string, number>(
   }
 
   .plan__nota {
-    height: 1rem;
+    /* Mínimo y no fijo: el texto mide 18px de línea y desbordaba la caja. */
+    min-height: 1rem;
     color: var(--tinta-suave);
     font-size: 0.75rem;
   }

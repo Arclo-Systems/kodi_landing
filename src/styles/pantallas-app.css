@@ -256,11 +256,6 @@
   letter-spacing: 0.2px;
 }
 
-.ap-dia--hecho {
-  background: var(--app-lima);
-  color: #fefefe;
-}
-
 /* Hoy no es un disco lleno: es un anillo de progreso. El arco lima marca lo
    que va de la meta y el resto del aro queda en lima al 20%. El relleno de
    adentro es la superficie elevada, con la letra en el texto del tema. */
@@ -461,26 +456,6 @@
   background:
     linear-gradient(135deg, rgb(227 178 60 / 0.18), rgb(244 124 107 / 0.14), rgb(64 141 153 / 0.1)),
     rgb(20 31 37 / 0.6);
-}
-
-/* Pro: el acento pasa a morado, en la tarjeta y en el disco del ícono. */
-.ap-tarjeta--pro {
-  border-color: rgb(183 154 232 / 0.32);
-  background:
-    linear-gradient(135deg, rgb(183 154 232 / 0.2), rgb(93 183 232 / 0.15), rgb(64 141 153 / 0.1)),
-    rgb(255 255 255 / 0.72);
-}
-
-:root[data-tema='oscuro'] .ap-tarjeta--pro {
-  background:
-    linear-gradient(135deg, rgb(183 154 232 / 0.2), rgb(93 183 232 / 0.15), rgb(64 141 153 / 0.1)),
-    rgb(20 31 37 / 0.6);
-}
-
-.ap-tarjeta--pro .ap-tarjeta__circulo {
-  border-color: rgb(183 154 232 / 0.4);
-  background: rgb(183 154 232 / 0.16);
-  color: #b79ae8;
 }
 
 .ap-tarjeta__circulo {
@@ -692,17 +667,6 @@
 
 :root[data-tema='oscuro'] .ap-panel__reportar {
   color: var(--app-coral);
-}
-
-.ap-panel__icono {
-  display: flex;
-  width: 24px;
-  height: 24px;
-  align-items: center;
-  justify-content: center;
-  border: 2px solid currentcolor;
-  border-radius: 12px;
-  font-size: 12px;
 }
 
 .ap-panel__rotulo {

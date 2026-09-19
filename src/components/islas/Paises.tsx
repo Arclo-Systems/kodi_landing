@@ -42,7 +42,7 @@ export default function Paises({ disponible, pronto }: Props) {
   return (
     <div ref={ref} className="paises-filas">
       {filas.map((fila, i) => (
-        <div key={i} className="paises-fila">
+        <div key={i === 0 ? 'derecha' : 'izquierda'} className="paises-fila">
           <motion.div className="paises-pista" style={{ transform: i === 0 ? derecha : izquierda }}>
             {fila.map((pais) => (
               <Chip key={pais.codigo} pais={pais} rotulo={rotulo(pais)} />

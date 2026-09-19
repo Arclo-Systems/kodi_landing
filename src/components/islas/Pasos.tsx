@@ -33,7 +33,7 @@ interface Ficha {
   readonly detalle: string;
 }
 
-export interface Paso {
+interface Paso {
   readonly numero: string;
   readonly titulo: string;
   readonly texto: string;
