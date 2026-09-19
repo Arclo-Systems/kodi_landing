@@ -1,14 +1,23 @@
-import { useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react';
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+  type ReactNode,
+  type RefObject,
+} from 'react';
 import {
   cubicBezier,
   motion,
   useMotionTemplate,
+  useMotionValue,
   useScroll,
   useTransform,
   type MotionValue,
 } from 'motion/react';
 import { PANTALLAS } from './pantallas';
-import { CAJON } from '../../lib/movimiento';
+import { avanceDePista, CAJON } from '../../lib/movimiento';
 
 /**
  * Los pasos con el teléfono central: la sección se queda pegada y el scroll
@@ -230,6 +239,56 @@ function Barrita({ avance, i, total }: { avance: MotionValue<number>; i: number;
 }
 
 /**
+ * El avance de la pista, de 0 a 1, medido contra la caja pegada.
+ *
+ * No es `useScroll` con `target`: esa versión divide entre
+ * `window.innerHeight`, que en teléfono sube y baja con la barra del
+ * navegador mientras la pista sigue en `svh`. Ver `avanceDePista`.
+ */
+function useAvancePegado(
+  pista: RefObject<HTMLDivElement | null>,
+  pegado: RefObject<HTMLDivElement | null>,
+): MotionValue<number> {
+  const { scrollY } = useScroll();
+  const avance = useMotionValue(0);
+
+  useEffect(() => {
+    const caja = pista.current;
+    const fijo = pegado.current;
+    if (!caja || !fijo) return;
+
+    let top = 0;
+    let alto = 0;
+    let altoFijo = 0;
+
+    const recalcular = () => avance.set(avanceDePista(scrollY.get(), top, alto, altoFijo));
+
+    const medir = () => {
+      const marco = caja.getBoundingClientRect();
+      top = marco.top + window.scrollY;
+      alto = marco.height;
+      altoFijo = fijo.getBoundingClientRect().height;
+      recalcular();
+    };
+
+    medir();
+    // Sobre la pista y el cuerpo, no sobre la ventana: los dos van en `svh` y
+    // así la barra del navegador no dispara una remedida que no cambió nada.
+    const vigia = new ResizeObserver(medir);
+    vigia.observe(caja);
+    vigia.observe(document.body);
+    const soltar = scrollY.on('change', recalcular);
+
+    return () => {
+      vigia.disconnect();
+      soltar();
+    };
+  }, [avance, pegado, pista, scrollY]);
+
+  return avance;
+}
+
+/**
  * La secuencia pegada. Vive en su propio componente a propósito.
  *
  * `useScroll` se queda con el elemento que encuentra en el ref la primera vez
@@ -241,15 +300,13 @@ function Barrita({ avance, i, total }: { avance: MotionValue<number>; i: number;
  */
 function Secuencia({ pasos, escenas }: { pasos: readonly Paso[]; escenas: ReactNode[] }) {
   const pista = useRef<HTMLDivElement>(null);
-  const { scrollYProgress: avance } = useScroll({
-    target: pista,
-    offset: ['start start', 'end end'],
-  });
+  const pegado = useRef<HTMLDivElement>(null);
+  const avance = useAvancePegado(pista, pegado);
   const total = pasos.length;
 
   return (
     <div ref={pista} className="pasos-pista" style={{ '--pasos': total } as CSSProperties}>
-      <div className="pasos-pegado">
+      <div ref={pegado} className="pasos-pegado">
         <div className="pasos-reja">
           <div className="pasos-columna">
             {pasos.map((paso, i) => (
