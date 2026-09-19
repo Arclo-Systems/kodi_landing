@@ -189,33 +189,11 @@ export const COPY = {
   },
 
   hero: {
-    ceja: 'Costa Rica · COSEVI · Admisión · Pruebas Nacionales',
     cta: 'Descargar gratis en Google Play',
     // Lo que la ficha de Play declara y la landing callaba. Decirlo acá cuesta
     // una línea; que se descubra al apretar "Instalar" cuesta la instalación.
     microcopy: 'Gratis, con anuncios y compras opcionales.',
     iphone: '¿iPhone? Dejanos tu correo',
-
-    // La pregunta jugable. El texto de alrededor, no la pregunta.
-    prueba: {
-      invitacion: 'Probá una pregunta de verdad:',
-      elegiExamen: 'Elegí tu examen',
-      correcto: '¡Correcto!',
-      incorrecto: 'Casi',
-      exp: '+10 EXP',
-      pixel: 'Pixel te explica',
-      // Cierre cualitativo: no se puede decir "te quedan N preguntas" porque
-      // la landing no muestra cantidades.
-      cierre: 'Así es toda la app. Descargala gratis.',
-      otra: 'Probá otra',
-    },
-
-    // Cuenta regresiva. Sale de `fechas-examenes.ts`; si el examen no tiene
-    // fecha confirmada, no se pinta nada.
-    cuenta: (dias: number, nombre: string) =>
-      dias === 0 ? `Hoy es ${nombre}` : `Faltan ${dias} días para ${nombre}`,
-    // COSEVI no lleva cuenta regresiva: la cita la agenda cada persona.
-    sinFecha: 'Tu examen es cuando vos lo agendés. Practicá hasta estar listo.',
   },
 
   // ─── 2. Franja de confianza ───────────────────────────────────────────────
@@ -245,13 +223,11 @@ export const COPY = {
     // estatal que Kodi no administra.
     bajada:
       'Cada módulo se arma con el material oficial vigente: el mismo temario y el mismo formato que el examen real.',
-    cta: 'Abrí tu examen en Kodi',
     nuevo: 'nuevo',
   },
 
   // ─── 4. Cómo funciona ─────────────────────────────────────────────────────
   como: {
-    ceja: 'Cómo funciona',
     // No es un recorrido de principio a fin: son seis funciones sueltas de la
     // app. El titular anterior ("De la primera pregunta al día del examen")
     // prometía una secuencia que estas pantallas no cuentan.
@@ -348,7 +324,6 @@ export const COPY = {
         pastilla: 'Se canjean en el negocio',
       },
     ],
-    cta: 'Hacé la primera pregunta hoy',
   },
 
   // ─── Países ───────────────────────────────────────────────────────────────
@@ -379,7 +354,6 @@ export const COPY = {
     // en la segunda.
     bajada:
       'Gratis en Android. Elegí tu examen entre los cinco que hay, hacé la primera pregunta hoy y empezá a ver cuánto te falta.',
-    redes: 'Redes sociales',
   },
   redes: 'Redes sociales',
 
@@ -395,8 +369,6 @@ export const COPY = {
     marcador: 'tu@correo.com',
     boton: 'Avisame',
     // Dice para qué se usa el dato, en el punto donde se pide. Quien deja el
-    // correo puede ser menor de edad.
-    finalidad: 'Solo lo usamos para avisarte del lanzamiento.',
     estados: {
       enviando: 'Enviando…',
       ok: 'Listo, quedaste en la lista.',
@@ -410,9 +382,7 @@ export const COPY = {
   // El bloque de empresas sale del cuerpo de la página: interrumpe el camino a
   // la descarga justo antes del cierre, y su vocabulario es de agencia leído
   // por chicos de 17. Queda como un enlace en el pie.
-  empresas: {
-    enlace: 'Kodi para empresas',
-  },
+  empresas: {},
 
   pie: {
     copyright: '© 2026 Kodi',
@@ -426,7 +396,6 @@ export const COPY = {
     // Lo que acompaña al logotipo en la columna de la izquierda. Dos líneas
     // como mucho: la columna mide 20rem y abajo va el botón.
     frase: 'Practicá para tu examen desde el teléfono, con preguntas hechas del material oficial.',
-    boton: 'Descargar la app',
 
     // Cuatro columnas de enlaces. `href` en `null` significa que el destino
     // todavía no existe: se dibuja el rótulo apagado y sin enlace, porque un

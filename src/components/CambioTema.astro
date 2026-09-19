@@ -90,17 +90,6 @@ import { Moon, Sun } from '@lucide/astro';
     transition: transform 260ms var(--salida);
   }
 
-  /* En móvil, la barra de descarga ocupa esta misma esquina: el botón se sube
-     por encima de ella mientras está a la vista. El alto lo publica la propia
-     barra. Arriba de 800 la barra no existe y esto no aplica.
-     Se aparta con `transform` y no con `bottom`, que saltaba los 90 px de un
-     cuadro al otro mientras la barra todavía se estaba deslizando. */
-  @media (max-width: 800px) {
-    :root.con-barra .tema {
-      transform: translateY(calc(8px - var(--alto-barra, 0px)));
-    }
-  }
-
   /* Apagado hasta que alguien lo busca. Es una preferencia, no una acción de
      la página: si estuviera a opacidad plena competiría con el contenido en
      todas las pantallas. */
