@@ -22,10 +22,28 @@
      coral de marca (#f47c6b, que sobre la tarjeta da 2.8:1 y no llega a AA);
      esta es `coralDark` de la app y da 5.4:1. */
   --coral-texto: #b34734;
+  /* El lima de la app en su variante de TEXTO: el estado "live" de países y la
+     insignia de módulo nuevo. Antes era el mismo hex escrito en dos archivos. */
+  --lima-texto: #4b742b;
+
+  /* La pizarra del cierre: oscura en los DOS temas, así que no tiene variante.
+     Es la única superficie del sitio que no sigue al modo. */
+  --pizarra: #0f191e;
+  --sobre-pizarra: #f2f4f5;
 
   --tinta: #141f25;
   --tinta-suave: #525252;
   --borde: #e5e5e5;
+  /* El límite de un campo tiene que verse: `--borde` da 1.21 sobre la
+     superficie y el mínimo son 3. Este da 3.31 en claro y 4.36 en oscuro. */
+  --borde-control: #8a8a8a;
+  /* El error tiene su propio color: antes usaba el rojo de TikTok, que daba
+     3.53 de contraste sobre la superficie. Este da 5.81. */
+  --error-texto: #c4102f;
+  /* Un escalón por DEBAJO de la superficie: el fondo de los controles que se
+     ven hundidos, como la pista de un selector. `--tarjeta` no sirve para eso
+     porque está por encima, y lo seleccionado encima de ella desaparecía. */
+  --hundido: #efefef;
 
   /* El titular pasó de dos palabras ("¡muy pronto!") a una frase, y debajo hay
      dos bloques más que antes. A 15vw/11rem la frase se partía en tres líneas y
@@ -35,7 +53,21 @@
   --hero: clamp(2.5rem, 7vw, 4.5rem);
   --sub: clamp(1.0625rem, 2vw, 1.375rem);
 
+  /* Dos familias, cada una con su trabajo (founder, 2026-09-15):
+     · `--fuente-titular` = Geist, la grotesca de la referencia. Trazo recto y
+       uniforme: aguanta 84 px a peso medio sin verse floja.
+     · `--fuente-cuerpo` = Nunito, la de la app. Redonda y cálida, que es la voz
+       de Kodi y la que se lee adentro del teléfono.
+     Nunito a 84 px se veía más liviana que el modelo al mismo número, porque su
+     trazo es más fino; por eso el titular no se resolvía subiendo el peso. */
+  --fuente-titular: 'Geist Variable', ui-sans-serif, system-ui, sans-serif;
+  --fuente-cuerpo: 'Nunito Variable', ui-sans-serif, system-ui, sans-serif;
+
+  /* Las tres curvas del sitio, y ninguna más. `src/lib/movimiento.ts` exporta
+     estas mismas como tuplas para las islas, que no pueden leer un token. */
   --salida: cubic-bezier(0.23, 1, 0.32, 1);
+  --entre: cubic-bezier(0.77, 0, 0.175, 1);
+  --cajon: cubic-bezier(0.32, 0.72, 0, 1);
 
   /* Escala de espaciado — base 4 px, progresión ~1.5x. Todo el sitio cabe acá:
      ningún archivo escribe un rem de separación a mano. */
@@ -68,6 +100,84 @@
      propio padding, no `.pantalla`: ver el comentario de .pantalla. */
   --pad-x: clamp(var(--e-5), 5vw, var(--e-8)); /* 24→64 */
   --pad-y: clamp(var(--e-6), 6vw, var(--e-7)); /* 32→48 */
+
+  /* Medidas de las secciones largas. Antes cada una repetía los mismos
+     20/32/40 y 96/128 en tres `@media` propios. */
+  --caja: 1440px;
+  --pad-seccion: clamp(20px, 3vw, 40px);
+  --aire-seccion: clamp(96px, 10vw, 128px);
+
+  /* Dónde aterriza un ancla. Lo leen las secciones (`scroll-margin-top`) y el
+     scroll suavizado, para que el destino sea el mismo con Lenis y sin él. */
+  --alto-cabecera: 80px;
+  --respiro-ancla: var(--e-4);
+}
+
+/* ─── Tema oscuro ───────────────────────────────────────────────────────────
+   Dos reglas con el mismo cuerpo, y las dos hacen falta:
+
+     · El `@media` cubre a quien tiene el sistema en oscuro y todavía no eligió
+       nada. Funciona sin JavaScript.
+     · El atributo `data-tema` cubre la elección explícita, y gana siempre: si
+       alguien pide claro teniendo el sistema en oscuro, el `:not` de arriba lo
+       deja pasar.
+
+   Todos los colores se verificaron contra los dos fondos (superficie y
+   tarjeta). El más bajo de los textos da 7,5:1; el mínimo de AA es 4,5:1.
+   `--borde` queda a propósito por debajo: es una línea de material, no texto.
+
+   Para agregar un color acá NO se escribe un hex nuevo en un componente: se
+   agrega el token arriba y su valor oscuro acá. */
+:root[data-tema='oscuro'] {
+  color-scheme: dark;
+
+  --superficie: #0d1215;
+  --tarjeta: #161d21;
+
+  /* Más claros que los de marca: los de la paleta clara están pensados para
+     leerse SOBRE blanco y sobre el fondo oscuro se hunden. */
+  --teal: #4fa8b5;
+  --teal-texto: #6fc3cf;
+  /* El teal ahora es claro, así que lo que va encima tiene que ser oscuro. */
+  --sobre-teal: #06171a;
+
+  --tiktok: #ff6b83;
+  --instagram: #f4798f;
+  --facebook: #6ba6f7;
+  --whatsapp: #3ecf9f;
+  --coral-texto: #f09580;
+  --lima-texto: #9bcb6c;
+
+  --tinta: #f2f4f5;
+  --tinta-suave: #a3aeb4;
+  --borde: #273238;
+  --borde-control: #6c7c85;
+  --error-texto: #ff8a9c;
+  --hundido: #070b0d;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-tema='claro']) {
+    color-scheme: dark;
+
+    --superficie: #0d1215;
+    --tarjeta: #161d21;
+    --teal: #4fa8b5;
+    --teal-texto: #6fc3cf;
+    --sobre-teal: #06171a;
+    --tiktok: #ff6b83;
+    --instagram: #f4798f;
+    --facebook: #6ba6f7;
+    --whatsapp: #3ecf9f;
+    --coral-texto: #f09580;
+    --lima-texto: #9bcb6c;
+    --tinta: #f2f4f5;
+    --tinta-suave: #a3aeb4;
+    --borde: #273238;
+    --borde-control: #6c7c85;
+    --error-texto: #ff8a9c;
+    --hundido: #070b0d;
+  }
 }
 
 *,
@@ -84,7 +194,7 @@ html {
 body {
   background: var(--superficie);
   color: var(--tinta);
-  font-family: 'Nunito Variable', ui-sans-serif, system-ui, sans-serif;
+  font-family: var(--fuente-cuerpo);
   font-weight: 300;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
@@ -99,9 +209,14 @@ body {
   white-space: nowrap;
 }
 
+/* Indicador de DOS colores: el anillo teal solo daba 2.50 de contraste sobre
+   las superficies invertidas —el plan destacado, la píldora del menú, la
+   tarjeta blanca del cierre— y el mínimo son 3. Con la sombra por fuera,
+   siempre hay un borde que contrasta, apoye donde apoye. */
 :focus-visible {
   outline: 3px solid var(--teal);
   outline-offset: 4px;
+  box-shadow: 0 0 0 7px var(--superficie);
 }
 
 /* Solo aparece con el teclado, y siempre primero en el orden de tabulación. */
@@ -365,13 +480,21 @@ body {
   min-width: 0;
 }
 
+@media (hover: hover) and (pointer: fine) {
+  a.tarjeta:hover {
+    transform: translateY(-2px);
+  }
+}
+
+/* Después del hover y con la misma especificidad: si fuera antes, con mouse el
+   hover seguiría activo al apretar y el hundido no se pintaría nunca. */
 a.tarjeta:active {
   transform: scale(0.98);
 }
 
 @media (hover: hover) and (pointer: fine) {
-  a.tarjeta:hover {
-    transform: translateY(-2px);
+  a.tarjeta:active {
+    transform: translateY(-2px) scale(0.98);
   }
 }
 
@@ -404,6 +527,88 @@ a.tarjeta:active {
   .fila .tarjeta {
     width: min(100%, 14rem);
     min-width: 0;
+  }
+}
+
+/* El titular de una sección. Seis secciones repetían estas siete líneas. El
+   peso 600 es el acordado: a igual número, Geist tiene el trazo más fino que
+   la grotesca de la referencia y a 52 px un 500 se ve flojo. */
+.titular-seccion {
+  font-family: var(--fuente-titular);
+  font-size: clamp(1.875rem, 4.5vw, 3.25rem);
+  font-weight: 600;
+  line-height: 1.05;
+  letter-spacing: -0.025em;
+  color: var(--tinta);
+  text-wrap: balance;
+}
+
+/* El párrafo que acompaña al titular. Las mismas cinco declaraciones estaban
+   copiadas en las seis secciones. */
+.bajada-seccion {
+  max-width: 36rem;
+  margin-top: 20px;
+  color: var(--tinta-suave);
+  font-size: 1rem;
+  line-height: 1.625;
+}
+
+/* El respiro de la cabecera al saltar a un ancla, una vez y no en cada
+   sección. */
+section[id] {
+  scroll-margin-top: calc(var(--alto-cabecera) + var(--respiro-ancla));
+}
+
+/* Al tocar, el navegador pinta encima su propio destello gris. El sitio ya
+   tiene su señal de presión, y las dos juntas se ven como un parpadeo. */
+a,
+button,
+summary,
+label,
+input,
+.pulsable {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Estado de presión para cualquier pulsable que no lo traiga. `--texto` es
+   para las filas anchas de texto, donde encoger la caja entera se ve mal. */
+.pulsable {
+  transition: transform 140ms var(--salida);
+}
+
+.pulsable:active:not(:disabled):not([aria-disabled='true']) {
+  transform: scale(0.97);
+}
+
+/* Con la opacidad sin transición el toque corto daba un tirón; se funde. */
+.pulsable--texto {
+  transition:
+    transform 140ms var(--salida),
+    opacity 140ms var(--salida);
+}
+
+.pulsable--texto:active:not(:disabled):not([aria-disabled='true']) {
+  transform: none;
+  opacity: 0.7;
+}
+
+/* Con el dedo no: un toque dura menos que la transición, así que la bajada y
+   la vuelta se ven como un parpadeo. Lo que confirma el toque es que la fila
+   se abre, que pasa en el mismo momento. */
+@media (pointer: coarse) {
+  .pulsable--texto:active:not(:disabled):not([aria-disabled='true']) {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pulsable {
+    transition: none;
+  }
+
+  .pulsable:active:not(:disabled):not([aria-disabled='true']) {
+    transform: none;
+    opacity: 0.7;
   }
 }
 

@@ -25,7 +25,9 @@ const { copy } = Astro.props;
       {copy.titular}
     </h1>
 
-    <p class="bajada entra" style="animation-delay: 120ms">{copy.bajada}</p>
+    <p class="bajada entra" style="animation-delay: 120ms">
+      {copy.bajada}
+    </p>
 
     <p class="codigo entra" style="animation-delay: 150ms" data-codigo hidden>
       <span class="codigo__rotulo">{copy.codigo.rotulo}</span>
@@ -37,24 +39,26 @@ const { copy } = Astro.props;
       <h2 class="rotulo-seccion">{PITCH.rotulo}</h2>
       <p class="pitch">{COPY.bajada}</p>
       <ul class="puntos">
-        {PITCH.puntos.map((punto) => <li>{punto}</li>)}
+        {PITCH.puntos.map((punto) => (
+          <li>{punto}</li>
+        ))}
       </ul>
     </section>
 
     <div class="fila entra" style="animation-delay: 240ms">
-      {
-        TIENDAS.map((tienda) => (
-          <Tarjeta
-            icono={tienda.icono}
-            rotulo={rotuloDeTienda(tienda)}
-            nombre={tienda.nombre}
-            href={tienda.url ?? undefined}
-          />
-        ))
-      }
+      {TIENDAS.map((tienda) => (
+        <Tarjeta
+          icono={tienda.icono}
+          rotulo={rotuloDeTienda(tienda)}
+          nombre={tienda.nombre}
+          href={tienda.url ?? undefined}
+        />
+      ))}
     </div>
 
-    <a class="volver entra" style="animation-delay: 280ms" href="/">Conocé más de Kodi</a>
+    <a class="volver entra" style="animation-delay: 280ms" href="/">
+      Conocé más de Kodi
+    </a>
   </main>
 
   <Pie class="entra" style="animation-delay: 320ms" />

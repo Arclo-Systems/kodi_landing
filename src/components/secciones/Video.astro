@@ -1,0 +1,363 @@
+---
+import { ArrowDown, Play } from '@lucide/astro';
+import { VIDEO } from '../../data/video';
+
+const hayVideo = VIDEO.archivo !== null;
+const hayAlgo = hayVideo || VIDEO.portada !== null;
+---
+
+{hayAlgo && (
+  <div class="secuencia" id="secuencia">
+    <div class="secuencia__pegado">
+      <p class="secuencia__rotulo" aria-hidden="true">
+        <Play class="secuencia__play" size={13} stroke-width={2.5} fill="currentColor" />
+        {VIDEO.rotulo}
+      </p>
+
+      <div class="secuencia__marco">
+        {hayVideo ? (
+          <video
+            class="secuencia__pieza"
+            id="secuencia-pieza"
+            src={VIDEO.archivo!}
+            poster={VIDEO.portada ?? undefined}
+            muted
+            loop
+            playsinline
+            preload="metadata"
+            aria-label={VIDEO.descripcion}
+          />
+        ) : (
+          <img
+            class="secuencia__pieza"
+            src={VIDEO.portada!}
+            alt={VIDEO.descripcion}
+            loading="lazy"
+          />
+        )}
+
+        <div class="secuencia__aviso" aria-hidden="true">
+          <span class="secuencia__aviso-texto">{VIDEO.aviso}</span>
+          <ArrowDown class="secuencia__flecha" size={14} stroke-width={1.5} />
+        </div>
+      </div>
+    </div>
+  </div>
+)}
+
+{hayAlgo && <script>
+  {
+    /* Un solo avance manda sobre todo: el hero que se apaga, el rótulo que
+       sube, el recuadro que crece y el aviso que aparece al final.
+
+       Las constantes salen de medir la referencia y de leer su código: la
+       sección mide 180svh sobre un hero de 100svh, así que el avance se
+       completa en 80svh de scroll. El recuadro termina de crecer al 55% de
+       ese avance; el aviso vive entre el 55% y el 98%.
+
+       Nada de esto escribe en `<html>` ni anima `width`, `height` o `top`:
+       el recuadro tiene el tamaño FINAL y se encoge con `scale`, y cada
+       elemento lleva su propio valor. Lo que depende de la ventana —tamaño
+       final, alto del hero— se recalcula solo al cambiar de tamaño. */
+  }
+  const ALTO_SECCION = 1.8;
+  const FIN_CRECIMIENTO = 0.55;
+  const ENTRADA_AVISO: readonly [number, number] = [0.55, 0.65];
+  const SALIDA_AVISO: readonly [number, number] = [0.9, 0.98];
+  const DESVANECIDO_HERO = 0.45;
+  const SEPARACION_ROTULO = 44;
+  const MARGEN_SUPERIOR = 96;
+  const ANCHO_INICIAL = 400;
+  const ALTO_INICIAL = 260;
+
+  const limitar = (valor: number) => Math.min(1, Math.max(0, valor));
+  const entre = (valor: number, desde: number, hasta: number) =>
+    limitar((valor - desde) / (hasta - desde));
+
+  const quieto = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const seccion = document.getElementById('secuencia');
+  const marco = seccion?.querySelector<HTMLElement>('.secuencia__marco');
+  const rotulo = seccion?.querySelector<HTMLElement>('.secuencia__rotulo');
+  const aviso = seccion?.querySelector<HTMLElement>('.secuencia__aviso');
+  const hero = document.querySelector<HTMLElement>('.hero');
+  const heroCentro = document.querySelector<HTMLElement>('.hero__centro');
+
+  let anchoFinal = ANCHO_INICIAL;
+  let altoFinal = ALTO_INICIAL;
+  let bajadaInicial = 0;
+  let altoHero = window.innerHeight;
+  let pendiente = false;
+
+  {
+    /* El tamaño final lo decide el CSS con los tokens de canaleta del sitio;
+       acá solo se lee lo que ya midió el navegador. */
+  }
+  const medir = () => {
+    if (!seccion || !marco) return;
+    bajadaInicial = window.innerHeight - 50 - MARGEN_SUPERIOR;
+    anchoFinal = marco.offsetWidth || ANCHO_INICIAL;
+    altoFinal = marco.offsetHeight || ALTO_INICIAL;
+    altoHero = hero ? hero.getBoundingClientRect().height : window.innerHeight;
+    {
+      /* La referencia da por hecho que el hero mide una pantalla exacta, y el
+         nuestro no: por eso el margen negativo se ata a su altura real. */
+    }
+    seccion.style.setProperty('--alto-hero', `${altoHero}px`);
+  };
+
+  const limpiar = () => {
+    marco?.removeAttribute('style');
+    rotulo?.removeAttribute('style');
+    aviso?.removeAttribute('style');
+    heroCentro?.removeAttribute('style');
+    seccion?.removeAttribute('style');
+  };
+
+  const pintar = () => {
+    pendiente = false;
+    if (!seccion || !marco || quieto.matches) return;
+
+    const avance = limitar(window.scrollY / (window.innerHeight * (ALTO_SECCION - 1)));
+    const crecer = limitar(avance / FIN_CRECIMIENTO);
+    const arriba = MARGEN_SUPERIOR + bajadaInicial * (1 - crecer);
+
+    marco.style.setProperty('--y', `${arriba}px`);
+    marco.style.setProperty(
+      '--sx',
+      String((ANCHO_INICIAL + (anchoFinal - ANCHO_INICIAL) * crecer) / anchoFinal),
+    );
+    marco.style.setProperty(
+      '--sy',
+      String((ALTO_INICIAL + (altoFinal - ALTO_INICIAL) * crecer) / altoFinal),
+    );
+
+    if (rotulo) {
+      rotulo.style.setProperty('--y', `${arriba - SEPARACION_ROTULO}px`);
+      rotulo.style.opacity = String(1 - entre(avance, 0, 0.1));
+    }
+
+    if (aviso) {
+      aviso.style.opacity = String(
+        entre(avance, ENTRADA_AVISO[0], ENTRADA_AVISO[1]) *
+          (1 - entre(avance, SALIDA_AVISO[0], SALIDA_AVISO[1])),
+      );
+    }
+
+    {
+      /* El hero se apaga en el primer 45% de su propia altura, no del avance
+         de la secuencia: así no depende de cuán alto sea el recuadro. */
+    }
+    if (heroCentro) {
+      heroCentro.style.opacity = String(1 - entre(window.scrollY, 0, altoHero * DESVANECIDO_HERO));
+    }
+  };
+
+  const agendar = () => {
+    if (pendiente) return;
+    pendiente = true;
+    requestAnimationFrame(pintar);
+  };
+
+  const alRedimensionar = () => {
+    medir();
+    agendar();
+  };
+
+  window.addEventListener('scroll', agendar, { passive: true });
+  window.addEventListener('resize', alRedimensionar);
+  quieto.addEventListener('change', () => {
+    limpiar();
+    alRedimensionar();
+  });
+  medir();
+  pintar();
+
+  {
+    /* Arranca cuando el recuadro ya tomó la pantalla, no mientras crece.
+       Medido en la referencia: al 98% corre, al 88% sigue pausado. */
+  }
+  const VISIBLE_PARA_REPRODUCIR = 0.95;
+
+  const pieza = document.getElementById('secuencia-pieza');
+  if (pieza instanceof HTMLVideoElement) {
+    new IntersectionObserver(
+      ([entrada]) => {
+        if (entrada.intersectionRatio >= VISIBLE_PARA_REPRODUCIR) {
+          pieza.play().catch(() => {});
+        } else {
+          pieza.pause();
+        }
+      },
+      // El 0 hace falta: sin él no llega aviso al salir del todo.
+      { threshold: [0, VISIBLE_PARA_REPRODUCIR] },
+    ).observe(pieza);
+  }
+</script>}
+
+<style>
+  .secuencia {
+    /* Arranca solapando el hero: el recuadro aparece dentro de la primera
+       pantalla y sube por encima del titular. Con margen negativo se monta
+       sobre el hero sin sacarlo del flujo. */
+    position: relative;
+    z-index: 2;
+    /* Sube exactamente lo que mide el hero, para que la secuencia empiece en el
+       tope del documento: así el avance del scroll y el recorrido de la parte
+       pegada coinciden. El valor de respaldo es una pantalla, por si el script
+       todavía no corrió. */
+    margin-top: calc(-1 * var(--alto-hero, 100vh));
+    margin-top: calc(-1 * var(--alto-hero, 100svh));
+    height: 180vh;
+    height: 180svh;
+    pointer-events: none;
+  }
+
+  .secuencia__pegado {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    height: 100svh;
+    overflow: hidden;
+  }
+
+  /* Se mueve con `transform`, no con `top`: `top` re-maqueta la sección
+     entera en cada cuadro de scroll. */
+  .secuencia__rotulo {
+    position: absolute;
+    left: 50%;
+    top: 0;
+    transform: translate(-50%, var(--y, 806px));
+    display: inline-flex;
+    align-items: center;
+    gap: var(--e-2);
+    white-space: nowrap;
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    color: var(--tinta);
+  }
+
+  .secuencia__play {
+    flex: none;
+  }
+
+  /* La caja tiene SIEMPRE el tamaño final —el CSS lo calcula con la canaleta
+     del sitio, y el script lo lee de acá— y se encoge con `scale`. Animar
+     `width`, `height` y `top` re-maquetaba la sección en cada cuadro.
+     El radio va dividido por la escala para que se vea de 24 px en todo el
+     recorrido en vez de achatarse con la caja. Los valores de respaldo son la
+     proporción de arranque en una ventana típica, por si el script no corrió. */
+  .secuencia__marco {
+    position: absolute;
+    left: 50%;
+    top: 0;
+    width: calc(min(100vw, var(--caja)) - 2 * var(--pad-seccion));
+    height: calc(100svh - 120px);
+    transform-origin: top center;
+    transform: translate(-50%, var(--y, 850px)) scale(var(--sx, 0.3), var(--sy, 0.33));
+    overflow: hidden;
+    border-radius: calc(24px / var(--sx, 0.3)) / calc(24px / var(--sy, 0.33));
+    /* Negro fijo y NO `--tinta`: esto es lo que se ve detrás del video
+       mientras carga y en las franjas que el recuadro no llena. En modo
+       oscuro `--tinta` es casi blanco, y el marco quedaba como un bloque
+       claro en medio de la página. */
+    background: #000;
+    pointer-events: auto;
+  }
+
+  /* Contraescala: sin ella el video se estira con la caja, que arranca con
+     otra proporción. Así se dibuja derecho y el recuadro chico es una ventana
+     sobre él, que es justo lo que hace `cover`. */
+  .secuencia__pieza {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transform: scale(calc(1 / var(--sx, 0.3)), calc(1 / var(--sy, 0.33)));
+  }
+
+  .secuencia__aviso {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    translate: -50%;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px 8px 16px;
+    border-radius: 9999px;
+    background: rgb(0 0 0 / 0.55);
+    color: rgb(255 255 255 / 0.9);
+    /* Aparece recién cuando el recuadro llenó la pantalla: antes competiría
+       con el titular, y no hay nada que anunciar todavía. */
+    opacity: 0;
+  }
+
+  .secuencia__aviso-texto {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  .secuencia__flecha {
+    flex: none;
+    animation: secuencia-flecha 1.8s ease-in-out infinite;
+  }
+
+  @keyframes secuencia-flecha {
+    0%,
+    100% {
+      translate: 0 0;
+    }
+    50% {
+      translate: 0 3px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .secuencia {
+      margin-top: 0;
+      height: auto;
+      padding-block: var(--ritmo-seccion);
+    }
+
+    .secuencia__pegado {
+      position: static;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--e-4);
+      height: auto;
+    }
+
+    .secuencia__rotulo {
+      position: static;
+      top: auto;
+      transform: none;
+      opacity: 1;
+    }
+
+    .secuencia__marco {
+      position: relative;
+      top: auto;
+      transform: none;
+      width: calc(min(100vw, var(--caja)) - 2 * var(--pad-seccion));
+      height: auto;
+      aspect-ratio: 16 / 9;
+      border-radius: 24px;
+    }
+
+    .secuencia__pieza {
+      transform: none;
+    }
+
+    .secuencia__aviso {
+      display: none;
+    }
+
+    .secuencia__flecha {
+      animation: none;
+    }
+  }
+</style>

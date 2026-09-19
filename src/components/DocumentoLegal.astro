@@ -30,17 +30,17 @@ const endpoint = legalDocumentUrl(doc);
   <!-- aria-live: el refresco desde el API reemplaza las secciones después del
        load; sin esto el cambio es mudo para un lector de pantalla. -->
   <div data-legal-secciones aria-live="polite">
-    {
-      documento.sections.map((seccion) => (
-        <section class="documento__seccion">
-          <h2 class="documento__seccion-titulo">{seccion.title}</h2>
-          <p class="documento__seccion-cuerpo">{seccion.body}</p>
-        </section>
-      ))
-    }
+    {documento.sections.map((seccion) => (
+      <section class="documento__seccion">
+        <h2 class="documento__seccion-titulo">{seccion.title}</h2>
+        <p class="documento__seccion-cuerpo">{seccion.body}</p>
+      </section>
+    ))}
   </div>
 
-  <a class="documento__volver" href="/">Volver al inicio</a>
+  <a class="documento__volver" href="/">
+    Volver al inicio
+  </a>
 </article>
 
 <script>
@@ -77,14 +77,14 @@ const endpoint = legalDocumentUrl(doc);
   });
 
   /**
-   * ¿La versión remota es posterior a la horneada? Conviven dos formatos: el
-   * viejo `YYYY-MM-DD` y el nuevo `YYYY-MM-DD.N`, que numera varias
-   * publicaciones del mismo día. Compararlas como texto ordenaría mal en cuanto
-   * el contador pase de 9 ('2026-08-04.10' < '2026-08-04.9'), así que la fecha
-   * se compara como texto (ISO ya ordena) y el sufijo como número.
-   *
-   * Una versión ilegible cuenta como no-más-nueva: se queda el texto del build.
-   */
+     * ¿La versión remota es posterior a la horneada? Conviven dos formatos: el
+     * viejo `YYYY-MM-DD` y el nuevo `YYYY-MM-DD.N`, que numera varias
+     * publicaciones del mismo día. Compararlas como texto ordenaría mal en cuanto
+     * el contador pase de 9 ('2026-08-04.10' < '2026-08-04.9'), así que la fecha
+     * se compara como texto (ISO ya ordena) y el sufijo como número.
+     *
+     * Una versión ilegible cuenta como no-más-nueva: se queda el texto del build.
+     */
   function esMasNueva(remota: string, horneada: string): boolean {
     const [fechaRemota, nRemota] = partirVersion(remota);
     const [fechaHorneada, nHorneada] = partirVersion(horneada);

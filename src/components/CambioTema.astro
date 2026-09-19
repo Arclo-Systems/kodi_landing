@@ -1,0 +1,176 @@
+---
+import { Moon, Sun } from '@lucide/astro';
+
+// Los dos íconos se dibujan siempre y el CSS muestra el que toca. Así el botón
+// aparece correcto en el primer pintado, sin esperar a que corra JavaScript:
+// si el ícono lo eligiera el script, se vería la luna un instante aunque la
+// página ya estuviera en oscuro.
+//
+// El texto sí lo ajusta el script, porque una etiqueta no se puede tapar con
+// CSS sin que el lector de pantalla lea las dos.
+---
+
+<div class="tema">
+  <button class="tema__boton pulsable" type="button" aria-pressed="false" data-tema-boton>
+    <Sun class="tema__icono tema__icono--sol" size={20} aria-hidden="true" />
+    <Moon class="tema__icono tema__icono--luna" size={20} aria-hidden="true" />
+    <span class="oculto" data-tema-texto>
+      Cambiar a modo oscuro
+    </span>
+  </button>
+</div>
+
+<script>
+  const CLAVE = 'kodi-tema';
+  const boton = document.querySelector<HTMLButtonElement>('[data-tema-boton]');
+  const texto = document.querySelector<HTMLElement>('[data-tema-texto]');
+  const raiz = document.documentElement;
+
+  if (boton && texto) {
+    const preferenciaSistema = window.matchMedia('(prefers-color-scheme: dark)');
+
+    // El script del layout ya dejó el atributo puesto, siempre. Así que el
+    // tema que se ve es, sin vueltas, el que dice el atributo.
+    const temaActual = () => (raiz.dataset.tema === 'oscuro' ? 'oscuro' : 'claro');
+
+    // Si nadie eligió nada, la página sigue al sistema. Se pregunta al
+    // almacenamiento y no al atributo, porque el atributo ahora siempre tiene
+    // valor y ya no distingue "elegido" de "heredado del sistema".
+    const hayEleccion = () => {
+      try {
+        const guardado = localStorage.getItem(CLAVE);
+        return guardado === 'claro' || guardado === 'oscuro';
+      } catch {
+        return false;
+      }
+    };
+
+    const rotular = () => {
+      const oscuro = temaActual() === 'oscuro';
+      boton.setAttribute('aria-pressed', String(oscuro));
+      texto.textContent = oscuro ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro';
+
+      // La barra del navegador en el teléfono se pinta con esto. Sin
+      // actualizarlo, el teléfono sigue mostrando la barra clara sobre una
+      // página oscura.
+      // El color sale de `--superficie`, que es el que pinta la página: escrito
+      // a mano acá y en el layout, cualquier cambio de paleta dejaba la barra
+      // del navegador de un color que ya no existe.
+      const barra = document.querySelector<HTMLMetaElement>('meta[name="theme-color"]');
+      const superficie = getComputedStyle(document.documentElement)
+        .getPropertyValue('--superficie')
+        .trim();
+      if (barra && superficie) barra.content = superficie;
+    };
+
+    boton.addEventListener('click', () => {
+      const siguiente = temaActual() === 'oscuro' ? 'claro' : 'oscuro';
+      raiz.dataset.tema = siguiente;
+      try {
+        localStorage.setItem(CLAVE, siguiente);
+      } catch {
+        // Sin almacenamiento el cambio vale para esta visita y nada más.
+      }
+      rotular();
+    });
+
+    // Mientras nadie haya elegido, la página sigue al sistema en vivo.
+    preferenciaSistema.addEventListener('change', (evento) => {
+      if (hayEleccion()) return;
+      raiz.dataset.tema = evento.matches ? 'oscuro' : 'claro';
+      rotular();
+    });
+
+    rotular();
+  }
+</script>
+
+<style>
+  /* Las mismas medidas de la referencia: pegado abajo a la derecha, a 24 px de
+     los dos bordes, por encima de todo. */
+  .tema {
+    position: fixed;
+    right: 24px;
+    bottom: 24px;
+    z-index: 50;
+    transition: transform 260ms var(--salida);
+  }
+
+  /* Apagado hasta que alguien lo busca. Es una preferencia, no una acción de
+     la página: si estuviera a opacidad plena competiría con el contenido en
+     todas las pantallas. */
+  .tema__boton {
+    display: flex;
+    width: 40px;
+    height: 40px;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: 1px solid var(--borde);
+    border-radius: 9999px;
+    background: var(--tarjeta);
+    color: var(--tinta);
+    cursor: pointer;
+    /* 0.3 daba 1.91 de contraste y el mínimo son 3. Con 0.75 llega a 5.9 y
+       sigue leyéndose como un control secundario. */
+    opacity: 0.75;
+    box-shadow: 0 4px 12px rgb(0 0 0 / 0.1);
+    transition:
+      opacity 160ms ease,
+      box-shadow 160ms ease,
+      transform 140ms var(--salida);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .tema__boton:hover {
+      opacity: 1;
+      box-shadow: 0 8px 24px rgb(0 0 0 / 0.16);
+    }
+  }
+
+  .tema__boton:focus-visible {
+    opacity: 1;
+  }
+
+  /* En un teléfono no hay puntero que lo despierte, así que se ve entero. */
+  @media (hover: none) {
+    .tema__boton {
+      opacity: 0.55;
+    }
+  }
+
+  .tema__icono {
+    flex: none;
+  }
+
+  /* De día se ofrece la luna y de noche el sol: el ícono es a dónde vas, no
+     dónde estás. */
+  .tema__icono--sol {
+    display: none;
+  }
+
+  :global(:root[data-tema='oscuro']) .tema__icono--sol {
+    display: block;
+  }
+
+  :global(:root[data-tema='oscuro']) .tema__icono--luna {
+    display: none;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :global(:root:not([data-tema='claro'])) .tema__icono--sol {
+      display: block;
+    }
+
+    :global(:root:not([data-tema='claro'])) .tema__icono--luna {
+      display: none;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .tema,
+    .tema__boton {
+      transition: none;
+    }
+  }
+</style>

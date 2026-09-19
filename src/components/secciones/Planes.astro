@@ -1,0 +1,562 @@
+---
+import { Check } from '@lucide/astro';
+import { COPY } from '../../data/copy';
+
+// La estructura es la de la referencia, leída de su código: encabezado y
+// selector en una fila, tres tarjetas debajo, y la letra chica al final.
+//
+// El selector de periodo funciona SIN JavaScript para el estado visible: los
+// precios de los tres periodos se dibujan y el CSS muestra el que corresponde
+// según un atributo en la sección. El script solo cambia ese atributo.
+const { precios } = COPY;
+
+// Ahorro de cada período contra el mensual, con la misma regla que la app
+// (`getPeriodDiscount`): se compara el costo POR MES de cada plan pago y se
+// anuncia el descuento MENOR, que es el único que vale para todos. Prometer el
+// mejor caso y que algún plan no lo cumpla sería publicidad engañosa.
+const aNumero = (monto: string) => Number(monto.replace(/\./g, ''));
+
+const pagos = precios.planes.filter((plan) => !plan.gratis);
+
+const descuentos = new Map<string, number>(
+  precios.periodos.map((periodo) => {
+    if (periodo.meses === 1) return [periodo.id, 0];
+    const porPlan = pagos.map((plan) => {
+      const base = aNumero(plan.precios.mes.monto);
+      const porMes = aNumero(plan.precios[periodo.id].monto) / periodo.meses;
+      return Math.round((1 - porMes / base) * 100);
+    });
+    return [periodo.id, porPlan.length === 0 ? 0 : Math.min(...porPlan)];
+  }),
+);
+---
+
+<section class="planes" id="precios" data-periodo={precios.periodos[0].id}>
+  <div class="planes__cabeza">
+    <div class="planes__texto">
+      <h2 class="planes__titular titular-seccion">{precios.titular}</h2>
+      <p class="planes__bajada bajada-seccion">{precios.bajada}</p>
+    </div>
+
+    {/* Tres periodos y no dos: Kodi cobra por mes, por trimestre y por año.
+        El selector se dibuja desde la lista, así agregar o quitar uno no toca
+        este archivo. */}
+    <div
+      class="planes__selector"
+      role="group"
+      aria-label={precios.etiquetaSelector}
+      style={`--periodos: ${precios.periodos.length}`}
+    >
+      {/* La pastilla del elegido es un elemento suelto que se desliza, no el
+          fondo de cada botón: así el cambio se ve como un movimiento y no como
+          dos parpadeos. Decorativa — quién está activo lo dice `aria-pressed`. */}
+      <span class="planes__pastilla" aria-hidden="true"></span>
+      {precios.periodos.map((periodo, i) => (
+        <button
+          class="planes__opcion pulsable"
+          type="button"
+          data-elige={periodo.id}
+          aria-pressed={i === 0 ? 'true' : 'false'}
+        >
+          <span>{periodo.etiqueta}</span>
+          {(descuentos.get(periodo.id) ?? 0) > 0 && (
+            <span class="planes__ahorro">−{descuentos.get(periodo.id)}%</span>
+          )}
+        </button>
+      ))}
+    </div>
+  </div>
+
+  <div class="planes__grilla">
+    {precios.planes.map((plan) => (
+      <article class:list={['plan', plan.destacado && 'plan--destacado']}>
+        <header class="plan__cabeza">
+          <h3 class="plan__nombre">{plan.nombre}</h3>
+          {plan.destacado && <span class="plan__insignia">{precios.insignia}</span>}
+        </header>
+
+        <p class="plan__resumen">{plan.resumen}</p>
+
+        {/* Los tres precios se dibujan siempre y el CSS muestra el del
+              periodo elegido. Sin esto haría falta JavaScript para que el
+              número apareciera, y la sección se vería vacía hasta que cargue. */}
+        {/* Los tres se apilan en la misma celda y se cruzan con un fundido:
+              apareciendo y desapareciendo de golpe, el número saltaba. */}
+        <div class="plan__precios">
+          {precios.periodos.map((periodo) => (
+            <div class="plan__precio" data-para={periodo.id}>
+              {/* El plan gratis no lleva símbolo de moneda: "₡Gratis" no es
+                    un precio, es un error de plantilla. */}
+              {!plan.gratis && <span class="plan__moneda">{precios.moneda}</span>}
+              <span class="plan__monto">{plan.precios[periodo.id].monto}</span>
+              <span class="plan__periodo">{plan.precios[periodo.id].unidad}</span>
+            </div>
+          ))}
+        </div>
+
+        <div class="plan__notas">
+          {precios.periodos.map((periodo) => (
+            <p class="plan__nota" data-para={periodo.id}>
+              {plan.precios[periodo.id].nota}
+            </p>
+          ))}
+        </div>
+
+        <ul class="plan__lista">
+          {plan.incluye.map((linea) => (
+            <li>
+              <Check class="plan__tic" size={16} stroke-width={2} aria-hidden="true" />
+              <span>{linea}</span>
+            </li>
+          ))}
+        </ul>
+
+        <a class="plan__cta pulsable" href={plan.href}>
+          {plan.cta}
+        </a>
+      </article>
+    ))}
+  </div>
+
+  <p class="planes__legal">{precios.legal}</p>
+</section>
+
+<script>
+  {
+    /* Lo único que hace el script es mover un atributo. Todo lo demás —qué
+       precio se ve, qué nota se lee, qué botón está encendido— lo resuelve el
+       CSS a partir de ese atributo. Así la sección ya se ve bien en el primer
+       pintado y sigue funcionando si el script falla. */
+  }
+  const seccion = document.getElementById('precios');
+
+  if (seccion) {
+    const opciones = seccion.querySelectorAll<HTMLButtonElement>('[data-elige]');
+
+    for (const opcion of opciones) {
+      opcion.addEventListener('click', () => {
+        const elegido = opcion.dataset.elige;
+        if (!elegido) return;
+        seccion.dataset.periodo = elegido;
+
+        for (const otra of opciones) {
+          otra.setAttribute('aria-pressed', String(otra.dataset.elige === elegido));
+        }
+      });
+    }
+  }
+</script>
+
+<style>
+  /* Mismas medidas que la referencia: caja de 1440, márgenes de 20, 32 y 40, y
+     96 de respiro abajo que sube a 128. */
+  .planes {
+    max-width: var(--caja);
+    margin-inline: auto;
+    padding-inline: var(--pad-seccion);
+    padding-bottom: var(--aire-seccion);
+  }
+
+  /* El encabezado y el selector se alinean por abajo cuando hay ancho: el
+     selector queda a la altura de la última línea del texto, no del titular. */
+  /* 40, el mismo respiro que usan exámenes, fuentes, pasos y preguntas entre
+     su encabezado y su contenido. */
+  .planes__cabeza {
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+  }
+
+  @media (min-width: 1024px) {
+    .planes__cabeza {
+      flex-direction: row;
+      align-items: flex-end;
+      justify-content: space-between;
+    }
+  }
+
+  /* El bloque de texto entero llega hasta 672, que es lo que mide el de la
+     referencia. El titular no lleva ancho propio: lo reparte `text-wrap:
+     balance`, que es lo que hace que sus dos líneas queden parejas. */
+  .planes__texto {
+    max-width: 42rem;
+  }
+
+  /* 576 y no el ancho completo del bloque: el párrafo cierra antes que el
+     titular a propósito, y así rompe en dos líneas en vez de tres. */
+
+  /* ── Selector de periodo ──────────────────────────────────────────────── */
+  /* Columnas iguales y no al ancho del texto: la pastilla se desliza de una a
+     otra, y con anchos distintos tendría que medirlos en JavaScript para saber
+     dónde parar. Iguales, el salto es siempre de una columna. */
+  .planes__selector {
+    position: relative;
+    display: inline-grid;
+    flex: none;
+    grid-auto-flow: column;
+    grid-auto-columns: 1fr;
+    align-items: center;
+    padding: 4px;
+    border: 1px solid var(--borde);
+    border-radius: 9999px;
+    /* La pista va hundida y lo elegido sube encima. Al revés —pista blanca y
+       elegido en superficie— los dos quedaban casi del mismo valor en claro y
+       no se distinguía cuál estaba activo. */
+    background: var(--hundido);
+  }
+
+  .planes__pastilla {
+    position: absolute;
+    z-index: 0;
+    top: 4px;
+    bottom: 4px;
+    left: 4px;
+    width: calc((100% - 8px) / var(--periodos));
+    border-radius: 9999px;
+    background: var(--tarjeta);
+    box-shadow: 0 1px 2px rgb(0 0 0 / 0.06);
+    transform: translateX(calc(var(--indice, 0) * 100%));
+    /* `--entre` y no `--salida`: esto se mueve DENTRO de la pantalla, de una
+       columna a la de al lado, y una curva de salida lo dejaba flotando. */
+    transition: transform 240ms var(--entre);
+  }
+
+  .planes__opcion {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 20px;
+    gap: 6px;
+    border: 0;
+    border-radius: 9999px;
+    background: none;
+    color: var(--tinta-suave);
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 0.875rem;
+    font-weight: 500;
+    white-space: nowrap;
+    transition:
+      color 200ms var(--salida),
+      transform 140ms var(--salida);
+  }
+
+  /* El encendido se lee de `aria-pressed`, que ya tiene que estar bien por
+     accesibilidad: así el estado visible y el que anuncia el lector de
+     pantalla no pueden separarse nunca. El fondo ya no vive acá: lo pone la
+     pastilla, que es la que se mueve. */
+  /* También en PESO y no solo en color: la pastilla da 1.15 de contraste
+     contra su pista, así que el color del rótulo era la única señal de cuál
+     está elegido y eso falla para quien no distingue ese par. */
+  .planes__opcion[aria-pressed='true'] {
+    color: var(--tinta);
+    font-weight: 700;
+  }
+
+  /* El ahorro en el color de marca y más chico que la etiqueta: acompaña al
+     período, no compite con él. */
+  .planes__ahorro {
+    color: var(--teal-texto);
+    font-size: 0.75rem;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* En teléfono las tres opciones en línea piden 354px y la pastilla mide 335:
+     "Anual −40%" se salía por la derecha. El ahorro baja debajo de su etiqueta
+     y las columnas vuelven a entrar. */
+  @media (max-width: 560px) {
+    .planes__selector {
+      display: grid;
+      width: 100%;
+      align-items: stretch;
+    }
+
+    .planes__opcion {
+      flex-direction: column;
+      padding: 6px 8px;
+      gap: 2px;
+      font-size: 0.8125rem;
+    }
+
+    .planes__ahorro {
+      font-size: 0.6875rem;
+    }
+  }
+
+  /* ── Tarjetas ─────────────────────────────────────────────────────────── */
+  .planes__grilla {
+    display: grid;
+    margin-top: 56px;
+    gap: 16px;
+  }
+
+  /* Dos columnas antes de las cuatro: con cuatro planes, saltar de una a
+     cuatro deja las tarjetas de 170 px en una tablet. */
+  @media (min-width: 640px) {
+    .planes__grilla {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 1100px) {
+    .planes__grilla {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+
+  .plan {
+    display: flex;
+    height: 100%;
+    flex-direction: column;
+    padding: 28px;
+    border: 1px solid var(--borde);
+    border-radius: 24px;
+  }
+
+  @media (min-width: 640px) {
+    .plan {
+      padding: 28px;
+    }
+  }
+
+  @media (min-width: 1280px) {
+    .plan {
+      padding: 32px;
+    }
+  }
+
+  /* La destacada invierte el material en vez de subir de tamaño: el contraste
+     la separa sin descuadrar la grilla. */
+  .plan--destacado {
+    border-color: transparent;
+    background: var(--tinta);
+    color: var(--superficie);
+  }
+
+  .plan__cabeza {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--e-4);
+  }
+
+  .plan__nombre {
+    font-family: var(--fuente-titular);
+    font-size: 1.125rem;
+    font-weight: 500;
+    letter-spacing: -0.025em;
+  }
+
+  .plan__insignia {
+    padding: 4px 10px;
+    border: 1px solid currentColor;
+    border-radius: 9999px;
+    font-size: 11px;
+    font-weight: 500;
+    line-height: 1;
+    opacity: 0.7;
+    white-space: nowrap;
+  }
+
+  .plan__resumen {
+    margin-top: 6px;
+    color: var(--tinta-suave);
+    font-size: 0.875rem;
+  }
+
+  .plan--destacado .plan__resumen,
+  .plan--destacado .plan__lista span {
+    color: inherit;
+    opacity: 0.65;
+  }
+
+  /* Se atenúa con el color y no con `opacity`: esa la usa el relevo de arriba. */
+  .plan--destacado .plan__nota {
+    color: color-mix(in srgb, var(--superficie) 65%, transparent);
+  }
+
+  /* El respiro va en el contenedor, no en cada precio: dentro de la celda
+     apilada, un margen por hijo se suma a la altura de la caja. */
+  .plan__precios {
+    margin-top: 32px;
+  }
+
+  .plan__precio {
+    display: flex;
+    align-items: flex-end;
+  }
+
+  .plan__moneda {
+    align-self: flex-start;
+    padding-top: 4px;
+    font-family: var(--fuente-titular);
+    font-size: 1.25rem;
+    font-weight: 500;
+    letter-spacing: -0.025em;
+  }
+
+  .plan__monto {
+    font-family: var(--fuente-titular);
+    font-size: clamp(2.25rem, 2.6vw, 3rem);
+    font-weight: 500;
+    line-height: 1;
+    letter-spacing: -0.025em;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .plan__periodo {
+    margin-left: var(--e-2);
+    padding-bottom: 2px;
+    color: var(--tinta-suave);
+    font-size: 0.875rem;
+  }
+
+  .plan--destacado .plan__periodo {
+    color: inherit;
+    opacity: 0.65;
+  }
+
+  /* Alto fijo para que las tres tarjetas mantengan la misma línea aunque una
+     diga "gratis siempre" y otra "se cobra por año". */
+  .plan__notas {
+    margin-top: var(--e-2);
+  }
+
+  .plan__nota {
+    /* Mínimo y no fijo: el texto mide 18px de línea y desbordaba la caja. */
+    min-height: 1rem;
+    color: var(--tinta-suave);
+    font-size: 0.75rem;
+  }
+
+  .plan__lista {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    margin-top: 32px;
+    padding-inline-start: 0;
+    gap: 12px;
+    list-style: none;
+  }
+
+  .plan__lista li {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .plan__tic {
+    flex: none;
+    margin-top: 2px;
+  }
+
+  .plan__lista span {
+    color: var(--tinta-suave);
+    font-size: 0.875rem;
+    line-height: 1.6;
+  }
+
+  .plan__cta {
+    display: inline-flex;
+    height: 48px;
+    align-items: center;
+    justify-content: center;
+    margin-top: 36px;
+    border: 1px solid var(--borde);
+    border-radius: 9999px;
+    color: var(--tinta);
+    font-size: 0.875rem;
+    font-weight: 500;
+    text-decoration: none;
+    white-space: nowrap;
+    transition:
+      background-color 200ms var(--salida),
+      opacity 200ms var(--salida),
+      transform 140ms var(--salida);
+  }
+
+  .plan--destacado .plan__cta {
+    border-color: transparent;
+    background: var(--superficie);
+    color: var(--tinta);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .plan__cta:hover {
+      background: var(--tarjeta);
+    }
+
+    .plan--destacado .plan__cta:hover {
+      background: var(--superficie);
+      opacity: 0.85;
+    }
+  }
+
+  /* ── Qué precio se ve ─────────────────────────────────────────────────── */
+  /* Apilados en la misma celda: `display: none` hacía saltar el alto. La
+     `visibility` los saca del árbol de accesibilidad. */
+  .plan__precios,
+  .plan__notas {
+    display: grid;
+  }
+
+  /* Relevo secuencial y no fundido cruzado: con los dos a media opacidad los
+     textos se leían superpuestos. Primero sale el viejo, después entra el nuevo. */
+  .plan__precios > *,
+  .plan__notas > * {
+    grid-area: 1 / 1;
+    opacity: 0;
+    transform: translateY(4px);
+    visibility: hidden;
+    transition:
+      opacity 120ms var(--salida),
+      transform 120ms var(--salida),
+      visibility 120ms;
+  }
+
+  .planes[data-periodo='mes'] [data-para='mes'],
+  .planes[data-periodo='trimestre'] [data-para='trimestre'],
+  .planes[data-periodo='anio'] [data-para='anio'] {
+    opacity: 1;
+    transform: none;
+    visibility: visible;
+    transition:
+      opacity 180ms var(--salida) 120ms,
+      transform 180ms var(--salida) 120ms,
+      visibility 0s;
+  }
+
+  /* En qué columna para la pastilla. Va junto a las reglas de arriba porque es
+     la otra mitad de lo mismo: el atributo dice el período y de acá salen el
+     precio visible y la posición del indicador. */
+  .planes[data-periodo='mes'] {
+    --indice: 0;
+  }
+
+  .planes[data-periodo='trimestre'] {
+    --indice: 1;
+  }
+
+  .planes[data-periodo='anio'] {
+    --indice: 2;
+  }
+
+  .planes__legal {
+    margin-top: 24px;
+    color: var(--tinta-suave);
+    font-size: 0.75rem;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .planes__opcion,
+    .planes__pastilla,
+    .plan__precios > *,
+    .plan__notas > *,
+    .plan__cta {
+      transition: none;
+    }
+  }
+</style>

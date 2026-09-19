@@ -1,0 +1,480 @@
+---
+import Pasos from '../islas/Pasos';
+import { COPY } from '../../data/copy';
+// Las medidas de las pantallas viven en su propio archivo: son las del código
+// de la app y no se mezclan con las de la sección.
+import '../../styles/pantallas-app.css';
+
+const { como } = COPY;
+
+// Las pantallas del teléfono las importa la isla, no esta plantilla: las props
+// de una isla viajan serializadas y un elemento de React no sobrevive ese viaje.
+// Acá solo se carga su hoja de estilos.
+---
+
+<section class="pasos" id="como">
+  <div class="pasos__cabeza">
+    <h2 class="pasos__titular titular-seccion">{como.titular}</h2>
+    <p class="pasos__bajada bajada-seccion">{como.bajada}</p>
+  </div>
+
+  <Pasos client:visible pasos={como.pasos} />
+</section>
+
+<style is:global>
+  /* ── La paleta de la app, dentro del teléfono ────────────────────────────
+     Copiada de `frontend/src/theme/colors.ts`. La app tiene sus dos modos, así
+     que la pantalla del teléfono sigue el tema de la página: si la landing
+     está en claro, se ve la app en claro.
+
+     Son tokens aparte de los de la landing porque los valores son OTROS: el
+     fondo claro de la app es #EFF1F3 y el de la landing #FAFAFA, y su texto
+     lleva tinte teal. Si la app cambia de colores, se vuelven a copiar de ahí. */
+  .marco__pantalla {
+    --app-fondo: #eff1f3;
+    --app-tarjeta: #ffffff;
+    --app-elevado: #ffffff;
+    --app-campo: #e3e7ea;
+    --app-texto: #243238;
+    --app-texto-2: #55636a;
+    --app-texto-3: #636f76;
+    --app-marca: #356f78;
+    --app-borde: #dde1e4;
+    --app-borde-2: #c9d0d6;
+    /* El rótulo sobre las tarjetas de vidrio: en claro es el texto del tema,
+       en oscuro el blanco de marca. */
+    --app-sobre-vidrio: #243238;
+  }
+
+  :root[data-tema='oscuro'] .marco__pantalla {
+    --app-fondo: #141f25;
+    --app-tarjeta: #1b2932;
+    --app-elevado: #243640;
+    --app-campo: #1b2932;
+    --app-texto: #edf2f4;
+    --app-texto-2: #a8b5bd;
+    --app-texto-3: #82949e;
+    --app-marca: #5db0be;
+    --app-borde: #1f2d36;
+    --app-borde-2: #324551;
+    --app-sobre-vidrio: #fefefe;
+  }
+
+  /* Los colores de marca no cambian entre modos: son los mismos en los dos.
+     Las fuentes tampoco: adentro del teléfono manda la app, no la landing. */
+  .marco__pantalla {
+    --app-fuente: 'Poppins', ui-sans-serif, system-ui, sans-serif;
+    /* La app carga UN solo corte de Fredoka: 600 SemiBold. */
+    --app-display: 'Fredoka Variable', 'Poppins', ui-sans-serif, sans-serif;
+    --app-teal: #408d99;
+    --app-coral: #f47c6b;
+    --app-lima: #9bcb6c;
+    --app-dorado: #e3b23c;
+  }
+
+  /* Va global porque lo dibuja la isla de React, que no lleva el atributo de
+     alcance de este archivo. Todas las clases arrancan con un prefijo propio
+     para que no se crucen con nada más del sitio. */
+
+  /* ── La pista y lo que queda pegado ──────────────────────────────────── */
+  /* Cuánta ventana se recorre por paso. La isla pone `--pasos`; el tramo vive
+     acá porque cambia con el ancho. El respiro de arriba es el mismo 40 que
+     usan las demás secciones entre su encabezado y su contenido. */
+  .pasos-pista {
+    position: relative;
+    margin-top: 40px;
+    height: calc(var(--pasos, 6) * var(--tramo, 105) * 1svh);
+  }
+
+  /* La cabecera flota sobre la página, así que centrar en la ventana entera
+     dejaba el teléfono debajo de ella. Se centra en lo que queda libre. */
+  .pasos-pegado {
+    position: sticky;
+    top: 0;
+    display: flex;
+    height: 100vh;
+    height: 100svh;
+    align-items: center;
+    padding-top: var(--alto-cabecera);
+    overflow: hidden;
+  }
+
+  /* Tres columnas: texto, teléfono y ficha. La del medio se dimensiona a lo que
+     mide el teléfono y las otras dos se reparten el resto por igual, así el
+     teléfono queda centrado de verdad. */
+  .pasos-reja {
+    display: grid;
+    width: 100%;
+    max-width: var(--caja);
+    margin-inline: auto;
+    padding-inline: 40px;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    column-gap: 64px;
+  }
+
+  .pasos-columna {
+    position: relative;
+    height: 340px;
+  }
+
+  .pasos-centro {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 28px;
+  }
+
+  /* ── Texto del paso ──────────────────────────────────────────────────── */
+  .paso {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .paso__numero {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .paso__numero span {
+    color: var(--tinta);
+    font-family: var(--fuente-titular);
+    font-size: 0.75rem;
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .paso__raya {
+    display: block;
+    width: 48px;
+    height: 1px;
+    background: var(--tinta);
+  }
+
+  .paso__titulo {
+    margin-top: 20px;
+    color: var(--tinta);
+    font-family: var(--fuente-titular);
+    font-size: clamp(1.75rem, 2.6vw, 2.25rem);
+    font-weight: 600;
+    line-height: 1.1;
+    letter-spacing: -0.025em;
+  }
+
+  .paso__texto {
+    max-width: 24rem;
+    margin-top: 16px;
+    color: var(--tinta-suave);
+    font-size: 1rem;
+    line-height: 1.625;
+  }
+
+  /* ── Ficha de la derecha ─────────────────────────────────────────────── */
+  .ficha {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 16px;
+  }
+
+  .ficha__caja {
+    padding: 16px;
+    border: 1px solid var(--borde);
+    border-radius: 16px;
+    background: var(--tarjeta);
+    box-shadow: 0 1px 2px rgb(0 0 0 / 0.04);
+  }
+
+  .ficha__rotulo {
+    color: var(--tinta-suave);
+    font-size: 0.625rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .ficha__dato {
+    margin-top: 6px;
+    color: var(--tinta);
+    font-family: var(--fuente-titular);
+    font-size: 0.875rem;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+  }
+
+  .ficha__detalle {
+    margin-top: 4px;
+    color: var(--tinta-suave);
+    font-size: 0.75rem;
+  }
+
+  .ficha__pastilla {
+    padding: 6px 14px;
+    border: 1px solid var(--borde);
+    border-radius: 9999px;
+    background: var(--tarjeta);
+    color: var(--tinta-suave);
+    font-size: 0.75rem;
+  }
+
+  /* ── El teléfono ─────────────────────────────────────────────────────── */
+  /* Se mide por la PANTALLA interior y de ahí salen el ancho del marco y la
+     escala de las vistas. Escritas a mano se descuadraban: la escala ignoraba
+     el filete de 1px y las vistas sobraban un par de píxeles por cada lado,
+     que el marco recortaba. Cada punto de corte cambia un solo número. */
+  .marco {
+    --pantalla: 254px;
+    --escala: calc(var(--pantalla) / 390px);
+    width: calc(var(--pantalla) + 18px);
+    padding: 8px;
+    border: 1px solid var(--borde);
+    border-radius: 44px;
+    background: var(--tarjeta);
+    box-shadow: 0 30px 80px -30px rgb(0 0 0 / 0.35);
+  }
+
+  @media (min-width: 640px) {
+    .marco {
+      --pantalla: 282px;
+    }
+  }
+
+  /* En una pantalla baja el teléfono no entra entero, así que encoge. */
+  @media (min-width: 1100px) and (max-height: 760px) {
+    .marco {
+      --pantalla: 230px;
+    }
+  }
+
+  /* Apilado, el teléfono comparte el alto con las barritas y el texto del
+     paso: 306 es lo que ocupan esos dos con sus huecos, el respiro de la
+     cabecera y el propio marco del teléfono, y 2.11 la proporción de la vista
+     (823 sobre 390). Antes iba por saltos de alto y en un teléfono bajo el
+     texto salía cortado por el recorte del bloque pegado.
+
+     El tope de 202 no es de espacio sino de diseño: a 272 el teléfono se comía
+     dos tercios de la pantalla y los pasos caían bajo el pliegue. */
+  @media (max-width: 1099px) {
+    .marco {
+      --pantalla: min(202px, calc((100svh - 306px) / 2.11));
+    }
+  }
+
+  @media (min-width: 640px) and (max-width: 1099px) {
+    .marco {
+      --pantalla: min(282px, calc((100svh - 306px) / 2.11));
+    }
+  }
+
+  .marco__pantalla {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 9 / 19;
+    overflow: hidden;
+    border-radius: 36px;
+    background: var(--app-fondo);
+  }
+
+  .marco__escenas {
+    position: absolute;
+    inset: 0;
+  }
+
+  /* Del mismo material que el marco, no negro fijo: la isla es el marco del
+     teléfono metiéndose en la pantalla, así que sigue al tema como él. En negro
+     quedaba como una mancha que no pertenecía a ningún lado. */
+  .marco__isla {
+    position: absolute;
+    top: calc(14px * var(--escala));
+    left: 50%;
+    width: calc(104px * var(--escala));
+    height: calc(30px * var(--escala));
+    translate: -50%;
+    border: 1px solid var(--borde);
+    border-radius: 9999px;
+    background: var(--tarjeta);
+  }
+
+  /* Radio fijo y no interpolado cuadro a cuadro: `border-radius` no es
+     compositable y repintaba la caja del teléfono durante toda la secuencia. */
+  .escena {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    border-radius: 24px;
+  }
+
+  .escena__sombra {
+    position: absolute;
+    inset: 0;
+    background: #000;
+    pointer-events: none;
+  }
+
+  /* ── Barritas de avance ──────────────────────────────────────────────── */
+  .barritas {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .barrita {
+    display: block;
+    width: 36px;
+    height: 3px;
+    overflow: hidden;
+    border-radius: 9999px;
+    background: var(--borde);
+  }
+
+  .barrita__llenado {
+    display: block;
+    width: 100%;
+    height: 100%;
+    background: var(--tinta);
+  }
+
+  /* ── Hueco provisional de cada pantalla ──────────────────────────────── */
+  .hueco {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    align-items: center;
+    justify-content: center;
+    background: var(--app-fondo);
+  }
+
+  .hueco__numero {
+    color: var(--app-borde-2);
+    font-family: var(--fuente-titular);
+    font-size: 4rem;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ── Versión apilada: teléfono y móvil ───────────────────────────────── */
+  .pasos-lista {
+    display: flex;
+    max-width: 1440px;
+    flex-direction: column;
+    margin-inline: auto;
+    margin-top: 56px;
+    padding-inline: 20px;
+    gap: 64px;
+  }
+
+  @media (min-width: 640px) {
+    .pasos-lista {
+      padding-inline: 32px;
+    }
+  }
+
+  .pasos-lista__telefono {
+    display: flex;
+    justify-content: center;
+  }
+
+  .pasos-lista__items {
+    display: flex;
+    flex-direction: column;
+    padding-inline-start: 0;
+    gap: 48px;
+    list-style: none;
+  }
+
+  .paso__raya--fija {
+    display: block;
+    width: 48px;
+    height: 1px;
+    background: var(--tinta);
+  }
+
+  /* En angosto no hay dos columnas a los lados: el teléfono sube y el texto del
+     paso queda debajo, centrado. La ficha se guarda, que repite lo que ya está
+     dicho en la pantalla y no hay dónde ponerla. */
+  @media (max-width: 1099px) {
+    .pasos-reja {
+      grid-template-columns: minmax(0, 1fr);
+      justify-items: center;
+      padding-inline: var(--pad-seccion);
+      column-gap: 0;
+      /* Menos que esto y el número del paso queda pegado a las barritas. */
+      row-gap: 32px;
+    }
+
+    .pasos-centro {
+      order: -1;
+      gap: 20px;
+    }
+
+    .pasos-columna--ficha {
+      display: none;
+    }
+
+    /* Alto del paso más largo: los seis se dibujan uno encima de otro, así que
+       la columna la fija el que más ocupa. Más corta, ese se desborda. */
+    .pasos-columna {
+      width: 100%;
+      max-width: 30rem;
+      height: 150px;
+    }
+
+    .paso {
+      align-items: center;
+      text-align: center;
+    }
+
+    .paso__titulo {
+      margin-top: 16px;
+      font-size: 1.375rem;
+    }
+
+    .paso__texto {
+      margin-top: 12px;
+      font-size: 0.9375rem;
+      line-height: 1.6;
+    }
+
+    /* Un poco más largo que en escritorio para dar tiempo a leer, pero no
+       mucho: con 150 la sección se comía nueve pantallas de las dieciséis de
+       la página y se sentía trabada. */
+    .pasos-pista {
+      --tramo: 120;
+    }
+
+    /* Seis barritas de 36 se comían dos tercios del ancho. */
+    .barritas {
+      gap: 6px;
+    }
+
+    .barrita {
+      width: 24px;
+      height: 2px;
+    }
+  }
+</style>
+
+<style>
+  .pasos {
+    padding-bottom: var(--aire-seccion);
+  }
+
+  .pasos__cabeza {
+    max-width: var(--caja);
+    margin-inline: auto;
+    padding-inline: var(--pad-seccion);
+  }
+
+  .pasos__titular {
+    max-width: 42rem;
+  }
+
+</style>

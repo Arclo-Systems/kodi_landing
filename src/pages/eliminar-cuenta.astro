@@ -22,37 +22,41 @@ const CORREO_SOPORTE = 'soporte@holakodi.com';
       </a>
     </header>
 
-    <main id="contenido">
+    <main id="contenido" tabindex="-1">
       <article class="documento">
         <h1 class="documento__titulo">Eliminar tu cuenta de Kodi</h1>
         <p class="documento__entrada">
-          Podés eliminar tu cuenta desde la app o pedirlo por correo. Acá está el procedimiento,
-          qué datos se borran y qué pasa con tu suscripción.
+          Podés eliminar tu cuenta desde la app o pedirlo por correo. Acá está el procedimiento, qué
+          datos se borran y qué pasa con tu suscripción.
         </p>
 
         <section class="documento__seccion">
           <h2 class="documento__seccion-titulo">Desde la app</h2>
           <ol class="documento__pasos">
             <li>Abrí Kodi e iniciá sesión.</li>
-            <li>Entrá a la pestaña <strong>Perfil</strong>.</li>
-            <li>Abrí <strong>Configuración</strong> y tocá <strong>Eliminar cuenta</strong>.</li>
+            <li>
+              Entrá a la pestaña <strong>Perfil</strong>.
+            </li>
+            <li>
+              Abrí <strong>Configuración</strong> y tocá <strong>Eliminar cuenta</strong>.
+            </li>
             <li>Confirmá con la contraseña de tu cuenta.</li>
           </ol>
           <p class="documento__seccion-cuerpo">
-            Al confirmar, la cuenta se desactiva de inmediato y perdés el acceso. Tenés 30 días
-            para revertirlo: si volvés a iniciar sesión dentro de ese plazo, te ofrecemos
-            reactivarla. Pasados los 30 días el borrado es definitivo y no se puede deshacer.
+            Al confirmar, la cuenta se desactiva de inmediato y perdés el acceso. Tenés 30 días para
+            revertirlo: si volvés a iniciar sesión dentro de ese plazo, te ofrecemos reactivarla.
+            Pasados los 30 días el borrado es definitivo y no se puede deshacer.
           </p>
         </section>
 
         <section class="documento__seccion">
           <h2 class="documento__seccion-titulo">Sin la app</h2>
           <p class="documento__seccion-cuerpo">
-            Escribinos a <a href={`mailto:${CORREO_SOPORTE}?subject=Eliminar%20cuenta`}
-              >{CORREO_SOPORTE}</a
-            > desde la misma dirección de correo con la que creaste la cuenta, con el asunto
-            «Eliminar cuenta». Verificamos que ese correo corresponda a la cuenta, hacemos la
-            eliminación y te confirmamos por el mismo medio.
+            Escribinos a{' '}
+            <a href={`mailto:${CORREO_SOPORTE}?subject=Eliminar%20cuenta`}>{CORREO_SOPORTE}</a>{' '}
+            desde la misma dirección de correo con la que creaste la cuenta, con el asunto «Eliminar
+            cuenta». Verificamos que ese correo corresponda a la cuenta, hacemos la eliminación y te
+            confirmamos por el mismo medio.
           </p>
         </section>
 
@@ -60,9 +64,9 @@ const CORREO_SOPORTE = 'soporte@holakodi.com';
           <h2 class="documento__seccion-titulo">Qué se elimina</h2>
           <p class="documento__seccion-cuerpo">
             Los datos de tu cuenta y todo lo asociado a ella: nombre, correo, teléfono y
-            preferencias; tu progreso de aprendizaje, estadísticas y respuestas; EXP, racha,
-            monedas del juego, artículos obtenidos dentro de la app y logros; tu actividad social
-            y tus conversaciones con soporte.
+            preferencias; tu progreso de aprendizaje, estadísticas y respuestas; EXP, racha, monedas
+            del juego, artículos obtenidos dentro de la app y logros; tu actividad social y tus
+            conversaciones con soporte.
           </p>
         </section>
 
@@ -70,33 +74,34 @@ const CORREO_SOPORTE = 'soporte@holakodi.com';
           <h2 class="documento__seccion-titulo">Qué se conserva</h2>
           <p class="documento__seccion-cuerpo">
             Únicamente lo que la ley aplicable obliga a conservar: registros de facturación y los
-            datos mínimos necesarios para prevenir fraude y abuso. Se guardan por el plazo legal
-            que corresponda, con acceso restringido y sin usarse para ningún otro fin. También
-            podemos conservar datos agregados o anonimizados que ya no permiten identificarte.
+            datos mínimos necesarios para prevenir fraude y abuso. Se guardan por el plazo legal que
+            corresponda, con acceso restringido y sin usarse para ningún otro fin. También podemos
+            conservar datos agregados o anonimizados que ya no permiten identificarte.
           </p>
         </section>
 
         <section class="documento__seccion">
           <h2 class="documento__seccion-titulo">Tu suscripción se cancela aparte</h2>
           <p class="documento__seccion-cuerpo">
-            Si tenés una suscripción activa, la cobra y la administra la tienda donde la
-            compraste, no Kodi. Eliminar la cuenta no cancela la suscripción ni detiene las
-            renovaciones: cancelala primero desde la tienda. En Google Play, desde Play Store →
-            tu foto de perfil → Pagos y suscripciones → Suscripciones → Kodi → Cancelar
-            suscripción. En App Store, desde Ajustes → tu nombre → Suscripciones.
+            Si tenés una suscripción activa, la cobra y la administra la tienda donde la compraste,
+            no Kodi. Eliminar la cuenta no cancela la suscripción ni detiene las renovaciones:
+            cancelala primero desde la tienda. En Google Play, desde Play Store → tu foto de perfil
+            → Pagos y suscripciones → Suscripciones → Kodi → Cancelar suscripción. En App Store,
+            desde Ajustes → tu nombre → Suscripciones.
           </p>
         </section>
 
         <section class="documento__seccion">
           <h2 class="documento__seccion-titulo">Más información</h2>
           <p class="documento__seccion-cuerpo">
-            El detalle de qué datos tratamos y por cuánto tiempo está en la <a href="/privacidad"
-              >Política de privacidad</a
-            >.
+            El detalle de qué datos tratamos y por cuánto tiempo está en la{' '}
+            <a href="/privacidad">Política de privacidad</a>.
           </p>
         </section>
 
-        <a class="documento__volver" href="/">Volver al inicio</a>
+        <a class="documento__volver" href="/">
+          Volver al inicio
+        </a>
       </article>
     </main>
 

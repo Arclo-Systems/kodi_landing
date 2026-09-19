@@ -1,0 +1,76 @@
+---
+import TextoRevelado from '../islas/TextoRevelado';
+import { COPY } from '../../data/copy';
+
+// El que anima es el `ScrollReveal` de React Bits, sin tocar. `TextoRevelado`
+// es solo el puente que le entrega el párrafo como cadena de React y fija sus
+// opciones; el porqué de ese puente está en su propio archivo.
+---
+
+<section class="manifiesto" aria-label="Para qué existe Kodi">
+  <TextoRevelado client:visible texto={COPY.manifiesto} />
+</section>
+
+<style is:global>
+  /* Va global porque las clases se las pasamos a un componente de React, que
+     Astro no toca: sus elementos no llevan el atributo de alcance. */
+  .manifiesto__bloque {
+    margin: 0;
+  }
+
+  /* Los cinco valores salen del componente de la referencia tal cual:
+     26 a 52 px, interlínea 1.18, peso 500 y el ajuste de letra apretado.
+     El ancho máximo es la clave del bloque: sin él el párrafo se estira a lo
+     ancho de la caja, rompe en menos líneas y el encendido deja de leerse como
+     un recorrido. */
+  .manifiesto__texto {
+    max-width: 56rem;
+    font-family: var(--fuente-titular);
+    font-size: clamp(1.625rem, 4.2vw, 3.25rem);
+    font-weight: 500;
+    line-height: 1.18;
+    letter-spacing: -0.025em;
+    color: var(--tinta);
+  }
+
+  /* Quien pidió menos movimiento lee el párrafo entero y encendido. El
+     componente deja las palabras a `baseOpacity` hasta que el scroll las
+     alcanza, así que sin esto vería un texto casi invisible. */
+  @media (prefers-reduced-motion: reduce) {
+    .manifiesto__texto .word {
+      opacity: 1 !important;
+      filter: none !important;
+    }
+  }
+
+  /* Las palabras arrancan apagadas ya en el HTML. Sin esto, el párrafo se ve
+     entero hasta que la isla hidrata y GSAP lo apaga de un golpe, que se lee
+     como si el efecto se reiniciara al llegar a la sección. El 0.12 es el
+     mismo `baseOpacity` que recibe el componente. */
+  .manifiesto__texto .word {
+    opacity: 0.12;
+  }
+
+  /* Sin JavaScript nadie las enciende: se leen y punto. */
+  @media (scripting: none) {
+    .manifiesto__texto .word {
+      opacity: 1;
+    }
+  }
+</style>
+
+<style>
+  /* Medidas leídas del componente de la referencia, no estimadas: caja de
+     1440 centrada, margen lateral de 20, 32 y 40 según el ancho, y un respiro
+     vertical de 112 que sube a 160. Es mucho más aire que el ritmo normal del
+     sitio, y es a propósito: el párrafo tiene que quedar solo en la pantalla,
+     sin nada que lo acompañe arriba ni abajo. */
+  .manifiesto {
+    max-width: var(--caja);
+    margin-inline: auto;
+    /* 112 en teléfono y 160 desde 1456, fluido entre medio: los números de la
+       referencia, a propósito por encima del ritmo del sitio. */
+    padding-block: clamp(112px, 11vw, 160px);
+    padding-inline: var(--pad-seccion);
+  }
+</style>

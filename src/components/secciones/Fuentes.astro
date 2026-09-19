@@ -1,0 +1,216 @@
+---
+import MaquinaContenido from '../islas/MaquinaContenido';
+import { COPY } from '../../data/copy';
+
+// El plan pedía acá una banda plana de tres columnas. Con el `magic-transform`
+// de React Bits la misma idea se MUESTRA en vez de contarse: por la izquierda
+// entra el material oficial, en el centro lo procesa el equipo de contenido, y
+// por la derecha salen las piezas de cada pregunta.
+//
+// Las tres columnas siguen abajo, porque la animación no dice de qué material
+// se trata y eso es justo lo que la sección tiene que responder.
+const { fuentes } = COPY;
+---
+
+<section class="fuentes" id="fuentes">
+  <div class="fuentes__texto">
+    <h2 class="fuentes__titular titular-seccion">{fuentes.titular}</h2>
+    <p class="fuentes__autoria bajada-seccion">{fuentes.autoria}</p>
+  </div>
+
+  <div class="fuentes__maquina">
+    {/* La escala va en este div y no en la isla: `<astro-island>` es
+        `display: contents` y no acepta transform. */}
+    <div class="fuentes__escenario">
+      <MaquinaContenido client:visible />
+    </div>
+  </div>
+
+  <dl class="fuentes__columnas">
+    {fuentes.columnas.map((columna) => (
+      <div class="fuentes__columna">
+        <dt>{columna.examen}</dt>
+        <dd>{columna.fuente}</dd>
+      </div>
+    ))}
+  </dl>
+
+  {/* Esta sección nombra al COSEVI, al MEP, a la UCR, a la UNA y al TEC. Sin
+      esta línea, nombrarlos implica un respaldo que no existe. */}
+  <p class="fuentes__deslinde">{fuentes.deslinde}</p>
+</section>
+
+<style>
+  .fuentes {
+    max-width: var(--caja);
+    margin-inline: auto;
+    padding-inline: var(--pad-seccion);
+    padding-bottom: var(--aire-seccion);
+  }
+
+  .fuentes__texto {
+    max-width: 42rem;
+  }
+
+
+  /* La máquina reserva su alto desde el primer pintado aunque la isla todavía
+     no haya montado: si no, al aparecer empuja media página hacia abajo.
+     `--escala` la achica entera donde no entra su escenario de 640; el alto se
+     multiplica por lo mismo para no dejar hueco debajo. */
+  /* El escenario mide 460 pero solo dibuja en 341: le sobran 82 arriba y 37
+     abajo, medidos a lo largo de toda la animación. Ese vacío se sumaba al
+     respiro de la sección y en portátil parecían 146px de hueco. Se recorta
+     dejando 12 de aire por lado. */
+  .fuentes__maquina {
+    --escena: 640px;
+    --alto-escena: 460px;
+    --recorte-arriba: 70px;
+    --recorte-abajo: 25px;
+    --escala: 1;
+    display: flex;
+    height: calc(
+      (var(--alto-escena) - var(--recorte-arriba) - var(--recorte-abajo)) * var(--escala)
+    );
+    justify-content: center;
+    /* El mismo respiro fluido que usa la grilla de exámenes entre su
+       encabezado y su contenido. */
+    margin-top: clamp(40px, 8vw, 64px);
+    /* Las piezas que expulsa el eje vuelan más allá del escenario; sin esto se
+       meten en el texto de las columnas de abajo. */
+    overflow: hidden;
+  }
+
+  /* El escenario conserva su ancho de escritorio y se achica entero: si en
+     cambio se estrechara, la hoja de la izquierda no entraría y saldría
+     cortada. */
+  .fuentes__escenario {
+    width: var(--escena);
+    flex: none;
+    transform: scale(var(--escala));
+    transform-origin: top center;
+  }
+
+  /* El recorte va DENTRO de la caja escalada, no fuera: así encoge con ella y
+     en teléfono no se traga el dibujo. */
+  .fuentes__escenario :global(.maquina) {
+    margin-top: calc(var(--recorte-arriba) * -1);
+  }
+
+  @media (max-width: 680px) {
+    .fuentes__maquina {
+      --escala: calc((100vw - 2 * var(--pad-seccion)) / var(--escena));
+    }
+  }
+
+  /* La entrada de la máquina. Va global porque el marcado lo pinta React.
+     Sube un poco y se funde: sin esto aparecía de un cuadro al otro. */
+  .fuentes__escenario :global(.maquina) {
+    opacity: 0;
+    transform: translateY(10px);
+    transition:
+      opacity 420ms var(--salida),
+      transform 420ms var(--salida);
+  }
+
+  .fuentes__escenario :global(.maquina[data-entra]) {
+    opacity: 1;
+    transform: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .fuentes__escenario :global(.maquina) {
+      transform: none;
+      transition: opacity 200ms var(--salida);
+    }
+  }
+
+  .fuentes__columnas {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    margin-top: clamp(32px, 6vw, 48px);
+    border-top: 1px solid var(--borde);
+    padding-top: clamp(28px, 5vw, 40px);
+  }
+
+  /* Una línea entre columna y columna, no alrededor de cada una: son tres
+     partes de una misma afirmación, no tres tarjetas. La primera no lleva
+     línea ni sangría, así que arranca a plomo con el titular de arriba. */
+  .fuentes__columna + .fuentes__columna {
+    border-inline-start: 1px solid var(--borde);
+    padding-inline-start: clamp(12px, 3vw, 40px);
+  }
+
+  .fuentes__columna:not(:last-child) {
+    padding-inline-end: clamp(12px, 3vw, 40px);
+  }
+
+  /* La jerarquía va al revés de lo que parece: lo que la sección promete NO es
+     el nombre del examen, es de dónde sale el material. Así que el examen es el
+     rótulo y la fuente es la frase, con vez y media de diferencia de cuerpo
+     entre una y otra. Antes iban casi al mismo tamaño y se leía plano. */
+  /* Título grande y con peso, párrafo chico y suave. La versión anterior tenía
+     esto al revés —el nombre del examen más chico que su propia frase— con la
+     excusa de que la fuente era lo importante. No se sostiene: un título que
+     mide menos que su párrafo no se lee como título. */
+  .fuentes__columna dt {
+    color: var(--tinta);
+    font-family: var(--fuente-titular);
+    font-size: 1.25rem;
+    font-weight: 600;
+    line-height: 1.3;
+    letter-spacing: -0.02em;
+  }
+
+  .fuentes__columna dd {
+    margin-top: var(--e-2);
+    margin-inline-start: 0;
+    color: var(--tinta-suave);
+    font-size: 0.9375rem;
+    font-weight: 400;
+    line-height: 1.6;
+    text-wrap: pretty;
+  }
+
+  /* Sin ancho máximo: la frase entra entera en una línea y partida en dos
+     quedaba como un párrafo huérfano colgando de la banda. Va con una regla
+     arriba, la misma que cierra las columnas, para que se lea como el pie de
+     la banda y no como un texto suelto más. */
+  /* En teléfono van una debajo de otra: a tres columnas quedaban de 112px y
+     cada frase se partía en tres líneas. El cuerpo se queda en el tamaño
+     chico, que es el que pidió el founder. */
+  @media (max-width: 767px) {
+    .fuentes__columnas {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 20px;
+    }
+
+    .fuentes__columna + .fuentes__columna {
+      border-inline-start: 0;
+      padding-inline-start: 0;
+    }
+
+    .fuentes__columna:not(:last-child) {
+      padding-inline-end: 0;
+    }
+
+    .fuentes__columna dt {
+      font-size: 0.9375rem;
+    }
+
+    .fuentes__columna dd {
+      margin-top: 4px;
+      font-size: 0.75rem;
+      line-height: 1.5;
+    }
+  }
+
+  .fuentes__deslinde {
+    margin-top: 40px;
+    border-top: 1px solid var(--borde);
+    padding-top: 20px;
+    color: var(--tinta-suave);
+    font-size: 0.75rem;
+    line-height: 1.5;
+    text-align: center;
+  }
+</style>

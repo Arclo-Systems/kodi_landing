@@ -1,6 +1,6 @@
-export type SocialId = 'tiktok' | 'instagram' | 'facebook' | 'whatsapp';
+type SocialId = 'tiktok' | 'instagram' | 'facebook' | 'whatsapp';
 
-export interface SocialLink {
+interface SocialLink {
   id: SocialId;
   href: string;
 }

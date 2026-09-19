@@ -6,3 +6,9 @@ node_modules/
 .env.production
 .DS_Store
 npm-debug.log*
+.env.local
+.env.*.local
+
+# Salidas de las pruebas de navegador
+test-results/
+playwright-report/

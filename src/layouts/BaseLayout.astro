@@ -1,7 +1,12 @@
 ---
 import nunitoLatin from '@fontsource-variable/nunito/files/nunito-latin-wght-normal.woff2?url';
+import geistLatin from '@fontsource-variable/geist/files/geist-latin-wght-normal.woff2?url';
 import '@fontsource-variable/nunito/wght.css';
-import '../styles/global.css';
+import '@fontsource-variable/geist/wght.css';
+import '../styles/tailwind.css';
+import { COPY } from '../data/copy';
+import { SOCIAL } from '../data/social';
+import { TIENDAS } from '../data/tiendas';
 
 interface Props {
   title: string;
@@ -18,19 +23,46 @@ const { title, description, noindex = false, preconnect } = Astro.props;
 // sirven bajo /u/* y /r/*, así que su URL real no se puede calcular en el build.
 // Declarar la del archivo (/invitacion) haría que las redes compartan un enlace
 // sin el código y le diría a Google que indexe lo que acabamos de excluir.
-const canonical =
-  !noindex && Astro.site ? new URL(Astro.url.pathname, Astro.site).href : undefined;
+const canonical = !noindex && Astro.site ? new URL(Astro.url.pathname, Astro.site).href : undefined;
 const imagen = Astro.site ? new URL('/og.png', Astro.site).href : '/og.png';
+
+// El marcado describe la APP, no la página: la descripción es fija y los
+// sistemas salen de las tiendas que ya tienen URL, para que no pueda decir
+// "iOS" mientras la página anuncia "muy pronto en App Store".
+const sistemas = TIENDAS.filter((tienda) => tienda.url !== null).map((tienda) =>
+  tienda.icono === 'googleplay' ? 'Android' : 'iOS',
+);
+
+// "Kodi" también es un centro multimedia muy conocido, así que desambiguar la
+// entidad importa acá más que de costumbre: el nodo de organización con sus
+// perfiles es la señal estándar para eso.
+const organizacion = {
+  '@type': 'Organization',
+  '@id': 'https://holakodi.com/#organizacion',
+  name: 'Kodi',
+  url: 'https://holakodi.com/',
+  logo: 'https://holakodi.com/favicon.svg',
+  email: COPY.faq.correo,
+  areaServed: 'CR',
+  sameAs: Object.values(SOCIAL).map((red) => red.href),
+};
+
+const aplicacion = {
+  '@type': 'MobileApplication',
+  name: 'Kodi',
+  publisher: { '@id': organizacion['@id'] },
+  applicationCategory: 'EducationalApplication',
+  operatingSystem: sistemas.join(', '),
+  description: COPY.descripcion,
+  inLanguage: 'es-CR',
+  // `countriesSupported` y no `areaServed`: esa segunda no existe para este
+  // tipo y el validador la descarta.
+  countriesSupported: 'CR',
+};
 
 const datosEstructurados = {
   '@context': 'https://schema.org',
-  '@type': 'MobileApplication',
-  name: 'Kodi',
-  applicationCategory: 'EducationalApplication',
-  operatingSystem: 'iOS, Android',
-  description,
-  inLanguage: 'es-CR',
-  areaServed: 'CR',
+  '@graph': [organizacion, aplicacion],
 };
 ---
 
@@ -43,9 +75,17 @@ const datosEstructurados = {
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="preload" as="font" type="font/woff2" href={nunitoLatin} crossorigin />
+    {/* Geist va en los titulares y aparece en la primera pantalla, así que se
+        precarga igual que Nunito: sin esto el titular se dibuja con la fuente
+        del sistema y salta de forma al llegar la buena. */}
+    <link rel="preload" as="font" type="font/woff2" href={geistLatin} crossorigin />
     {preconnect && <link rel="preconnect" href={preconnect} crossorigin />}
     {canonical && <link rel="canonical" href={canonical} />}
-    {noindex && <meta name="robots" content="noindex" />}
+    {noindex ? (
+      <meta name="robots" content="noindex" />
+    ) : (
+      <meta name="robots" content="index, follow, max-image-preview:large" />
+    )}
     <title>{title}</title>
     <meta name="description" content={description} />
     <meta name="theme-color" content="#fafafa" />
@@ -55,16 +95,51 @@ const datosEstructurados = {
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:image" content={imagen} />
+    {/* Las medidas reales de `public/og.png`. Sin ellas, Facebook muestra el
+        enlace sin vista previa mientras descarga la imagen. */}
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={COPY.titular} />
     {canonical && <meta property="og:url" content={canonical} />}
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={imagen} />
+    <meta name="twitter:image:alt" content={COPY.titular} />
     <meta name="generator" content={Astro.generator} />
-    <script is:inline type="application/ld+json" set:html={JSON.stringify(datosEstructurados)} />
+    {/* Va acá arriba, suelto y sin diferir, a propósito: tiene que correr
+        ANTES del primer pintado. Si esperara al final del cuerpo, quien eligió
+        oscuro vería la página en claro por una fracción de segundo y después
+        el golpe de cambio. */}
+    <script is:inline>
+      (() => {
+        let elegido = null;
+        try {
+          elegido = localStorage.getItem('kodi-tema');
+        } catch {
+          // Modo privado o almacenamiento bloqueado: se resuelve por sistema.
+        }
+        // El atributo se escribe SIEMPRE, incluso cuando nadie eligió nada y
+        // el tema lo decide el sistema. Es lo que mantiene unidos los dos
+        // caminos: nuestra paleta y la variante `dark:` de Tailwind, que los
+        // componentes de React Bits usan por dentro. Si el atributo faltara,
+        // una persona con el sistema en oscuro y el tema claro elegido vería
+        // la página clara con esos componentes oscuros.
+        const sistema = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        document.documentElement.dataset.tema =
+          elegido === 'claro' || elegido === 'oscuro' ? elegido : sistema ? 'oscuro' : 'claro';
+      })();
+    </script>
+    <script
+      is:inline
+      type="application/ld+json"
+      set:html={JSON.stringify(datosEstructurados)}
+    ></script>
   </head>
   <body>
-    <a class="salto" href="#contenido">Ir al contenido</a>
+    <a class="salto" href="#contenido">
+      Ir al contenido
+    </a>
     <slot />
   </body>
 </html>

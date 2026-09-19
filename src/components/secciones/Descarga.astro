@@ -1,0 +1,336 @@
+---
+import BounceCards from '../react-bits/BounceCards';
+import Tarjeta from '../Tarjeta.astro';
+import { COPY } from '../../data/copy';
+import { MODULOS } from '../../data/modulos';
+import { TIENDAS, rotuloDeTienda } from '../../data/tiendas';
+
+// El cierre de la referencia: un panel oscuro en los dos temas, con el abanico
+// de tarjetas arriba, el titular grande, una bajada corta y los botones.
+//
+// Las cinco tarjetas son los íconos de módulo del panel de administración
+// sobre su color de identidad. Salen de `data/modulos.ts`, que es donde vive
+// el catálogo: acá estaban copiados a mano y eran la tercera lista de lo
+// mismo que había que mantener sincronizada.
+
+// Los cinco lugares del abanico, medidos en la referencia: el del centro
+// derecho, los de al lado 112 afuera y 8 abajo con 6°, y los extremos 224
+// afuera y 30 abajo con 13°.
+const ABANICO = [
+  'translate(-224px, 30px) rotate(-13deg)',
+  'translate(-112px, 8px) rotate(-6deg)',
+  'none',
+  'translate(112px, 8px) rotate(6deg)',
+  'translate(224px, 30px) rotate(13deg)',
+];
+
+// Al pasar el mouse, la referencia hace dos cosas a la vez sobre esa tarjeta:
+// la sube 10 y le endereza el giro al 40% (medido: -13° pasa a -5.2°, -6° a
+// -2.4°). Las vecinas no se mueven.
+const ALZADA = [
+  'translate(-224px, 20px) rotate(-5.2deg)',
+  'translate(-112px, -2px) rotate(-2.4deg)',
+  'translate(0px, -10px)',
+  'translate(112px, -2px) rotate(2.4deg)',
+  'translate(224px, 20px) rotate(5.2deg)',
+];
+
+// De dónde arrancan antes de entrar en pantalla, también medido: apiladas casi
+// juntas al centro, 48 más abajo, sin giro e invisibles.
+const APILADAS = [
+  'translate(-56px, 48px)',
+  'translate(-28px, 48px)',
+  'translate(0px, 48px)',
+  'translate(28px, 48px)',
+  'translate(56px, 48px)',
+];
+
+const { descarga } = COPY;
+---
+
+<section class="cierre" id="descargar">
+  <div class="cierre__panel">
+    {/* Ancho fijo de 600 porque el abanico se mide en px desde el centro; en
+        pantallas chicas se encoge a la mitad desde arriba, como en la
+        referencia. */}
+    <div class="cierre__abanico">
+      <BounceCards
+        client:visible
+        images={MODULOS.map((m) => m.icono)}
+        backgrounds={MODULOS.map((m) => m.color)}
+        transformStyles={ABANICO}
+        containerWidth={600}
+        containerHeight={192}
+        cardWidth={136}
+        cardAspect="17 / 18"
+        cardRadius={16}
+        cardBorder="0"
+        cardShadow="0 16px 40px -12px rgba(0, 0, 0, 0.55)"
+        hoverShadow="0 26px 48px -12px rgba(0, 0, 0, 0.55)"
+        imageFit="contain"
+        hoverStyles={ALZADA}
+        fromStyles={APILADAS}
+        fromOpacity={0}
+        duration={0.85}
+        easeType="power3.out"
+        animationDelay={0}
+        animationStagger={0.07}
+        staggerFrom="center"
+      />
+    </div>
+
+    {/* Las tres palabras del titular entran una por una desde abajo, cada una
+        recortada por su propia caja: es el mismo revelado por palabra que usa
+        la referencia en este cierre. */}
+    {/* El texto va UNA vez. Antes iba dos: una copia recortada para lectores de
+        pantalla y otra animada con `aria-hidden`. Como `.oculto` recorta pero no
+        saca del DOM, el encabezado salía con la frase repetida. */}
+    <h2 class="cierre__titular">
+      <span class="cierre__palabras">
+        {descarga.titular.map((palabra, i) => (
+          <span class="cierre__caja">
+            <span class="cierre__palabra" style={`--i: ${i}`}>
+              {palabra}
+            </span>
+          </span>
+        ))}
+      </span>
+    </h2>
+
+    <p class="cierre__bajada">{descarga.bajada}</p>
+
+    {/* Las mismas tarjetas de tienda del hero, no un botón inventado: el
+        rótulo de cada una sale del estado de la tienda en `tiendas.ts`. */}
+    <div class="cierre__tiendas">
+      {TIENDAS.map((tienda) => (
+        <Tarjeta
+          icono={tienda.icono}
+          rotulo={rotuloDeTienda(tienda)}
+          nombre={tienda.nombre}
+          href={tienda.url ?? undefined}
+        />
+      ))}
+    </div>
+  </div>
+</section>
+
+<script>
+  // Enciende el revelado de las palabras cuando el panel entra en pantalla.
+  // Un observador y una clase: no vale un framework.
+  const panel = document.querySelector('.cierre__panel');
+  if (panel) {
+    new IntersectionObserver(
+      ([e], obs) => {
+        if (!e.isIntersecting) return;
+        panel.classList.add('cierre__panel--visible');
+        obs.disconnect();
+      },
+      { threshold: 0.35 },
+    ).observe(panel);
+  }
+</script>
+
+<style>
+  .cierre {
+    max-width: var(--caja);
+    margin-inline: auto;
+    padding-inline: var(--pad-seccion);
+    padding-bottom: var(--aire-seccion);
+  }
+
+  /* Oscuro en los dos temas, como la referencia: es la pizarra de la app, la
+     única superficie que allá tampoco cambia con el modo. El texto va claro
+     fijo por la misma razón. */
+  .cierre__panel {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow: hidden;
+    padding: 48px 20px 56px;
+    border-radius: 40px;
+    background: var(--pizarra);
+    color: var(--sobre-pizarra);
+    text-align: center;
+  }
+
+  @media (min-width: 640px) {
+    .cierre__panel {
+      padding: 80px 24px 128px;
+    }
+  }
+
+  /* 192 de alto a tamaño completo; en móvil, la mitad y encogido desde arriba
+     para que el abanico entero siga cabiendo. */
+  .cierre__abanico {
+    display: flex;
+    width: 100%;
+    height: 96px;
+    justify-content: center;
+    transform: scale(0.5);
+    transform-origin: top center;
+  }
+
+  @media (min-width: 640px) {
+    .cierre__abanico {
+      height: 192px;
+      transform: none;
+    }
+  }
+
+  /* El arte de módulo es un busto con el corte plano abajo. Para que parezca
+     que sale de la tarjeta, va a todo el ancho, pegado al pie y un 8% por
+     debajo del borde: el corte queda fuera y las esquinas redondeadas recortan
+     al personaje. En bloque, porque un `img` en línea deja hueco de línea bajo
+     el arte y ese hueco era la franja de color que se veía abajo. */
+  .cierre__abanico :global(.card) {
+    display: flex;
+    align-items: flex-end;
+  }
+
+  .cierre__abanico :global(.card) {
+    justify-content: center;
+  }
+
+  /* A 110% del ancho de la tarjeta (elegido por el founder tras probar 135,
+     115, 108 y 100): los hombros rozan los costados y el desplazamiento hacia
+     abajo es lo que hace que el personaje "salga".
+
+     La tarjeta mide 136 x 144: se ensanchó desde 120 (relación 5:6) para que
+     el arte, que es cuadrado, no quede tan recortado de costados y se lea
+     estirado. El alto no cambió, así que el abanico entra igual. */
+  .cierre__abanico :global(.card img) {
+    display: block;
+    flex: none;
+    width: 110%;
+    max-width: none;
+    height: auto;
+    transform: translateY(6%);
+  }
+
+  .cierre__titular {
+    max-width: 48rem;
+    margin-top: 48px;
+    font-family: var(--fuente-titular);
+    font-size: clamp(34px, 5.5vw, 68px);
+    /* 600, un paso sobre el 500 de la referencia: el founder lo quiso más
+       contundente y a 700 ya deja de leerse como la misma familia que el hero. */
+    font-weight: 600;
+    line-height: 1.06;
+    letter-spacing: -0.025em;
+  }
+
+  .cierre__palabras {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    column-gap: 0.28em;
+  }
+
+  /* La caja recorta la palabra mientras sube; el margen negativo y el relleno
+     dejan sitio a los descendentes sin agrandar la línea. */
+  .cierre__caja {
+    display: inline-flex;
+    overflow: hidden;
+    margin-bottom: -0.12em;
+    padding-bottom: 0.12em;
+  }
+
+  .cierre__palabra {
+    display: inline-block;
+    transform: translateY(110%);
+    transition: transform 0.7s var(--cajon);
+    transition-delay: calc(var(--i) * 70ms);
+  }
+
+  .cierre__panel--visible .cierre__palabra {
+    transform: none;
+  }
+
+  /* Un solo color, como la referencia. Se probó el tagline tricolor del
+     Welcome de la app (teal/dorado/lima) y a 68px, sobre cinco tarjetas de
+     color, era un arcoíris que le robaba el bloque al titular. */
+
+  @media (prefers-reduced-motion: reduce) {
+    .cierre__palabra {
+      transform: none;
+      transition: none;
+    }
+  }
+
+  /* Sin JavaScript nadie enciende el revelado: el titular quedaba en blanco y
+     el abanico entero invisible. El estado de partida solo vale si algo lo va
+     a mover. */
+  @media (scripting: none) {
+    .cierre__palabra {
+      transform: none;
+    }
+
+    .cierre__abanico :global(.card) {
+      transform: var(--abanico, none) !important;
+      opacity: 1 !important;
+    }
+  }
+
+  .cierre__bajada {
+    max-width: 28rem;
+    margin-top: 24px;
+    font-size: clamp(0.9375rem, 0.82rem + 0.5vw, 1rem);
+    line-height: 1.6;
+  }
+
+  .cierre__tiendas {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-top: 40px;
+    gap: 12px;
+  }
+
+  /* Lado a lado, como en el hero: con su ancho mínimo de 13.5rem no entraban
+     las dos y la de iOS caía a una segunda línea. */
+  @media (max-width: 520px) {
+    .cierre__tiendas {
+      flex-wrap: nowrap;
+      width: 100%;
+      margin-top: 32px;
+      gap: var(--e-2);
+    }
+
+    .cierre__tiendas :global(.tarjeta) {
+      min-width: 0;
+      flex: 1 1 0;
+      gap: var(--e-2);
+      padding: var(--e-2) var(--e-3);
+    }
+
+    .cierre__tiendas :global(.tarjeta svg) {
+      width: 1.375rem;
+      height: 1.375rem;
+    }
+
+    .cierre__tiendas :global(.tarjeta__rotulo) {
+      font-size: 0.6875rem;
+    }
+
+    .cierre__tiendas :global(.tarjeta__nombre) {
+      font-size: 0.875rem;
+    }
+  }
+
+  /* Las tarjetas leen los tokens del tema, pero el panel es oscuro en los dos
+     modos: acá se fijan a mano. La de Play va clara con texto oscuro, como el
+     botón primario de la referencia; la punteada (tienda sin URL) va con
+     texto claro, que en modo claro quedaba oscuro sobre oscuro. */
+  .cierre__tiendas :global(.tarjeta) {
+    --tarjeta: #ffffff;
+    --tinta: #141f25;
+    --tinta-suave: #525252;
+    --borde: #ffffff;
+  }
+
+  .cierre__tiendas :global(.tarjeta:not(a)) {
+    --tinta: var(--sobre-pizarra);
+    --tinta-suave: #a3aeb4;
+    --borde: rgb(255 255 255 / 0.35);
+  }
+</style>

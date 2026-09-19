@@ -1,84 +1,44 @@
 ---
+// La landing. Diez secciones, de arriba abajo: el hero con el campo de
+// órbitas, el manifiesto, los cinco exámenes, de dónde sale el material, cómo
+// funciona, los países, los planes, las preguntas y el cierre de descarga.
+//
+// Se construyó aparte, en una página de andamio, y ocupó este lugar cuando
+// estuvo entera. La versión anterior era una sola pantalla con la lista de
+// módulos y la lista de espera.
 import BaseLayout from '../layouts/BaseLayout.astro';
-import ListaEspera from '../components/ListaEspera.astro';
-import Modulos from '../components/Modulos.astro';
+import CambioTema from '../components/CambioTema.astro';
+import Encabezado from '../components/Encabezado.astro';
+import ScrollSuave from '../components/ScrollSuave.astro';
+import Examenes from '../components/secciones/Examenes.astro';
+import Fuentes from '../components/secciones/Fuentes.astro';
+import Hero from '../components/secciones/Hero.astro';
+import Manifiesto from '../components/secciones/Manifiesto.astro';
 import Pie from '../components/Pie.astro';
-import Tarjeta from '../components/Tarjeta.astro';
-import Wordmark from '../components/Wordmark.astro';
+import Pasos from '../components/secciones/Pasos.astro';
+import Planes from '../components/secciones/Planes.astro';
+import Preguntas from '../components/secciones/Preguntas.astro';
+import Descarga from '../components/secciones/Descarga.astro';
+import Paises from '../components/secciones/Paises.astro';
+import Video from '../components/secciones/Video.astro';
 import { COPY } from '../data/copy';
-import { SOCIAL } from '../data/social';
-import { TIENDAS, rotuloDeTienda } from '../data/tiendas';
 ---
 
-<BaseLayout title={COPY.titulo} description={COPY.bajada}>
-  <div class="pantalla">
-    <header class="encabezado entra">
-      <Wordmark class="marca" />
-    </header>
-
-    <main id="contenido" class="centro">
-      <div class="intro entra" style="animation-delay: 60ms">
-        <h1 class="titular">{COPY.titular}</h1>
-        <p class="bajada">{COPY.bajada}</p>
-      </div>
-
-      {/* Las tiendas y los exámenes son un solo grupo: "descargala" y "esto es
-          lo que trae adentro" se leen de corrido, así que van con el paso chico
-          entre ellos y el aire grande queda afuera. */}
-      <div class="descarga entra" style="animation-delay: 180ms">
-        <div class="fila">
-          {
-            TIENDAS.map((tienda) => (
-              <Tarjeta
-                icono={tienda.icono}
-                rotulo={rotuloDeTienda(tienda, 'Pronto en')}
-                nombre={tienda.nombre}
-                href={tienda.url ?? undefined}
-              />
-            ))
-          }
-        </div>
-
-        <Modulos />
-      </div>
-
-      <ListaEspera class="entra" style="animation-delay: 240ms" />
-
-      <section class="bloque bloque--ancho entra" style="animation-delay: 300ms">
-        <h2 class="rotulo-seccion">{COPY.redes}</h2>
-        <div class="redes">
-          <Tarjeta
-            icono="tiktok"
-            rotulo="Seguinos en"
-            nombre="TikTok"
-            href={SOCIAL.tiktok.href}
-            acento="tiktok"
-          />
-          <Tarjeta
-            icono="instagram"
-            rotulo="Seguinos en"
-            nombre="Instagram"
-            href={SOCIAL.instagram.href}
-            acento="instagram"
-          />
-          <Tarjeta
-            icono="facebook"
-            rotulo="Seguinos en"
-            nombre="Facebook"
-            href={SOCIAL.facebook.href}
-            acento="facebook"
-          />
-          <Tarjeta
-            icono="whatsapp"
-            rotulo="Seguinos en"
-            nombre="WhatsApp"
-            href={SOCIAL.whatsapp.href}
-            acento="whatsapp"
-          />
-        </div>
-      </section>
-    </main>
-
-    <Pie class="entra" style="animation-delay: 360ms" />
-  </div>
+<BaseLayout title={COPY.titulo} description={COPY.descripcion}>
+  <ScrollSuave />
+  <Encabezado />
+  <main id="contenido" tabindex="-1">
+    <Hero />
+    <Video />
+    <Manifiesto />
+    <Examenes />
+    <Fuentes />
+    <Pasos />
+    <Paises />
+    <Planes />
+    <Preguntas />
+    <Descarga />
+  </main>
+  <Pie />
+  <CambioTema />
 </BaseLayout>

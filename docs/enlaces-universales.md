@@ -3,10 +3,10 @@
 Los archivos que hacen que `holakodi.com/u/*` y `holakodi.com/r/*` abran la app viven en
 `public/.well-known/` y se publican tal cual al desplegar:
 
-| Archivo | URL pública | Plataforma |
-| --- | --- | --- |
-| `public/.well-known/apple-app-site-association` | `https://holakodi.com/.well-known/apple-app-site-association` | iOS |
-| `public/.well-known/assetlinks.json` | `https://holakodi.com/.well-known/assetlinks.json` | Android |
+| Archivo                                         | URL pública                                                   | Plataforma |
+| ----------------------------------------------- | ------------------------------------------------------------- | ---------- |
+| `public/.well-known/apple-app-site-association` | `https://holakodi.com/.well-known/apple-app-site-association` | iOS        |
+| `public/.well-known/assetlinks.json`            | `https://holakodi.com/.well-known/assetlinks.json`            | Android    |
 
 El primero va **sin extensión** a propósito y `vercel.json` le fuerza el
 `Content-Type: application/json` que exige Apple.
@@ -22,8 +22,8 @@ El primero va **sin extensión** a propósito y `vercel.json` le fuerza el
 Se reemplaza por el Team ID de la cuenta de Apple Developer (10 caracteres
 alfanuméricos, por ejemplo `A1B2C3D4E5`). Dónde encontrarlo:
 
-- <https://developer.apple.com/account> → **Membership details** → *Team ID*, o
-- App Store Connect → **Users and Access** → *Integrations* → el prefijo del App ID.
+- <https://developer.apple.com/account> → **Membership details** → _Team ID_, o
+- App Store Connect → **Users and Access** → _Integrations_ → el prefijo del App ID.
 
 El resultado queda `A1B2C3D4E5.com.holakodi.app`. Es el único cambio: el bundle
 identifier `com.holakodi.app` ya es el definitivo.
@@ -56,7 +56,7 @@ Formato: 32 pares hexadecimales separados por dos puntos, en mayúsculas
 una sola, y hay que **sumar** —no reemplazar— en estos casos:
 
 1. Si se activa **Play App Signing**, la del certificado con el que Google refirma:
-   Play Console → *Release* → *Setup* → *App signing* → **App signing key
+   Play Console → _Release_ → _Setup_ → _App signing_ → **App signing key
    certificate** → SHA-256. Sin esta, los enlaces dejan de verificar en las
    instalaciones bajadas de Play, aunque funcionen en el APK propio.
 2. Opcionalmente la del keystore de debug, para probar en desarrollo.
@@ -96,7 +96,7 @@ Sin embargo la app ya declara ese host en los dos lados:
 En Android 11 y anteriores la verificación es todo-o-nada: si **algún** host declarado
 no resuelve su `assetlinks.json`, falla también el apex, que está perfecto. Salidas:
 sacar `www` de `app.json` (lo barato), o asignar `www.holakodi.com` al proyecto en
-Vercel → *Settings* → *Domains* sin redirect, para que sirva el sitio directo.
+Vercel → _Settings_ → _Domains_ sin redirect, para que sirva el sitio directo.
 
 ### 2. `/r/` está reclamado acá pero la app no lo atiende
 
@@ -121,10 +121,10 @@ página de invitación. Es lo que ve quien abre el enlace **sin** la app instala
 universales no se ven afectados: iOS y Android matchean por patrón de URL y actúan
 antes de que el navegador pida nada.
 
-| Ruta pública | Rewrite en `vercel.json` | Página que la genera |
-| --- | --- | --- |
+| Ruta pública  | Rewrite en `vercel.json`        | Página que la genera                |
+| ------------- | ------------------------------- | ----------------------------------- |
 | `/u/<código>` | `/invitacion-perfil/index.html` | `src/pages/invitacion-perfil.astro` |
-| `/r/<código>` | `/invitacion/index.html` | `src/pages/invitacion.astro` |
+| `/r/<código>` | `/invitacion/index.html`        | `src/pages/invitacion.astro`        |
 
 Las dos usan el mismo componente (`src/components/Invitacion.astro`) y solo cambian el
 copy, que vive en `src/data/invitacion.ts`.

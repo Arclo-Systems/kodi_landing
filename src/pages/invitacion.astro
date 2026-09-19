@@ -5,6 +5,10 @@ import Invitacion from '../components/Invitacion.astro';
 import { INVITACION_REFERIDO } from '../data/invitacion';
 ---
 
-<BaseLayout title={INVITACION_REFERIDO.titulo} description={INVITACION_REFERIDO.descripcion} noindex>
+<BaseLayout
+  title={INVITACION_REFERIDO.titulo}
+  description={INVITACION_REFERIDO.descripcion}
+  noindex
+>
   <Invitacion copy={INVITACION_REFERIDO} />
 </BaseLayout>

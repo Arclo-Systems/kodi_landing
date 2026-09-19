@@ -1,0 +1,173 @@
+---
+import { COPY } from '../../data/copy';
+import ListaEspera from '../ListaEspera.astro';
+import Tarjeta from '../Tarjeta.astro';
+import { TIENDAS, rotuloDeTienda } from '../../data/tiendas';
+import CampoOrbitas from '../islas/CampoOrbitas';
+
+// El fondo es el campo de órbitas: la réplica del hero de la referencia
+// (cuatro anillos de fichas girando, con el centro difuminado), escrita con
+// three.js a partir de su shader y sus números. Va `client:only`: si no monta
+// —o si la máquina no da WebGL— el hero sigue siendo tipografía sobre la
+// superficie y no pierde nada.
+---
+
+<section class="hero" id="inicio">
+  <div class="hero__fondo" aria-hidden="true">
+    <CampoOrbitas client:only="react" />
+  </div>
+
+  <div class="hero__centro">
+    <h1 class="hero__titular">{COPY.titular}</h1>
+    <p class="hero__bajada">{COPY.bajada}</p>
+
+    {/* Va ARRIBA de las tarjetas y no abajo por pedido del founder. En sobrio,
+        que es lo que lo deja funcionar ahí: quien tiene Android baja la vista
+        una línea y encuentra Google Play; quien tiene iPhone ya leyó la salida
+        que le toca antes de llegar a una tarjeta que no puede tocar. */}
+    <ListaEspera class="hero__lista" variante="sobria" />
+
+    {/* La tarjeta de tienda en vez de un botón inventado: es el badge que ya
+        usa el sitio, con el ícono de Play, el rótulo chico arriba y el nombre
+        de la tienda abajo. El día que salga iOS, su tarjeta cambia sola de
+        "Muy pronto en" a "Descargala en" — el rótulo sale del estado de la
+        tienda, no está escrito a mano. */}
+    <div class="hero__tiendas">
+      {TIENDAS.map((tienda) => (
+        <Tarjeta
+          icono={tienda.icono}
+          rotulo={rotuloDeTienda(tienda)}
+          nombre={tienda.nombre}
+          href={tienda.url ?? undefined}
+        />
+      ))}
+    </div>
+
+    <p class="hero__micro">{COPY.hero.microcopy}</p>
+  </div>
+</section>
+
+<style>
+  .hero {
+    position: relative;
+    display: grid;
+    place-items: center;
+    /* La altura de la referencia: la ventana entera, con un piso de 640 para
+       que en una pantalla baja el campo de órbitas siga teniendo aire. Es lo
+       que hace que el campo se vea como el suyo: con un hero más bajo, dos de
+       los anillos caen fuera de cuadro y quedan cuatro fichas sueltas. */
+    min-height: max(100svh, 640px);
+    padding-block: clamp(var(--e-7), 9vw, 120px) var(--e-6);
+    /* El mismo margen lateral que las demás secciones: con --pad-x el titular
+       del hero entraba 4px más que todos los titulares de abajo. */
+    padding-inline: var(--pad-seccion);
+    overflow: hidden;
+    isolation: isolate;
+  }
+
+  /* El campo de órbitas cubre el hero entero, también en teléfono: la ficha se
+     mide como fracción del ancho, así que se achica sola. Los estilos de la
+     isla van globales porque el marcado lo pinta React. */
+  .hero__fondo {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  .hero__centro {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--e-5);
+    width: min(100%, 52rem);
+    text-align: center;
+  }
+
+  /* El rasgo de la referencia: enorme, peso medio y muy apretado. Un 900 a este
+     tamaño grita; con el interletrado cerrado se lee como tipografía editorial
+     y deja que hable el contenido.
+     Va en Geist, no en Nunito: es la misma grotesca de la referencia, y su
+     trazo recto aguanta el peso 500 a 84 px. Nunito, más redonda y fina, se
+     veía floja al mismo número y había que subirla a 600 para compensar. */
+  .hero__titular {
+    font-family: var(--fuente-titular);
+    font-size: clamp(2.75rem, 7vw, 5.25rem);
+    font-weight: 500;
+    line-height: 1.02;
+    letter-spacing: -0.028em;
+    text-wrap: balance;
+  }
+
+  /* Fluida en vez de un escalón por breakpoint: a 390 da 14 px y llega a 16
+     desde 768. Con 16 fijos la bajada se comía cinco líneas del hero. */
+  .hero__bajada {
+    max-width: 34rem;
+    font-size: clamp(0.875rem, 0.66rem + 0.9vw, 1rem);
+    font-weight: 400;
+    line-height: 1.55;
+    color: var(--tinta-suave);
+    text-wrap: pretty;
+  }
+
+  /* Separación de grupo y no de bloque: la promesa de iPhone y las tarjetas
+     son la misma decisión (por dónde bajo la app), no dos temas distintos. */
+  .hero__lista {
+    margin-top: var(--ritmo-grupo);
+  }
+
+  .hero__tiendas {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--e-3);
+  }
+
+  /* En teléfono las dos tarjetas van lado a lado: con su ancho mínimo de 13.5rem
+     no entraban y la de iOS caía a una segunda línea. Se reparten el ancho y la
+     tipografía baja con él; el alto queda en 48 px, sobre el mínimo táctil. */
+  @media (max-width: 520px) {
+    .hero__tiendas {
+      flex-wrap: nowrap;
+      gap: var(--e-2);
+      width: 100%;
+    }
+
+    .hero__tiendas :global(.tarjeta) {
+      min-width: 0;
+      flex: 1 1 0;
+      gap: var(--e-2);
+      padding: var(--e-2) var(--e-3);
+    }
+
+    .hero__tiendas :global(.tarjeta svg) {
+      width: 1.375rem;
+      height: 1.375rem;
+    }
+
+    .hero__tiendas :global(.tarjeta__rotulo) {
+      font-size: 0.6875rem;
+    }
+
+    .hero__tiendas :global(.tarjeta__nombre) {
+      font-size: 0.875rem;
+    }
+  }
+
+  .hero__micro {
+    font-size: 0.8125rem;
+    color: var(--tinta-suave);
+  }
+</style>
+
+<style is:global>
+  /* El color del filete de cada ficha se lee de acá con `getComputedStyle`, y
+     por eso el campo lleva el token puesto en `color`. */
+  .campo {
+    position: absolute;
+    inset: 0;
+    color: var(--borde);
+  }
+</style>

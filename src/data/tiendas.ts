@@ -12,7 +12,7 @@
  *
  *   App Store    https://apps.apple.com/cr/app/<slug>/id<ID_NUMERICO>
  */
-export interface Tienda {
+interface Tienda {
   /** Nombre del icono en `components/Icono.astro`. */
   readonly icono: 'appstore' | 'googleplay';
   readonly nombre: string;
