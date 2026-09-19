@@ -255,8 +255,12 @@ const descuentos = new Map<string, number>(
      accesibilidad: así el estado visible y el que anuncia el lector de
      pantalla no pueden separarse nunca. El fondo ya no vive acá: lo pone la
      pastilla, que es la que se mueve. */
+  /* También en PESO y no solo en color: la pastilla da 1.15 de contraste
+     contra su pista, así que el color del rótulo era la única señal de cuál
+     está elegido y eso falla para quien no distingue ese par. */
   .planes__opcion[aria-pressed='true'] {
     color: var(--tinta);
+    font-weight: 700;
   }
 
   /* El ahorro en el color de marca y más chico que la etiqueta: acompaña al

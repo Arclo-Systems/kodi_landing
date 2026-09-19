@@ -85,6 +85,14 @@ const { examenes } = COPY;
     transform: none;
   }
 
+  /* Con teclado se puede llegar a una fila antes de que le toque entrar: sin
+     esto el foco se posa sobre algo invisible. */
+  .examen:focus-visible {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
   /* Sin JavaScript la isla nunca monta y nadie pone el atributo: las filas se
      ven, y punto. */
   @media (scripting: none) {

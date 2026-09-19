@@ -270,9 +270,16 @@ const esExterno = (href: string) => href.startsWith('http');
   /* Sin subrayado en todo el pie: son listas de navegación, se leen como tal
      por su posición, y subrayados convierten el pie en una maraña de rayas.
      El aviso de que se pueden tocar es el cambio de color. */
-  .pie__lista a,
-  .pie__base a {
+  /* Sin subrayado en las listas del pie: son navegación y se leen como tal por
+     su posición. El del copyright SÍ va subrayado: vive dentro de una frase y
+     ahí nada lo distingue del texto que lo rodea. */
+  .pie__lista a {
     text-decoration: none;
+  }
+
+  .pie__base a {
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
   }
 
   /* La transición va en `opacity` y NO en `color`: sobre un color que sale de
@@ -308,8 +315,14 @@ const esExterno = (href: string) => href.startsWith('http');
   }
 
   /* Lo que todavía no existe se ve, pero no se puede tocar ni enfocar. */
+  /* Color propio y no opacidad: al 55% daba 2.36 de contraste y el mínimo son
+     4.5. Lo que dice que todavía no existe es el texto, no el tono. */
   .pie__pendiente {
-    opacity: 0.55;
+    color: #767676;
+  }
+
+  :root[data-tema='oscuro'] .pie__pendiente {
+    color: #8b959b;
   }
 
   /* En teléfono el orden se invierte para que el copyright quede al final de

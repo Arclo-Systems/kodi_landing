@@ -179,6 +179,7 @@ export default function MenuPildora({ abrir, cerrar, grupos }: Props) {
               type="button"
               className="pildora__boton pulsable"
               aria-expanded={abierto}
+              aria-controls="menu-panel"
               aria-label={abierto ? cerrar : abrir}
               onClick={() => setAbierto((v) => !v)}
             >
@@ -190,8 +191,10 @@ export default function MenuPildora({ abrir, cerrar, grupos }: Props) {
 
           <AnimatePresence initial={false}>
             {abierto && (
-              <motion.div
+              <motion.nav
                 key="panel"
+                id="menu-panel"
+                aria-label={abrir}
                 className="pildora__panel"
                 initial={{ height: 0 }}
                 animate={{ height: 'auto' }}
@@ -207,9 +210,12 @@ export default function MenuPildora({ abrir, cerrar, grupos }: Props) {
                     {grupos.map((grupo, g) => (
                       <div
                         key={grupo.titulo}
+                        role="group"
+                        aria-labelledby={`menu-grupo-${g}`}
                         className={`pildora__grupo${grupo.grande ? ' pildora__grupo--grande' : ''}${g > 0 ? ' pildora__grupo--separado' : ''}`}
                       >
                         <motion.span
+                          id={`menu-grupo-${g}`}
                           className="pildora__titulo"
                           custom={orden++}
                           variants={ENTRADA}
@@ -236,7 +242,7 @@ export default function MenuPildora({ abrir, cerrar, grupos }: Props) {
                     ))}
                   </motion.div>
                 </div>
-              </motion.div>
+              </motion.nav>
             )}
           </AnimatePresence>
         </div>

@@ -37,6 +37,9 @@
   /* El límite de un campo tiene que verse: `--borde` da 1.21 sobre la
      superficie y el mínimo son 3. Este da 3.31 en claro y 4.36 en oscuro. */
   --borde-control: #8a8a8a;
+  /* El error tiene su propio color: antes usaba el rojo de TikTok, que daba
+     3.53 de contraste sobre la superficie. Este da 5.81. */
+  --error-texto: #c4102f;
   /* Un escalón por DEBAJO de la superficie: el fondo de los controles que se
      ven hundidos, como la pista de un selector. `--tarjeta` no sirve para eso
      porque está por encima, y lo seleccionado encima de ella desaparecía. */
@@ -149,6 +152,7 @@
   --tinta-suave: #a3aeb4;
   --borde: #273238;
   --borde-control: #6c7c85;
+  --error-texto: #ff8a9c;
   --hundido: #070b0d;
 }
 
@@ -171,6 +175,7 @@
     --tinta-suave: #a3aeb4;
     --borde: #273238;
     --borde-control: #6c7c85;
+    --error-texto: #ff8a9c;
     --hundido: #070b0d;
   }
 }
@@ -204,9 +209,14 @@ body {
   white-space: nowrap;
 }
 
+/* Indicador de DOS colores: el anillo teal solo daba 2.50 de contraste sobre
+   las superficies invertidas —el plan destacado, la píldora del menú, la
+   tarjeta blanca del cierre— y el mínimo son 3. Con la sombra por fuera,
+   siempre hay un borde que contrasta, apoye donde apoye. */
 :focus-visible {
   outline: 3px solid var(--teal);
   outline-offset: 4px;
+  box-shadow: 0 0 0 7px var(--superficie);
 }
 
 /* Solo aparece con el teclado, y siempre primero en el orden de tabulación. */
@@ -550,7 +560,7 @@ input,
   transition: transform 140ms var(--salida);
 }
 
-.pulsable:active:not(:disabled) {
+.pulsable:active:not(:disabled):not([aria-disabled='true']) {
   transform: scale(0.97);
 }
 
@@ -561,7 +571,7 @@ input,
     opacity 140ms var(--salida);
 }
 
-.pulsable--texto:active:not(:disabled) {
+.pulsable--texto:active:not(:disabled):not([aria-disabled='true']) {
   transform: none;
   opacity: 0.7;
 }
@@ -570,7 +580,7 @@ input,
    la vuelta se ven como un parpadeo. Lo que confirma el toque es que la fila
    se abre, que pasa en el mismo momento. */
 @media (pointer: coarse) {
-  .pulsable--texto:active:not(:disabled) {
+  .pulsable--texto:active:not(:disabled):not([aria-disabled='true']) {
     opacity: 1;
   }
 }
@@ -580,7 +590,7 @@ input,
     transition: none;
   }
 
-  .pulsable:active:not(:disabled) {
+  .pulsable:active:not(:disabled):not([aria-disabled='true']) {
     transform: none;
     opacity: 0.7;
   }

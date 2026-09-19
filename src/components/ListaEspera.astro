@@ -240,7 +240,7 @@ const raiz = sobria ? 'lista-hero' : 'lista';
   }
 
   .lista--sobria .lista__campo[aria-invalid='true'] {
-    color: var(--tiktok);
+    color: var(--error-texto);
   }
 
   .lista--sobria .lista__boton {
@@ -262,13 +262,13 @@ const raiz = sobria ? 'lista-hero' : 'lista';
   /* El aviso de que se puede tocar es que se aclara, no un subrayado: en esta
      variante el subrayado lo haría parecer un enlace más del hero. */
   @media (hover: hover) and (pointer: fine) {
-    .lista--sobria .lista__boton:hover:not(:disabled) {
+    .lista--sobria .lista__boton:hover:not([aria-disabled='true']) {
       opacity: 0.65;
     }
   }
 
   /* Después del hover: si no, con mouse el apretón no se pinta nunca. */
-  .lista--sobria .lista__boton:active:not(:disabled) {
+  .lista--sobria .lista__boton:active:not([aria-disabled='true']) {
     transform: scale(0.97);
     opacity: 0.8;
   }
@@ -318,7 +318,7 @@ const raiz = sobria ? 'lista-hero' : 'lista';
   }
 
   .lista__campo[aria-invalid='true'] {
-    border-color: var(--tiktok);
+    border-color: var(--error-texto);
   }
 
   /* Fondo `--teal-texto` y no `--teal`: el blanco sobre el teal de marca da
@@ -339,25 +339,25 @@ const raiz = sobria ? 'lista-hero' : 'lista';
     transition: transform 160ms var(--salida);
   }
 
-  .lista__boton:disabled {
+  .lista__boton[aria-disabled='true'] {
     cursor: default;
     opacity: 0.6;
   }
 
   @media (hover: hover) and (pointer: fine) {
-    .lista__boton:hover:not(:disabled) {
+    .lista__boton:hover:not([aria-disabled='true']) {
       transform: translateY(-2px);
     }
   }
 
   /* Después del hover y con la misma especificidad: si fuera antes, con mouse
      el hover seguiría ganando al apretar. */
-  .lista__boton:active:not(:disabled) {
+  .lista__boton:active:not([aria-disabled='true']) {
     transform: scale(0.98);
   }
 
   @media (hover: hover) and (pointer: fine) {
-    .lista__boton:active:not(:disabled) {
+    .lista__boton:active:not([aria-disabled='true']) {
       transform: translateY(-2px) scale(0.98);
     }
   }
@@ -369,9 +369,15 @@ const raiz = sobria ? 'lista-hero' : 'lista';
   }
 
   /* Sin mensaje no ocupa lugar: si no, el `gap` del flex dejaría una banda
-     muerta debajo del formulario en el estado normal, que es el 99 % del tiempo. */
+     muerta debajo del formulario en el estado normal, que es el 99 % del tiempo.
+
+     Se colapsa el ALTO y no con `display: none`: una región en vivo que pasa de
+     no existir a visible en el mismo cuadro en que recibe el texto no la
+     anuncian de forma fiable los lectores de pantalla. */
   .lista__estado:empty {
-    display: none;
+    height: 0;
+    margin: 0;
+    overflow: hidden;
   }
 
   .lista__estado--error {
@@ -418,9 +424,9 @@ const raiz = sobria ? 'lista-hero' : 'lista';
   for (const formulario of document.querySelectorAll<HTMLFormElement>('[data-lista]')) {
     const campo = formulario.querySelector<HTMLInputElement>('[data-campo]');
     const boton = formulario.querySelector<HTMLButtonElement>('[data-boton]');
-    // La salida la nombra el propio formulario con `aria-describedby`, así que
-    // cada instancia encuentra la suya.
-    const idSalida = formulario.getAttribute('aria-describedby');
+    // La salida la nombra el CAMPO con `aria-describedby`, así que cada
+    // instancia encuentra la suya sin depender de dónde esté en el marcado.
+    const idSalida = campo?.getAttribute('aria-describedby');
     const salida = idSalida
       ? document.getElementById(idSalida)
       : formulario.parentElement?.querySelector<HTMLElement>('[data-estado]');
@@ -435,8 +441,12 @@ const raiz = sobria ? 'lista-hero' : 'lista';
       campo.setAttribute('aria-invalid', String(estado === 'invalido'));
     };
 
+    // `aria-disabled` y no `disabled`: deshabilitar el botón mientras se envía
+    // le saca el foco a quien acaba de apretarlo, porque el foco de un elemento
+    // deshabilitado se cae al body y el siguiente tabulador reinicia desde
+    // arriba del documento. El envío repetido lo ataja el guard del submit.
     const ocupado = (activo: boolean): void => {
-      boton.disabled = activo;
+      boton.setAttribute('aria-disabled', String(activo));
       formulario.setAttribute('aria-busy', String(activo));
     };
 
@@ -476,6 +486,7 @@ const raiz = sobria ? 'lista-hero' : 'lista';
 
     formulario.addEventListener('submit', async (evento) => {
       evento.preventDefault();
+      if (boton.getAttribute('aria-disabled') === 'true') return;
 
       const correo = campo.value.trim();
       if (!CORREO.test(correo)) {

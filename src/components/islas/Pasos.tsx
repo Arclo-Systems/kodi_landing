@@ -343,7 +343,9 @@ function Hueco({ numero }: { numero: string }) {
 function Marco({ children }: { children: ReactNode }) {
   return (
     <div className="marco">
-      <div className="marco__pantalla">
+      {/* Ilustración: sin esto el lector de pantalla lee las seis maquetas
+          enteras, con sus ligas, sus metas y sus preguntas de ejemplo. */}
+      <div className="marco__pantalla" aria-hidden="true">
         {children}
         <div className="marco__isla" aria-hidden="true" />
       </div>

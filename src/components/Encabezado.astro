@@ -67,11 +67,9 @@ const MENU = [
         va). Se dibuja igual que allá, pero sin enlace: todavía no tiene
         página. Cuando el sitio de empresas exista, vuelve a ser un <a>. */}
     <div class="cabecera__derecha">
-      <span
-        class="cabecera__destacado cabecera__destacado--apagado"
-        aria-disabled="true"
-        role="link"
-      >
+      {/* Texto plano: con `role="link"` un lector de pantalla lo anunciaba como
+          enlace y al activarlo no pasaba nada. */}
+      <span class="cabecera__destacado cabecera__destacado--apagado">
         Empresas
       </span>
     </div>
