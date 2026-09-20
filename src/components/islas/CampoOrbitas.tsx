@@ -291,29 +291,12 @@ export default function CampoOrbitas() {
 
   const { scrollY } = useScroll();
   const velocidad = useVelocity(scrollY);
-  // Con el dedo hace falta más recorrido para el mismo empujón: ver
-  // `empujeDeVelocidad`, que es donde vive la cuenta y su prueba.
-  const [punteroGrueso, setPunteroGrueso] = useState(false);
-
-  useEffect(() => {
-    const consulta = window.matchMedia('(pointer: coarse)');
-    const revisar = () => setPunteroGrueso(consulta.matches);
-    revisar();
-    consulta.addEventListener('change', revisar);
-    return () => consulta.removeEventListener('change', revisar);
-  }, []);
 
   // El bucle no se reinicia cuando cambia ninguno de estos: los lee de acá.
-  const vivo = useRef({
-    seco: false,
-    imagenes: [] as readonly HTMLImageElement[],
-    velocidad,
-    punteroGrueso: false,
-  });
+  const vivo = useRef({ seco: false, imagenes: [] as readonly HTMLImageElement[], velocidad });
   vivo.current.seco = seco === true;
   vivo.current.imagenes = imagenes;
   vivo.current.velocidad = velocidad;
-  vivo.current.punteroGrueso = punteroGrueso;
 
   // Las 27 descargas van en un efecto y no en el cuerpo: ahí se disparaban en
   // cada render.
@@ -420,8 +403,8 @@ export default function CampoOrbitas() {
     };
 
     const avanzar = (paso: number) => {
-      const { seco: quieto, imagenes: artes, velocidad: v, punteroGrueso: grueso } = vivo.current;
-      const objetivo = quieto ? 0 : empujeDeVelocidad(v.get(), grueso);
+      const { seco: quieto, imagenes: artes, velocidad: v } = vivo.current;
+      const objetivo = quieto ? 0 : empujeDeVelocidad(v.get());
       const { angulos, empujes } = giro;
 
       ANILLOS.forEach((anillo, i) => {
