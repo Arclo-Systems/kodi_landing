@@ -10,6 +10,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import CambioTema from '../components/CambioTema.astro';
 import Encabezado from '../components/Encabezado.astro';
 import ScrollSuave from '../components/ScrollSuave.astro';
+import Depurador from '../components/Depurador.astro';
 import Examenes from '../components/secciones/Examenes.astro';
 import Fuentes from '../components/secciones/Fuentes.astro';
 import Hero from '../components/secciones/Hero.astro';
@@ -26,6 +27,7 @@ import { COPY } from '../data/copy';
 
 <BaseLayout title={COPY.titulo} description={COPY.descripcion}>
   <ScrollSuave />
+  <Depurador />
   <Encabezado />
   <main id="contenido" tabindex="-1">
     <Hero />

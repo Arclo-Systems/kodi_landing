@@ -49,6 +49,13 @@
       window.dispatchEvent(new CustomEvent('scroll-suave'));
     });
 
+    // Solo con `?depurar=1`: el recuadro de diagnóstico compara el valor
+    // interno de Lenis contra el scroll nativo, y para eso necesita la
+    // instancia. Fuera de ese caso nadie la ve.
+    if (location.search.includes('depurar')) {
+      (window as unknown as { lenisDepuracion?: unknown }).lenisDepuracion = lenis;
+    }
+
     // Los enlaces de ancla viajan con el mismo deslizamiento; si no, la página
     // salta de golpe y rompe la sensación que acabamos de construir.
     //
