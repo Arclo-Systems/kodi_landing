@@ -83,7 +83,6 @@ const { como } = COPY;
   .pasos-pista {
     position: relative;
     margin-top: 40px;
-    height: calc(var(--pasos, 6) * var(--tramo, 105) * 1vh);
     height: calc(var(--pasos, 6) * var(--tramo, 105) * 1svh);
   }
 
@@ -93,7 +92,8 @@ const { como } = COPY;
     position: sticky;
     top: 0;
     display: flex;
-    height: 100vh;
+    /* El respaldo `height: 100vh` que había acá no llegaba al navegador:
+       lightningcss borra la declaración duplicada. Si hace falta, `@supports`. */
     height: 100svh;
     align-items: center;
     padding-top: var(--alto-cabecera);
@@ -265,14 +265,12 @@ const { como } = COPY;
      dos tercios de la pantalla y los pasos caían bajo el pliegue. */
   @media (max-width: 1099px) {
     .marco {
-      --pantalla: min(202px, calc((100vh - 306px) / 2.11));
       --pantalla: min(202px, calc((100svh - 306px) / 2.11));
     }
   }
 
   @media (min-width: 640px) and (max-width: 1099px) {
     .marco {
-      --pantalla: min(282px, calc((100vh - 306px) / 2.11));
       --pantalla: min(282px, calc((100svh - 306px) / 2.11));
     }
   }
