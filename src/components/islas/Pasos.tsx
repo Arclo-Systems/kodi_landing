@@ -350,7 +350,14 @@ export default function Pasos({ pasos }: Props) {
   // La secuencia pegada va en todas las pantallas; lo que cambia es la reja,
   // que en angosto apila el teléfono sobre el texto y guarda la ficha. Lo único
   // que la apaga es pedir menos movimiento: ahí la idea misma sobra.
-  const [conMovimiento, setConMovimiento] = useState(false);
+  //
+  // Arranca en `true` porque el servidor no puede consultar la preferencia y
+  // tiene que apostar por el caso común. Arrancando en `false` pintaba la lista
+  // corta y, al montar, la reemplazaba por la pista pegada: el documento crecía
+  // 3646 px en móvil y 2727 en escritorio de un cuadro al otro, y todo lo que
+  // estabas leyendo se corría. Quien pide menos movimiento se lleva ese cambio
+  // ahora, que son muchos menos.
+  const [conMovimiento, setConMovimiento] = useState(true);
 
   useEffect(() => {
     const quieto = window.matchMedia('(prefers-reduced-motion: reduce)');
