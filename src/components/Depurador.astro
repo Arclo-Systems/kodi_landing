@@ -74,6 +74,39 @@
 
       const numero = (n: number, ancho = 6) => n.toFixed(0).padStart(ancho);
 
+      // Lo que hay que mirar cuando el celular salta: si se movió la caja
+      // pegada, si cambió de tamaño, o si el contenido se corrió adentro.
+      const foto = (): Record<string, number> => {
+        const caja = (sel: string) => document.querySelector(sel)?.getBoundingClientRect() ?? null;
+        const pegado = caja('.pasos-pegado');
+        const pista = caja('.pasos-pista');
+        const marco = caja('.marco');
+        const barras = [...document.querySelectorAll<HTMLElement>('.barrita__llenado')].reduce(
+          (suma, n) => {
+            const t = n.style.transform;
+            if (!t || t === 'none') return suma + 1;
+            const m = /scaleX\(([\d.]+)\)/.exec(t);
+            return suma + (m ? parseFloat(m[1]) : 0);
+          },
+          0,
+        );
+        return {
+          'pegado.top': pegado ? Math.round(pegado.top) : NaN,
+          'pegado.alto': pegado ? Math.round(pegado.height) : NaN,
+          'pista.top': pista ? Math.round(pista.top) : NaN,
+          'pista.alto': pista ? Math.round(pista.height) : NaN,
+          'marco.alto': marco ? Math.round(marco.height) : NaN,
+          // El ancho del marco es `--pantalla` ya resuelta: la variable en crudo
+          // devuelve el texto `min(202px, calc(...))`, que no se puede medir.
+          'marco.ancho': marco ? Math.round(marco.width) : NaN,
+          avance: Math.round(barras * 100) / 100,
+        };
+      };
+
+      let fotoAnterior = foto();
+      let culpables: string[] = [];
+      let montaje = '  (todavía no se montó)';
+
       let anteriorY = window.scrollY;
       let anteriorAlto = window.innerHeight;
       let anteriorMarco: number | null = null;
@@ -96,9 +129,28 @@
         const dAlto = alto - anteriorAlto;
 
         // Un salto es que algo se mueva MÁS de lo que se movió el scroll.
-        if (marco !== null && anteriorMarco !== null) {
+        const ahora = foto();
+        const medidoAntes = !Object.values(fotoAnterior).some((n) => Number.isNaN(n));
+
+        // El cuadro en que la isla se monta mueve todo de golpe, pero eso NO es
+        // el salto que buscamos: se cuenta aparte para no tapar a los demás.
+        if (!medidoAntes && !Object.values(ahora).some((n) => Number.isNaN(n))) {
+          montaje = `  t=${Math.round(performance.now())}ms  y=${y}  celular.top=${marco === null ? '?' : Math.round(marco)}`;
+        }
+
+        if (marco !== null && anteriorMarco !== null && medidoAntes) {
           const esperado = anteriorMarco - dy;
-          anotar('celular', marco - esperado, `y=${y} dy=${dy} alto=${alto}`);
+          const desvio = marco - esperado;
+          const previo = picos.get('celular');
+          if (!previo || Math.abs(desvio) > Math.abs(previo.valor)) {
+            // El salto es de un cuadro: hay que guardar QUÉ cambió en ese
+            // mismo paso, porque un cuadro después ya no se distingue.
+            culpables = Object.keys(ahora)
+              .filter((k) => ahora[k] !== fotoAnterior[k])
+              .map((k) => `  ${k.padEnd(12)} ${fotoAnterior[k]} → ${ahora[k]}`);
+            if (culpables.length === 0) culpables = ['  (nada del layout cambió)'];
+          }
+          anotar('celular', desvio, `y=${y} dy=${dy} alto=${alto}`);
         }
         if (lenis !== null) {
           anotar('lenis-vs-nativo', lenis - y, `y=${y} alto=${alto}`);
@@ -119,9 +171,16 @@
           ...[...picos.entries()].map(
             ([clave, p]) => `${clave.padEnd(16)} ${numero(p.valor, 7)}  ${p.contexto}`,
           ),
+          '',
+          'MONTAJE DE LA ISLA',
+          montaje,
+          '',
+          'EN EL SALTO DEL CELULAR',
+          ...culpables,
         ];
         texto.textContent = filas.join('\n');
 
+        fotoAnterior = ahora;
         anteriorY = y;
         anteriorAlto = alto;
         anteriorMarco = marco;
@@ -129,7 +188,10 @@
         requestAnimationFrame(latido);
       };
 
-      reiniciar.addEventListener('click', () => picos.clear());
+      reiniciar.addEventListener('click', () => {
+        picos.clear();
+        culpables = [];
+      });
       requestAnimationFrame(latido);
     }
   }
