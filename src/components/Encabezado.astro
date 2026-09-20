@@ -25,6 +25,7 @@ const MENU = [
   {
     titulo: 'Otros',
     enlaces: [
+      { texto: 'Empresas', href: '/empresas' },
       { texto: 'Términos de uso', href: '/terminos' },
       { texto: 'Política de privacidad', href: '/privacidad' },
       { texto: 'Soporte', href: 'mailto:soporte@holakodi.com' },
@@ -64,14 +65,9 @@ const MENU = [
     </div>
 
     {/* Empresas ocupa el lugar del "Sign up" de la referencia (el "Login" no
-        va). Se dibuja igual que allá, pero sin enlace: todavía no tiene
-        página. Cuando el sitio de empresas exista, vuelve a ser un <a>. */}
+        va). Estuvo apagado hasta que la página existió. */}
     <div class="cabecera__derecha">
-      {/* Texto plano: con `role="link"` un lector de pantalla lo anunciaba como
-          enlace y al activarlo no pasaba nada. */}
-      <span class="cabecera__destacado cabecera__destacado--apagado">
-        Empresas
-      </span>
+      <a class="cabecera__destacado" href="/empresas">Empresas</a>
     </div>
   </div>
 </header>

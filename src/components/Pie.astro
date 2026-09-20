@@ -51,7 +51,10 @@ const esExterno = (href: string) => href.startsWith('http');
             <ul class="pie__lista">
               {columna.enlaces.map((enlace) => (
                 <li>
-                  {enlace.href === null ? (
+                  {/* El tipo se ensancha a mano: hoy ningún enlace está en
+                      `null`, así que TypeScript reduce esta rama a `never` —
+                      pero la capacidad de apagar uno tiene que seguir viva. */}
+                  {(enlace.href as string | null) === null ? (
                     <span class="pie__pendiente">{enlace.texto}</span>
                   ) : (
                     <a

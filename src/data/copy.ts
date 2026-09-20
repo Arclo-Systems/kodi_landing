@@ -411,7 +411,7 @@ export const COPY = {
       {
         titulo: 'Kodi',
         enlaces: [
-          { texto: 'Kodi para empresas', href: null },
+          { texto: 'Kodi para empresas', href: '/empresas' },
           { texto: 'Soporte', href: 'mailto:soporte@holakodi.com' },
           { texto: 'Arclo Systems', href: 'https://www.arclosystems.com/es' },
         ],
