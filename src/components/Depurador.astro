@@ -78,6 +78,7 @@
       // pegada, si cambió de tamaño, o si el contenido se corrió adentro.
       const foto = (): Record<string, number> => {
         const caja = (sel: string) => document.querySelector(sel)?.getBoundingClientRect() ?? null;
+        const hero = caja('.hero');
         const pegado = caja('.pasos-pegado');
         const pista = caja('.pasos-pista');
         const marco = caja('.marco');
@@ -91,6 +92,8 @@
           0,
         );
         return {
+          'hero.top': hero ? Math.round(hero.top) : NaN,
+          'hero.alto': hero ? Math.round(hero.height) : NaN,
           'pegado.top': pegado ? Math.round(pegado.top) : NaN,
           'pegado.alto': pegado ? Math.round(pegado.height) : NaN,
           'pista.top': pista ? Math.round(pista.top) : NaN,
@@ -157,6 +160,13 @@
           if (anteriorLenis !== null) {
             anotar('lenis-salto', lenis - anteriorLenis - dy, `y=${y} dy=${dy}`);
           }
+        }
+        // El hero se mide igual que el celular: cuánto se movió de más respecto
+        // de lo que se movió el scroll. En navegadores dentro de apps las barras
+        // de arriba y abajo se encogen distinto y ahí es donde se reporta.
+        if (medidoAntes && !Number.isNaN(ahora['hero.top']) && !Number.isNaN(fotoAnterior['hero.top'])) {
+          anotar('hero', ahora['hero.top'] - (fotoAnterior['hero.top'] - dy), `y=${y} dy=${dy} alto=${alto}`);
+          anotar('hero.alto', ahora['hero.alto'] - fotoAnterior['hero.alto'], `y=${y} alto=${alto}`);
         }
         if (dAlto !== 0) anotar('barra', dAlto, `y=${y}`);
         anotar('scroll-cuadro', dy, `y=${y} alto=${alto}`);

@@ -56,6 +56,9 @@ import CampoOrbitas from '../islas/CampoOrbitas';
        que en una pantalla baja el campo de órbitas siga teniendo aire. Es lo
        que hace que el campo se vea como el suyo: con un hero más bajo, dos de
        los anillos caen fuera de cuadro y quedan cuatro fichas sueltas. */
+    /* El respaldo va primero: un navegador que no entienda `svh` descarta la
+       declaración entera y el hero se queda sin alto mínimo. */
+    min-height: max(100vh, 640px);
     min-height: max(100svh, 640px);
     padding-block: clamp(var(--e-7), 9vw, 120px) var(--e-6);
     /* El mismo margen lateral que las demás secciones: con --pad-x el titular
