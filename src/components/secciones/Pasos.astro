@@ -1,24 +1,42 @@
 ---
-import Pasos from '../islas/Pasos';
+import Pasos, { type Paso } from '../islas/Pasos';
+import type { NombreDePantalla } from '../islas/pantallas';
 import { COPY } from '../../data/copy';
 // Las medidas de las pantallas viven en su propio archivo: son las del código
 // de la app y no se mezclan con las de la sección.
 import '../../styles/pantallas-app.css';
 
-const { como } = COPY;
-
 // Las pantallas del teléfono las importa la isla, no esta plantilla: las props
 // de una isla viajan serializadas y un elemento de React no sobrevive ese viaje.
 // Acá solo se carga su hoja de estilos.
+
+// La sección se reusa en `/empresas` con otro contenido; por defecto trae el de
+// la home, así que la página que ya la usaba no cambia.
+interface Props {
+  titular?: string;
+  bajada?: string;
+  pasos?: readonly Paso[];
+  /** Cuáles pantallas del teléfono, en el orden de los pasos. */
+  pantallas?: readonly NombreDePantalla[];
+  id?: string;
+}
+
+const {
+  titular = COPY.como.titular,
+  bajada = COPY.como.bajada,
+  pasos = COPY.como.pasos,
+  pantallas,
+  id = 'como',
+} = Astro.props;
 ---
 
-<section class="pasos" id="como">
+<section class="pasos" id={id}>
   <div class="pasos__cabeza">
-    <h2 class="pasos__titular titular-seccion">{como.titular}</h2>
-    <p class="pasos__bajada bajada-seccion">{como.bajada}</p>
+    <h2 class="pasos__titular titular-seccion">{titular}</h2>
+    <p class="pasos__bajada bajada-seccion">{bajada}</p>
   </div>
 
-  <Pasos client:visible pasos={como.pasos} />
+  <Pasos client:visible pasos={pasos} pantallas={pantallas} />
 </section>
 
 <style is:global>
