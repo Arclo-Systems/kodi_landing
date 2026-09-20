@@ -16,7 +16,7 @@ import {
   useTransform,
   type MotionValue,
 } from 'motion/react';
-import { PANTALLAS, PANTALLA_POR_NOMBRE, type NombreDePantalla } from './pantallas';
+import { PANTALLAS } from './pantallas';
 import { avanceDePista, CAJON } from '../../lib/movimiento';
 
 /**
@@ -36,13 +36,13 @@ import { avanceDePista, CAJON } from '../../lib/movimiento';
  *     largo, que es lo que hace que la pantalla se sienta pesada.
  */
 
-export interface Ficha {
+interface Ficha {
   readonly rotulo: string;
   readonly dato: string;
   readonly detalle: string;
 }
 
-export interface Paso {
+interface Paso {
   readonly numero: string;
   readonly titulo: string;
   readonly texto: string;
@@ -52,8 +52,6 @@ export interface Paso {
 
 interface Props {
   readonly pasos: readonly Paso[];
-  /** Cuáles pantallas y en qué orden. Por defecto, las de la home en su orden. */
-  readonly pantallas?: readonly NombreDePantalla[];
 }
 
 /**
@@ -344,12 +342,10 @@ function Secuencia({ pasos, escenas }: { pasos: readonly Paso[]; escenas: ReactN
   );
 }
 
-export default function Pasos({ pasos, pantallas }: Props) {
-  const escenas: ReactNode[] = pasos.map((paso, i) => {
-    const elegida = pantallas?.[i];
-    const pantalla = elegida ? PANTALLA_POR_NOMBRE[elegida] : PANTALLAS[i];
-    return pantalla ?? <Hueco key={paso.numero} numero={paso.numero} />;
-  });
+export default function Pasos({ pasos }: Props) {
+  const escenas: ReactNode[] = pasos.map(
+    (paso, i) => PANTALLAS[i] ?? <Hueco key={paso.numero} numero={paso.numero} />,
+  );
 
   // La secuencia pegada va en todas las pantallas; lo que cambia es la reja,
   // que en angosto apila el teléfono sobre el texto y guarda la ficha. Lo único

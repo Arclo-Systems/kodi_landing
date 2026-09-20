@@ -932,21 +932,3 @@ export const PANTALLAS = [
   <PantallaRacha key="racha" />,
   <PantallaBeneficios key="beneficios" />,
 ];
-
-/**
- * Las mismas, por nombre.
- *
- * Existe para que una página pueda elegir cuáles van y en qué orden: los
- * elementos de React no sobreviven la serialización de props de Astro, pero
- * una cadena sí.
- */
-export const PANTALLA_POR_NOMBRE = {
-  hoy: PANTALLAS[0],
-  error: PANTALLAS[1],
-  partida: PANTALLAS[2],
-  liga: PANTALLAS[3],
-  racha: PANTALLAS[4],
-  beneficios: PANTALLAS[5],
-} as const;
-
-export type NombreDePantalla = keyof typeof PANTALLA_POR_NOMBRE;
