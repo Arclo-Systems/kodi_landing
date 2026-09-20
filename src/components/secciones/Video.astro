@@ -51,9 +51,9 @@ const hayAlgo = hayVideo || VIDEO.portada !== null;
        sube, el recuadro que crece y el aviso que aparece al final.
 
        Las constantes salen de medir la referencia y de leer su código: la
-       sección mide 180svh sobre un hero de 100svh, así que el avance se
-       completa en 80svh de scroll —el alto de la sección menos el de la parte
-       pegada, los dos leídos del DOM. El recuadro termina de crecer al 55% de
+       sección mide 1,8 pantallas sobre un hero de una, así que el avance se
+       completa en 0,8 pantallas de scroll —el alto de la sección menos el de
+       la parte pegada, los dos leídos del DOM. Crece hasta el 55% de
        ese avance; el aviso vive entre el 55% y el 98%.
 
        Nada de esto escribe en `<html>` ni anima `width`, `height` o `top`:
@@ -99,8 +99,8 @@ const hayAlgo = hayVideo || VIDEO.portada !== null;
     if (!seccion || !marco) return;
     {
       /* Del DOM y no de `window.innerHeight`: la sección y la parte pegada
-         van en `svh`, que la barra del navegador no mueve, y la ventana sí.
-         Mezclarlos corría el recuadro 71 px con la página quieta. */
+         van en `--alto-ventana`, que la barra del navegador no mueve, y la
+         ventana sí. Mezclarlos corría el recuadro 71 px con la página quieta. */
     }
     altoSeccion = seccion.getBoundingClientRect().height;
     altoPegado = pegado ? pegado.getBoundingClientRect().height : window.innerHeight;
@@ -215,18 +215,15 @@ const hayAlgo = hayVideo || VIDEO.portada !== null;
        tope del documento: así el avance del scroll y el recorrido de la parte
        pegada coinciden. El valor de respaldo es una pantalla, por si el script
        todavía no corrió. */
-    margin-top: calc(-1 * var(--alto-hero, 100vh));
-    margin-top: calc(-1 * var(--alto-hero, 100svh));
-    height: 180vh;
-    height: 180svh;
+    margin-top: calc(-1 * var(--alto-hero, var(--alto-ventana)));
+    height: calc(var(--alto-ventana) * 1.8);
     pointer-events: none;
   }
 
   .secuencia__pegado {
     position: sticky;
     top: 0;
-    height: 100vh;
-    height: 100svh;
+    height: var(--alto-ventana);
     overflow: hidden;
   }
 
@@ -262,7 +259,7 @@ const hayAlgo = hayVideo || VIDEO.portada !== null;
     left: 50%;
     top: 0;
     width: calc(min(100vw, var(--caja)) - 2 * var(--pad-seccion));
-    height: calc(100svh - 120px);
+    height: calc(var(--alto-ventana) - 120px);
     transform-origin: top center;
     transform: translate(-50%, var(--y, 850px)) scale(var(--sx, 0.3), var(--sy, 0.33));
     overflow: hidden;

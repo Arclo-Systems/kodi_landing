@@ -1,0 +1,40 @@
+---
+/**
+ * Publica el alto de la ventana en `--alto-ventana`, y lo deja QUIETO mientras
+ * solo se mueva la barra del navegador.
+ *
+ * `svh` tendría que ser el viewport chico y fijo, pero medido en un navegador
+ * dentro de una app en iPhone se comporta como `dvh`: al retraerse la barra,
+ * `innerHeight` pasó de 659 a 745 y en el mismo cuadro crecieron el hero (+86),
+ * la caja pegada (+86) y la pista de los pasos (+617). Un número de JavaScript
+ * no depende de cómo el motor interprete la unidad.
+ *
+ * Va suelto en el `<head>` y sin diferir, igual que el guion del tema: la
+ * variable tiene que existir ANTES del primer pintado o la página se re-maqueta
+ * al cargar.
+ */
+---
+
+<script is:inline>
+  (() => {
+    const raiz = document.documentElement;
+    // Solo donde el dedo es el puntero hay barra que se retrae. En escritorio
+    // el alto de la ventana manda siempre, como hasta ahora.
+    const tactil = window.matchMedia('(pointer: coarse)');
+    let ancho = window.innerWidth;
+
+    const publicar = () => {
+      ancho = window.innerWidth;
+      raiz.style.setProperty('--alto-ventana', `${window.innerHeight}px`);
+    };
+
+    publicar();
+
+    window.addEventListener('resize', () => {
+      if (tactil.matches && window.innerWidth === ancho) return;
+      publicar();
+      // Al rotar, iOS dispara `resize` antes de terminar de acomodar la ventana.
+      requestAnimationFrame(publicar);
+    });
+  })();
+</script>

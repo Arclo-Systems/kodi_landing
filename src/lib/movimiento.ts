@@ -39,14 +39,13 @@ export function empujeDeVelocidad(velocidad: number): number {
  * Cuánto avanzó una pista de scroll con una caja pegada adentro, de 0 a 1.
  *
  * La cuenta existe porque `useScroll` mide el recorrido contra
- * `window.innerHeight`, y la pista y la caja pegada están escritas en `svh`.
- * En teléfono esos dos números no son el mismo: `svh` es fijo, `innerHeight`
- * sube y baja con la barra del navegador. Medido en celular emulado, esconder
+ * `window.innerHeight`, y la pista y la caja pegada van en `--alto-ventana`.
+ * En teléfono esos dos números no son el mismo: la variable queda quieta,
+ * `innerHeight` sube y baja con la barra. Medido en celular emulado, esconder
  * la barra (844 → 915) movía el avance hasta 0.011 con la página quieta, y en
  * la peor transición eso corría la escena 218 px de golpe: el rebote.
  *
- * Acá los dos términos salen del propio DOM, los dos en `svh`, así que la
- * barra no puede moverlos.
+ * Acá los dos términos salen del propio DOM, así que la barra no los mueve.
  */
 export function avanceDePista(
   scrollY: number,

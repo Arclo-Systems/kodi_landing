@@ -243,7 +243,7 @@ function Barrita({ avance, i, total }: { avance: MotionValue<number>; i: number;
  *
  * No es `useScroll` con `target`: esa versión divide entre
  * `window.innerHeight`, que en teléfono sube y baja con la barra del
- * navegador mientras la pista sigue en `svh`. Ver `avanceDePista`.
+ * navegador mientras la pista sigue en `--alto-ventana`. Ver `avanceDePista`.
  */
 function useAvancePegado(
   pista: RefObject<HTMLDivElement | null>,
@@ -272,8 +272,8 @@ function useAvancePegado(
     };
 
     medir();
-    // Sobre la pista y el cuerpo, no sobre la ventana: los dos van en `svh` y
-    // así la barra del navegador no dispara una remedida que no cambió nada.
+    // Sobre la pista y el cuerpo, no sobre la ventana: los dos van en
+    // `--alto-ventana`, que la barra del navegador no mueve.
     const vigia = new ResizeObserver(medir);
     vigia.observe(caja);
     vigia.observe(document.body);
