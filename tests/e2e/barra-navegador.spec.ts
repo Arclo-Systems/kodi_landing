@@ -18,9 +18,14 @@ test('la barra del navegador no mueve la escena de los pasos', async ({ page, is
   test.skip(!isMobile, 'el síntoma sale de la barra de un navegador de teléfono');
 
   await page.goto('/');
-  // La isla es `client:visible`: la pista no existe hasta que la sección asoma.
+  // La pista ya viene del servidor, así que estar en el DOM no significa que la
+  // isla haya hidratado. La señal de que sí es que Motion haya escrito el
+  // primer `transform` en las barritas.
   await page.locator('#como').scrollIntoViewIfNeeded();
-  await page.locator('.pasos-pista').waitFor({ state: 'attached' });
+  await page.waitForFunction(() => {
+    const barra = document.querySelector<HTMLElement>('.barrita__llenado');
+    return Boolean(barra && barra.style.transform);
+  });
 
   const ventana = page.viewportSize();
   if (!ventana) throw new Error('la prueba necesita una ventana de tamaño conocido');
@@ -77,6 +82,15 @@ test('la barra del navegador no mueve la escena de los pasos', async ({ page, is
       },
       posicion,
     );
+
+  // Antes de comparar, esperar a que el avance se haya asentado en esa posición:
+  // recién hidratada, la isla puede tardar un cuadro en escribir el primero.
+  await page.evaluate((y) => window.scrollTo(0, y), posicion);
+  await page.waitForFunction(() =>
+    [...document.querySelectorAll<HTMLElement>('.barrita__llenado')].some((n) =>
+      /^scaleX\(0\.\d+\)$/.test(n.style.transform),
+    ),
+  );
 
   const conBarra = await leer();
   await page.setViewportSize({ width: ventana.width, height: ventana.height + SUBIDA_DE_BARRA });
