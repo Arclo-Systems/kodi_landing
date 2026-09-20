@@ -17,23 +17,22 @@ export const CAJON = [0.32, 0.72, 0, 1] as const;
  * Cuánto empuje recibe el campo de órbitas por la velocidad del scroll.
  *
  * El campo estira sus anillos y los acelera en proporción a lo rápido que se
- * mueva la página. La referencia divide la velocidad entre 300, pero está
- * calibrada para rueda de ratón: medido en producción con el mismo gesto, la
- * rueda pica en 728 px/s y un dedo en 3231, cuatro veces y media más. Con un
- * solo divisor, en teléfono el empuje se iba casi al tope y el campo se
- * estiraba y volvía de golpe en cada arrastre.
+ * mueva la página. El divisor es el de la referencia.
  *
- * Los dos divisores salen de esa medición: 3231/1300 y 728/300 dan
- * prácticamente el mismo empuje, que es lo que la prueba comprueba.
+ * Hubo un intento de subirlo a 1300 en táctil, porque un dedo pica cuatro
+ * veces y media más rápido que la rueda. La cuenta cerraba sobre el pico
+ * instantáneo, pero no sobre lo que el suavizado deja llegar a los anillos:
+ * medido después, el campo quedó 4,33 veces más débil y el hero se sintió
+ * muerto. Revertido. Si se vuelve a intentar, hay que calibrar contra el
+ * estirón en píxeles, no contra el pico de `useVelocity`.
  */
-export const VELOCIDAD_POR_PUNTO = { fino: 300, grueso: 1300 } as const;
+export const VELOCIDAD_POR_PUNTO = 300;
 
 /** Tope del empuje. Por encima, el estirón dejaría de leerse como tal. */
 export const EMPUJE_MAX = 14;
 
-export function empujeDeVelocidad(velocidad: number, punteroGrueso: boolean): number {
-  const divisor = punteroGrueso ? VELOCIDAD_POR_PUNTO.grueso : VELOCIDAD_POR_PUNTO.fino;
-  return Math.min(Math.abs(velocidad) / divisor, EMPUJE_MAX);
+export function empujeDeVelocidad(velocidad: number): number {
+  return Math.min(Math.abs(velocidad) / VELOCIDAD_POR_PUNTO, EMPUJE_MAX);
 }
 
 /**

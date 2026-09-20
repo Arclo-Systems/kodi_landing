@@ -1,0 +1,136 @@
+---
+/**
+ * Recuadro de diagnóstico del scroll, solo con `?depurar=1` en la URL.
+ *
+ * Existe porque hay saltos que solo pasan en un teléfono de verdad: la barra
+ * del navegador se anima al aparecer y desaparecer, y la inercia táctil no es
+ * la del scroll sintético. Desde un Chromium de escritorio no se reproducen,
+ * así que el dato tiene que salir del aparato donde se ven.
+ *
+ * Retiene el peor salto de cada cosa en vez de solo mostrar el valor vivo:
+ * cuando se siente el tirón ya pasó, y no da tiempo de leer nada.
+ */
+---
+
+<div id="depurador" hidden aria-hidden="true">
+  <button type="button" id="depurador-reiniciar">reiniciar</button>
+  <pre id="depurador-texto"></pre>
+</div>
+
+<style>
+  #depurador {
+    position: fixed;
+    top: env(safe-area-inset-top, 0px);
+    left: 0;
+    z-index: 9999;
+    background: #000000e6;
+    color: #7cff9b;
+    font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+    font-size: 11px;
+    line-height: 1.45;
+    padding: 8px 10px;
+    border-bottom-right-radius: 10px;
+    max-width: 100%;
+    pointer-events: none;
+  }
+  #depurador pre {
+    margin: 0;
+    white-space: pre;
+  }
+  #depurador-reiniciar {
+    pointer-events: auto;
+    position: absolute;
+    top: 6px;
+    right: 8px;
+    background: #7cff9b;
+    color: #000;
+    border: 0;
+    border-radius: 5px;
+    font: inherit;
+    font-size: 10px;
+    padding: 2px 6px;
+  }
+</style>
+
+<script>
+  if (location.search.includes('depurar')) {
+    const caja = document.getElementById('depurador') as HTMLElement | null;
+    const texto = document.getElementById('depurador-texto');
+    const reiniciar = document.getElementById('depurador-reiniciar');
+    if (caja && texto && reiniciar) {
+      caja.hidden = false;
+
+      interface Pico {
+        valor: number;
+        contexto: string;
+      }
+      const picos = new Map<string, Pico>();
+      const anotar = (clave: string, valor: number, contexto: string) => {
+        const previo = picos.get(clave);
+        if (!previo || Math.abs(valor) > Math.abs(previo.valor)) {
+          picos.set(clave, { valor, contexto });
+        }
+      };
+
+      const numero = (n: number, ancho = 6) => n.toFixed(0).padStart(ancho);
+
+      let anteriorY = window.scrollY;
+      let anteriorAlto = window.innerHeight;
+      let anteriorMarco: number | null = null;
+      let anteriorLenis: number | null = null;
+
+      const latido = () => {
+        const y = window.scrollY;
+        const alto = window.innerHeight;
+
+        // Lenis lleva su propio valor de scroll. Si se desincroniza del nativo
+        // durante la animación de la barra, la corrección se ve como un tirón.
+        const instancia = (window as unknown as { lenisDepuracion?: { scroll: number } })
+          .lenisDepuracion;
+        const lenis = instancia ? instancia.scroll : null;
+
+        const marcoNodo = document.querySelector('.marco');
+        const marco = marcoNodo ? marcoNodo.getBoundingClientRect().top : null;
+
+        const dy = y - anteriorY;
+        const dAlto = alto - anteriorAlto;
+
+        // Un salto es que algo se mueva MÁS de lo que se movió el scroll.
+        if (marco !== null && anteriorMarco !== null) {
+          const esperado = anteriorMarco - dy;
+          anotar('celular', marco - esperado, `y=${y} dy=${dy} alto=${alto}`);
+        }
+        if (lenis !== null) {
+          anotar('lenis-vs-nativo', lenis - y, `y=${y} alto=${alto}`);
+          if (anteriorLenis !== null) {
+            anotar('lenis-salto', lenis - anteriorLenis - dy, `y=${y} dy=${dy}`);
+          }
+        }
+        if (dAlto !== 0) anotar('barra', dAlto, `y=${y}`);
+        anotar('scroll-cuadro', dy, `y=${y} alto=${alto}`);
+
+        const filas = [
+          `scrollY   ${numero(y)}   dy ${numero(dy, 5)}`,
+          `innerH    ${numero(alto)}   d  ${numero(dAlto, 5)}`,
+          lenis === null ? 'lenis     (sin instancia)' : `lenis     ${numero(lenis)}   vs nativo ${numero(lenis - y, 5)}`,
+          marco === null ? 'celular   (fuera de vista)' : `celular   ${numero(marco)}`,
+          '',
+          'PEORES SALTOS',
+          ...[...picos.entries()].map(
+            ([clave, p]) => `${clave.padEnd(16)} ${numero(p.valor, 7)}  ${p.contexto}`,
+          ),
+        ];
+        texto.textContent = filas.join('\n');
+
+        anteriorY = y;
+        anteriorAlto = alto;
+        anteriorMarco = marco;
+        anteriorLenis = lenis;
+        requestAnimationFrame(latido);
+      };
+
+      reiniciar.addEventListener('click', () => picos.clear());
+      requestAnimationFrame(latido);
+    }
+  }
+</script>

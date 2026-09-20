@@ -1,47 +1,43 @@
 import { describe, expect, it } from 'vitest';
 
-import { EMPUJE_MAX, empujeDeVelocidad } from '../../src/lib/movimiento';
+import { EMPUJE_MAX, VELOCIDAD_POR_PUNTO, empujeDeVelocidad } from '../../src/lib/movimiento';
 
 /**
- * El campo de órbitas del hero estira sus anillos en proporción a la velocidad
- * del scroll. El founder reportó que en celular se sentía "un rebote al bajar y
- * subir" que en escritorio no está.
+ * El campo de órbitas del hero estira sus anillos según la velocidad del
+ * scroll. Los dos picos son medidos en https://holakodi.com/ con el mismo
+ * gesto: una pestaña con rueda de ratón y otra con emulación de teléfono.
  *
- * Los dos números de abajo NO son inventados: son el pico de velocidad medido
- * en https://holakodi.com/ con el mismo gesto, en una pestaña de Chrome con
- * emulación de teléfono y otra sin ella. La prueba existe para que el empuje no
- * vuelva a depender del aparato con el que se navega.
+ * Estas pruebas existen por un error concreto. Se subió el divisor a 1300 en
+ * táctil creyendo que el dedo saturaba el tope, porque su pico instantáneo es
+ * cuatro veces y media más alto. Pero el bucle suaviza esa velocidad antes de
+ * llegar a los anillos, así que nunca saturaba: el cambio dejó el campo 4,33
+ * veces más débil y el hero se sintió muerto. De ahí el piso de acá abajo.
  */
 const PICO_RUEDA = 728;
 const PICO_DEDO = 3231;
 
 describe('empuje del campo de órbitas', () => {
-  it('da prácticamente el mismo empuje con rueda y con dedo', () => {
-    const conRueda = empujeDeVelocidad(PICO_RUEDA, false);
-    const conDedo = empujeDeVelocidad(PICO_DEDO, true);
-
-    // Menos de medio punto de los catorce: el gesto se siente igual en los dos.
-    expect(Math.abs(conDedo - conRueda)).toBeLessThan(0.5);
+  it('reacciona de verdad a un gesto normal', () => {
+    // El piso es lo que faltaba: sin él, cualquier divisor grande pasa la
+    // prueba, incluidos los que dejan el campo quieto.
+    expect(empujeDeVelocidad(PICO_RUEDA)).toBeGreaterThan(EMPUJE_MAX / 8);
+    expect(empujeDeVelocidad(PICO_DEDO)).toBeGreaterThan(EMPUJE_MAX / 2);
   });
 
-  it('no satura el tope con un arrastre normal en teléfono', () => {
-    // Este era el fallo: con el divisor de la rueda, un dedo llegaba a 10.8 de
-    // 14 y el estirón se iba al máximo en cada arrastre.
-    expect(empujeDeVelocidad(PICO_DEDO, true)).toBeLessThan(EMPUJE_MAX / 3);
-    expect(empujeDeVelocidad(PICO_DEDO, false)).toBeGreaterThan(EMPUJE_MAX / 2);
+  it('usa el divisor de la referencia', () => {
+    expect(VELOCIDAD_POR_PUNTO).toBe(300);
+    expect(empujeDeVelocidad(PICO_RUEDA)).toBeCloseTo(PICO_RUEDA / 300, 5);
   });
 
   it('no reacciona cuando la página está quieta', () => {
-    expect(empujeDeVelocidad(0, true)).toBe(0);
-    expect(empujeDeVelocidad(0, false)).toBe(0);
+    expect(empujeDeVelocidad(0)).toBe(0);
   });
 
   it('trata igual subir que bajar', () => {
-    expect(empujeDeVelocidad(-PICO_DEDO, true)).toBe(empujeDeVelocidad(PICO_DEDO, true));
+    expect(empujeDeVelocidad(-PICO_DEDO)).toBe(empujeDeVelocidad(PICO_DEDO));
   });
 
   it('nunca pasa del tope, por rápido que se mueva', () => {
-    expect(empujeDeVelocidad(999_999, true)).toBe(EMPUJE_MAX);
-    expect(empujeDeVelocidad(999_999, false)).toBe(EMPUJE_MAX);
+    expect(empujeDeVelocidad(999_999)).toBe(EMPUJE_MAX);
   });
 });

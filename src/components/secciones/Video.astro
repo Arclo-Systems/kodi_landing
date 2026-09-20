@@ -52,7 +52,8 @@ const hayAlgo = hayVideo || VIDEO.portada !== null;
 
        Las constantes salen de medir la referencia y de leer su código: la
        sección mide 180svh sobre un hero de 100svh, así que el avance se
-       completa en 80svh de scroll. El recuadro termina de crecer al 55% de
+       completa en 80svh de scroll —el alto de la sección menos el de la parte
+       pegada, los dos leídos del DOM. El recuadro termina de crecer al 55% de
        ese avance; el aviso vive entre el 55% y el 98%.
 
        Nada de esto escribe en `<html>` ni anima `width`, `height` o `top`:
@@ -60,7 +61,6 @@ const hayAlgo = hayVideo || VIDEO.portada !== null;
        elemento lleva su propio valor. Lo que depende de la ventana —tamaño
        final, alto del hero— se recalcula solo al cambiar de tamaño. */
   }
-  const ALTO_SECCION = 1.8;
   const FIN_CRECIMIENTO = 0.55;
   const ENTRADA_AVISO: readonly [number, number] = [0.55, 0.65];
   const SALIDA_AVISO: readonly [number, number] = [0.9, 0.98];
@@ -79,12 +79,15 @@ const hayAlgo = hayVideo || VIDEO.portada !== null;
   const marco = seccion?.querySelector<HTMLElement>('.secuencia__marco');
   const rotulo = seccion?.querySelector<HTMLElement>('.secuencia__rotulo');
   const aviso = seccion?.querySelector<HTMLElement>('.secuencia__aviso');
+  const pegado = seccion?.querySelector<HTMLElement>('.secuencia__pegado');
   const hero = document.querySelector<HTMLElement>('.hero');
   const heroCentro = document.querySelector<HTMLElement>('.hero__centro');
 
   let anchoFinal = ANCHO_INICIAL;
   let altoFinal = ALTO_INICIAL;
   let bajadaInicial = 0;
+  let altoSeccion = 0;
+  let altoPegado = 0;
   let altoHero = window.innerHeight;
   let pendiente = false;
 
@@ -94,7 +97,14 @@ const hayAlgo = hayVideo || VIDEO.portada !== null;
   }
   const medir = () => {
     if (!seccion || !marco) return;
-    bajadaInicial = window.innerHeight - 50 - MARGEN_SUPERIOR;
+    {
+      /* Del DOM y no de `window.innerHeight`: la sección y la parte pegada
+         van en `svh`, que la barra del navegador no mueve, y la ventana sí.
+         Mezclarlos corría el recuadro 71 px con la página quieta. */
+    }
+    altoSeccion = seccion.getBoundingClientRect().height;
+    altoPegado = pegado ? pegado.getBoundingClientRect().height : window.innerHeight;
+    bajadaInicial = altoPegado - 50 - MARGEN_SUPERIOR;
     anchoFinal = marco.offsetWidth || ANCHO_INICIAL;
     altoFinal = marco.offsetHeight || ALTO_INICIAL;
     altoHero = hero ? hero.getBoundingClientRect().height : window.innerHeight;
@@ -117,7 +127,7 @@ const hayAlgo = hayVideo || VIDEO.portada !== null;
     pendiente = false;
     if (!seccion || !marco || quieto.matches) return;
 
-    const avance = limitar(window.scrollY / (window.innerHeight * (ALTO_SECCION - 1)));
+    const avance = limitar(window.scrollY / (altoSeccion - altoPegado));
     const crecer = limitar(avance / FIN_CRECIMIENTO);
     const arriba = MARGEN_SUPERIOR + bajadaInicial * (1 - crecer);
 
