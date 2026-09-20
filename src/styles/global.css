@@ -107,6 +107,13 @@
   --pad-seccion: clamp(20px, 3vw, 40px);
   --aire-seccion: clamp(96px, 10vw, 128px);
 
+  /* El alto de ventana con el que se maqueta. `AltoVentana.astro` lo pisa con
+     un valor en píxeles antes del primer pintado y solo lo vuelve a tocar si
+     cambia el ancho; el `svh` de acá es el respaldo para cuando no hay JS.
+     Ninguna sección escribe `svh` a mano: hay navegadores que lo tratan como
+     `dvh` y entonces el layout entero crece al retraerse la barra. */
+  --alto-ventana: 100svh;
+
   /* Dónde aterriza un ancla. Lo leen las secciones (`scroll-margin-top`) y el
      scroll suavizado, para que el destino sea el mismo con Lenis y sin él. */
   --alto-cabecera: 80px;

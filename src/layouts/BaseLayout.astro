@@ -4,6 +4,7 @@ import geistLatin from '@fontsource-variable/geist/files/geist-latin-wght-normal
 import '@fontsource-variable/nunito/wght.css';
 import '@fontsource-variable/geist/wght.css';
 import '../styles/tailwind.css';
+import AltoVentana from '../components/AltoVentana.astro';
 import { COPY } from '../data/copy';
 import { SOCIAL } from '../data/social';
 import { TIENDAS } from '../data/tiendas';
@@ -130,6 +131,7 @@ const datosEstructurados = {
           elegido === 'claro' || elegido === 'oscuro' ? elegido : sistema ? 'oscuro' : 'claro';
       })();
     </script>
+    <AltoVentana />
     <script
       is:inline
       type="application/ld+json"
