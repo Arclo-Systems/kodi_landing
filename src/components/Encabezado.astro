@@ -11,15 +11,23 @@ import { SOCIAL } from '../data/social';
 //
 // El menú del centro es una isla (Motion anima ancho, alto y los enlaces uno
 // detrás de otro); lo demás es Astro, porque son enlaces y un hover.
+// Las secciones viven en la portada. Desde una página propia —las legales,
+// las de cada examen— un `#examenes` suelto no lleva a ningún lado: hay que
+// volver a la raíz y bajar ahí. El prefijo se deriva de la ruta para que
+// cualquier página futura lo herede sin pasar props.
+const enPortada = Astro.url.pathname === '/';
+const seccion = (id: string) => (enPortada ? `#${id}` : `/#${id}`);
+const inicio = enPortada ? '#inicio' : '/';
+
 const MENU = [
   {
     titulo: 'Menú',
     grande: true,
     enlaces: [
-      { texto: COPY.nav.examenes, href: '#examenes' },
-      { texto: COPY.nav.como, href: '#como' },
-      { texto: 'Precios', href: '#precios' },
-      { texto: 'Preguntas', href: '#faq' },
+      { texto: COPY.nav.examenes, href: seccion('examenes') },
+      { texto: COPY.nav.como, href: seccion('como') },
+      { texto: 'Precios', href: seccion('precios') },
+      { texto: 'Preguntas', href: seccion('faq') },
     ],
   },
   {
@@ -47,15 +55,15 @@ const MENU = [
     <div class="cabecera__izquierda">
       {/* La marca en un círculo con borde, como la referencia: la silueta del
           ícono de la app sobre la superficie. Quieta, sin giro. */}
-      <a class="sello" href="#inicio" aria-label="Kodi, ir al inicio">
+      <a class="sello" href={inicio} aria-label="Kodi, ir al inicio">
         <span class="sello__circulo">
           <MarcaKodi tamano={32} class="sello__dibujo" />
         </span>
       </a>
 
       <nav class="pastilla" aria-label="Secciones">
-        <a href="#examenes">{COPY.nav.examenes}</a>
-        <a href="#como">{COPY.nav.como}</a>
+        <a href={seccion('examenes')}>{COPY.nav.examenes}</a>
+        <a href={seccion('como')}>{COPY.nav.como}</a>
       </nav>
     </div>
 

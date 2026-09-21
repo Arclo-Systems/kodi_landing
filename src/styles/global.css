@@ -252,9 +252,12 @@ body {
   display: flex;
   min-height: 100dvh;
   flex-direction: column;
-  /* Sin padding inferior: el que cierra la página es el del pie, que siempre es
+  /* Arriba, el alto de la cabecera MÁS el aire de la página: la cabecera es
+     fija y estas páginas no tienen hero que le haga sitio, así que con solo
+     `--pad-y` el titular nacía debajo de la píldora del menú.
+     Sin padding inferior: el que cierra la página es el del pie, que siempre es
      el último hijo. Con los dos, quedaba un vacío muerto debajo del copyright. */
-  padding: var(--pad-y) var(--pad-x) 0;
+  padding: calc(var(--alto-cabecera) + var(--pad-y)) var(--pad-x) 0;
 }
 
 /* El contenido empuja al pie hasta abajo; el pie ya no vive del sobrante. */

@@ -1,7 +1,8 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import CambioTema from '../components/CambioTema.astro';
+import Encabezado from '../components/Encabezado.astro';
 import Pie from '../components/Pie.astro';
-import Wordmark from '../components/Wordmark.astro';
 
 // A diferencia de /terminos, /privacidad y /bases, esta página NO es un
 // documento legal versionado en el panel: es el instructivo que Google Play
@@ -16,11 +17,7 @@ const CORREO_SOPORTE = 'soporte@holakodi.com';
   description="Cómo eliminar tu cuenta de Kodi desde la app o por correo, qué datos se borran, cuáles se conservan y cómo cancelar la suscripción."
 >
   <div class="pantalla">
-    <header class="encabezado encabezado--documento">
-      <a href="/" aria-label="Kodi, ir al inicio">
-        <Wordmark class="marca" />
-      </a>
-    </header>
+    <Encabezado />
 
     <main id="contenido" tabindex="-1">
       <article class="documento">
@@ -106,6 +103,7 @@ const CORREO_SOPORTE = 'soporte@holakodi.com';
     </main>
 
     <Pie />
+    <CambioTema />
   </div>
 </BaseLayout>
 
