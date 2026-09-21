@@ -16,6 +16,12 @@ const fechaDeVersion = (version: string): string => version.split('.')[0];
 
 export const ULTIMA_ACTUALIZACION: Readonly<Record<string, string>> = {
   '/': '2026-09-20',
+  '/senales-de-transito': '2026-09-21',
+  '/cosevi-auto': '2026-09-21',
+  '/cosevi-moto': '2026-09-21',
+  '/admision-ucr': '2026-09-21',
+  '/admision-tec': '2026-09-21',
+  '/pruebas-nacionales': '2026-09-21',
   '/eliminar-cuenta': '2026-09-19',
   '/bases': fechaDeVersion(RAFFLE_RULES_DOC.version),
   '/privacidad': fechaDeVersion(PRIVACY_DOC.version),

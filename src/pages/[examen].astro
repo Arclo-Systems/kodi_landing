@@ -1,0 +1,351 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import CambioTema from '../components/CambioTema.astro';
+import Encabezado from '../components/Encabezado.astro';
+import Pie from '../components/Pie.astro';
+import ScrollSuave from '../components/ScrollSuave.astro';
+import Tarjeta from '../components/Tarjeta.astro';
+import { PAGINAS_EXAMEN, type PaginaExamen } from '../data/paginas-examen';
+import { TIENDAS, rotuloDeTienda } from '../data/tiendas';
+
+// Una ruta para las cinco páginas de examen. Las rutas fijas (`/privacidad`,
+// `/senales-de-transito`) ganan sobre esta, así que no hay choque.
+export function getStaticPaths() {
+  return PAGINAS_EXAMEN.map((pagina) => ({
+    params: { examen: pagina.slug },
+    props: { pagina },
+  }));
+}
+
+interface Props {
+  pagina: PaginaExamen;
+}
+
+const { pagina } = Astro.props;
+
+// El catálogo de señales es una página propia: desde las dos de COSEVI se
+// enlaza en la materia que le corresponde, que es donde alguien la buscaría.
+const CON_CATALOGO = 'Señales de Tránsito';
+
+const faqLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: pagina.faq.map((item) => ({
+    '@type': 'Question',
+    name: item.pregunta,
+    acceptedAnswer: { '@type': 'Answer', text: item.respuesta },
+  })),
+};
+---
+
+<BaseLayout title={pagina.title} description={pagina.description}>
+  <div class="pantalla">
+    <ScrollSuave />
+    <Encabezado />
+
+    <main id="contenido" tabindex="-1">
+      <article class="examen">
+        <header class="hero">
+          <h1 class="hero__titular">{pagina.h1}</h1>
+          <p class="hero__bajada">{pagina.entrada}</p>
+
+          <div class="hero__datos">
+            <span class="dato">
+              <span class="dato__cifra">{pagina.preguntas}</span>
+              <span class="dato__rotulo">preguntas</span>
+            </span>
+            <span class="dato">
+              <span class="dato__cifra">{pagina.minutos}</span>
+              <span class="dato__rotulo">minutos</span>
+            </span>
+          </div>
+        </header>
+
+        <section class="examen__bloque">
+          <h2 class="examen__h2">Qué entra en {pagina.comoLeLlaman}</h2>
+          <p class="examen__nota">{pagina.deQueVa}</p>
+          <ul class="materias" role="list">
+            {
+              pagina.materias.map((materia) => (
+                <li class="materia">
+                  {materia === CON_CATALOGO ? (
+                    <a class="materia__enlace" href="/senales-de-transito">
+                      {materia}
+                      <span class="materia__pista">ver el catálogo</span>
+                    </a>
+                  ) : (
+                    materia
+                  )}
+                </li>
+              ))
+            }
+          </ul>
+        </section>
+
+        <section class="examen__bloque">
+          <h2 class="examen__h2">Preguntas frecuentes</h2>
+          <dl class="faq">
+            {
+              pagina.faq.map((item) => (
+                <div class="faq__par">
+                  <dt class="faq__pregunta">{item.pregunta}</dt>
+                  <dd class="faq__respuesta">{item.respuesta}</dd>
+                </div>
+              ))
+            }
+          </dl>
+        </section>
+
+        <aside class="examen__cierre">
+          <h2 class="examen__cierre-titulo">Practicalo hasta que sea fácil</h2>
+          <p class="examen__cierre-texto">
+            En Kodi practicás con preguntas hechas desde el material oficial, y cada vez que fallás
+            te explica por qué.
+          </p>
+          {/* Las tarjetas de tienda del sitio, no un botón propio: el rótulo
+              sale del estado de cada tienda, así que el día que salga iOS esta
+              página cambia sola. */}
+          <div class="examen__tiendas">
+            {
+              TIENDAS.map((tienda) => (
+                <Tarjeta
+                  icono={tienda.icono}
+                  rotulo={rotuloDeTienda(tienda)}
+                  nombre={tienda.nombre}
+                  href={tienda.url ?? undefined}
+                />
+              ))
+            }
+          </div>
+        </aside>
+      </article>
+    </main>
+
+    <Pie />
+    <CambioTema />
+  </div>
+
+  <script is:inline type="application/ld+json" set:html={JSON.stringify(faqLd)} />
+</BaseLayout>
+
+<style>
+  /* 46rem es la medida de lectura del cuerpo; la grilla de materias necesita
+     más para que tres columnas no queden apretadas, así que la caja crece y
+     los bloques de texto se siguen limitando por su cuenta. */
+  .examen {
+    width: min(100%, 56rem);
+    margin-inline: auto;
+    padding-bottom: var(--ritmo-seccion);
+  }
+
+  /* El hero de la portada, aplicado acá: centrado, titular enorme y el arte
+     del módulo como protagonista. Antes esto era un titular mediano alineado a
+     la izquierda con el arte de estampilla al lado, y la página se leía como
+     documentación en vez de como Kodi.
+     Un escalón por debajo del de la portada (5.25rem) porque este titular
+     nombra un examen y es más largo que "Practicá tu examen hasta que sea
+     fácil". */
+  .hero {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-block: clamp(var(--e-6), 6vw, var(--e-8)) 0;
+    text-align: center;
+  }
+
+  .hero__titular {
+    font-family: var(--fuente-titular);
+    font-size: clamp(2.25rem, 6vw, 4rem);
+    font-weight: 500;
+    line-height: 1.04;
+    letter-spacing: -0.028em;
+    color: var(--tinta);
+    margin: 0;
+    max-width: 18ch;
+    text-wrap: balance;
+  }
+
+  .hero__bajada {
+    max-width: 34rem;
+    margin: var(--ritmo-bloque) 0 0;
+    color: var(--tinta-suave);
+    line-height: 1.55;
+    text-wrap: pretty;
+  }
+
+  /* Los dos números sueltos, sin caja: son el remate del hero, no un panel de
+     datos. Una tarjeta acá era la respuesta perezosa. */
+  .hero__datos {
+    display: flex;
+    align-items: center;
+    gap: clamp(var(--e-6), 8vw, var(--e-8));
+    margin-top: var(--ritmo-bloque);
+  }
+
+  .dato {
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Una regla fina entre los dos, para que se lean como dos datos de la misma
+     ficha y no como dos números sueltos. Al alto del número, no de la caja. */
+  .dato + .dato {
+    padding-left: clamp(var(--e-6), 8vw, var(--e-8));
+    border-left: 1px solid var(--borde);
+  }
+
+  .dato__cifra {
+    font-family: var(--fuente-titular);
+    font-size: clamp(2.5rem, 7vw, 3.5rem);
+    font-weight: 500;
+    line-height: 1;
+    letter-spacing: -0.03em;
+    color: var(--tinta);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .dato__rotulo {
+    margin-top: var(--e-2);
+    color: var(--tinta-suave);
+    font-size: 0.9375rem;
+  }
+
+  /* Describe de qué va el examen, así que vive acá y no en el hero: ahí era un
+     segundo párrafo centrado que repetía lo que la bajada ya había dicho. */
+  .examen__nota {
+    max-width: 44rem;
+    margin: var(--ritmo-grupo) 0 0;
+    color: var(--tinta-suave);
+    line-height: 1.6;
+  }
+
+  .examen__bloque {
+    margin-top: var(--ritmo-seccion);
+  }
+
+  .examen__h2 {
+    font-family: var(--fuente-titular);
+    font-size: clamp(1.5rem, 3vw, 2rem);
+    font-weight: 500;
+    letter-spacing: -0.02em;
+    color: var(--tinta);
+    margin: 0;
+  }
+
+  /* Tres columnas fijas, no `auto-fill`: con el ancho de la caja el `minmax`
+     resolvía en dos y las materias quedaban en una lista larga. */
+  .materias {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0 var(--e-5);
+    margin: var(--ritmo-bloque) 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  @media (max-width: 48rem) {
+    .materias {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (max-width: 30rem) {
+    .materias {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .materia {
+    padding: var(--e-3) 0;
+    border-bottom: 1px solid var(--borde);
+    color: var(--tinta);
+  }
+
+  .materia__enlace {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--e-3);
+    color: var(--tinta);
+    text-decoration: none;
+  }
+
+  .materia__pista {
+    color: var(--teal-texto);
+    font-size: 0.8125rem;
+    white-space: nowrap;
+  }
+
+  .materia__enlace:hover .materia__pista {
+    text-decoration: underline;
+  }
+
+  .faq {
+    margin: var(--ritmo-bloque) 0 0;
+  }
+
+  .faq__par + .faq__par {
+    margin-top: var(--e-5);
+    padding-top: var(--e-5);
+    border-top: 1px solid var(--borde);
+  }
+
+  .faq__pregunta {
+    font-family: var(--fuente-titular);
+    font-size: 1.0625rem;
+    font-weight: 500;
+    color: var(--tinta);
+  }
+
+  .faq__respuesta {
+    margin: var(--e-2) 0 0;
+    color: var(--tinta-suave);
+    line-height: 1.6;
+  }
+
+  .examen__cierre {
+    margin-top: var(--ritmo-seccion);
+    padding: var(--e-7) var(--e-5);
+    border: 2px solid var(--borde);
+    border-radius: 1.25rem;
+    background: var(--tarjeta);
+    text-align: center;
+  }
+
+  .examen__cierre-titulo {
+    font-family: var(--fuente-titular);
+    font-size: clamp(1.25rem, 2.5vw, 1.75rem);
+    font-weight: 500;
+    letter-spacing: -0.02em;
+    color: var(--tinta);
+    margin: 0;
+    text-wrap: balance;
+  }
+
+  .examen__cierre-texto {
+    max-width: 34rem;
+    margin: var(--ritmo-grupo) auto 0;
+    color: var(--tinta-suave);
+  }
+
+  .examen__tiendas {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--e-3);
+    margin-top: var(--ritmo-bloque);
+  }
+
+  @media (max-width: 520px) {
+    .examen__tiendas {
+      flex-wrap: nowrap;
+      gap: var(--e-2);
+    }
+  }
+
+  @media (max-width: 34rem) {
+    .hero__datos {
+      gap: var(--e-6);
+    }
+  }
+</style>

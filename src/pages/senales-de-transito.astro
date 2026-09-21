@@ -1,0 +1,299 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import CambioTema from '../components/CambioTema.astro';
+import Encabezado from '../components/Encabezado.astro';
+import Pie from '../components/Pie.astro';
+import ScrollSuave from '../components/ScrollSuave.astro';
+import Tarjeta from '../components/Tarjeta.astro';
+import { CATEGORIAS, SENALES, senalesDe } from '../data/senales';
+import { TIENDAS, rotuloDeTienda } from '../data/tiendas';
+
+const grupos = CATEGORIAS.map((categoria) => ({
+  ...categoria,
+  senales: senalesDe(categoria.id),
+}));
+
+// El marcado describe una lista de referencia, no un examen: quien llega acá
+// busca qué significa un dibujo, no practicar. Practicar es lo que ofrece la
+// app al final de la página.
+const listaLd = {
+  '@context': 'https://schema.org',
+  '@type': 'ItemList',
+  name: 'Señales de tránsito de Costa Rica',
+  numberOfItems: SENALES.length,
+  itemListElement: SENALES.map((senal, indice) => ({
+    '@type': 'ListItem',
+    position: indice + 1,
+    name: senal.nombre,
+    description: senal.significado,
+  })),
+};
+---
+
+<BaseLayout
+  title="Señales de tránsito de Costa Rica y qué significa cada una"
+  description="Las señales de reglamentación y prevención de Costa Rica, con su dibujo oficial y qué ordena o advierte cada una. Hechas desde el manual del COSEVI."
+>
+  <div class="pantalla">
+    {/* Los saltos del índice bajan con el mismo deslizamiento que la portada:
+        sin esto el ancla aterriza de golpe. */}
+    <ScrollSuave />
+    <Encabezado />
+
+    <main id="contenido" tabindex="-1">
+      <article class="senales">
+        <header class="senales__entrada">
+          <h1 class="senales__titulo titular-seccion">Señales de tránsito de Costa Rica</h1>
+          <p class="senales__bajada bajada-seccion">
+            Qué ordena o advierte cada señal, con el dibujo tal como aparece en la vía. Son las
+            señales de reglamentación y de prevención del manual del COSEVI, las mismas que entran
+            en el examen teórico.
+          </p>
+          <nav class="senales__indice" aria-label="Categorías">
+            {
+              grupos.map((grupo) => (
+                <a class="senales__salto" href={`#${grupo.id}`}>
+                  {grupo.nombre}
+                  <span class="senales__cuenta">{grupo.senales.length}</span>
+                </a>
+              ))
+            }
+          </nav>
+        </header>
+
+        {
+          grupos.map((grupo) => (
+            <section class="senales__grupo" id={grupo.id}>
+              <h2 class="senales__grupo-titulo">{grupo.nombre}</h2>
+              <p class="senales__grupo-que">{grupo.que}</p>
+
+              <ul class="senales__lista" role="list">
+                {grupo.senales.map((senal) => (
+                  <li class="senal" id={senal.id}>
+                    <div class="senal__dibujo" set:html={senal.svg} />
+                    <div class="senal__texto">
+                      <h3 class="senal__nombre">{senal.nombre}</h3>
+                      <p class="senal__significado">{senal.significado}</p>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          ))
+        }
+
+        <aside class="senales__cierre">
+          <h2 class="senales__cierre-titulo">Saberlas no es lo mismo que reconocerlas</h2>
+          <p class="senales__cierre-texto">
+            En el examen la señal aparece sola, sin el nombre debajo. En Kodi practicás con estas y
+            con el resto del temario: cada vez que fallás, te explica por qué.
+          </p>
+          <div class="senales__tiendas">
+            {
+              TIENDAS.map((tienda) => (
+                <Tarjeta
+                  icono={tienda.icono}
+                  rotulo={rotuloDeTienda(tienda)}
+                  nombre={tienda.nombre}
+                  href={tienda.url ?? undefined}
+                />
+              ))
+            }
+          </div>
+        </aside>
+      </article>
+    </main>
+
+    <Pie />
+    <CambioTema />
+  </div>
+
+  <script is:inline type="application/ld+json" set:html={JSON.stringify(listaLd)} />
+</BaseLayout>
+
+<style>
+  .senales {
+    width: min(100%, 68rem);
+    margin-inline: auto;
+    padding-bottom: var(--ritmo-seccion);
+  }
+
+  .senales__entrada {
+    max-width: 44rem;
+  }
+
+  .senales__titulo {
+    margin: 0;
+  }
+
+  .senales__bajada {
+    margin: var(--ritmo-grupo) 0 0;
+  }
+
+  .senales__indice {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--e-3);
+    margin-top: var(--ritmo-bloque);
+  }
+
+  /* Sin píldoras: el radio es el de las tarjetas, no el del óvalo. 44 de alto
+     es el piso táctil. */
+  .senales__salto {
+    display: inline-flex;
+    min-height: 44px;
+    align-items: center;
+    gap: var(--e-2);
+    padding: var(--e-2) var(--e-4);
+    border: 2px solid var(--borde);
+    border-radius: 0.875rem;
+    background: var(--tarjeta);
+    color: var(--tinta);
+    font-weight: 700;
+    text-decoration: none;
+    transition: transform 160ms var(--salida);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .senales__salto:hover {
+      transform: translateY(-2px);
+    }
+  }
+
+  /* El número no compite con el nombre: es el dato de apoyo. */
+  .senales__cuenta {
+    color: var(--tinta-suave);
+    font-variant-numeric: tabular-nums;
+    font-weight: 500;
+  }
+
+  .senales__grupo {
+    margin-top: var(--ritmo-seccion);
+    scroll-margin-top: calc(var(--alto-cabecera) + var(--respiro-ancla));
+  }
+
+  .senales__grupo-titulo {
+    font-family: var(--fuente-titular);
+    font-size: clamp(1.5rem, 3vw, 2rem);
+    font-weight: 500;
+    letter-spacing: -0.02em;
+    color: var(--tinta);
+    margin: 0;
+  }
+
+  .senales__grupo-que {
+    max-width: 40rem;
+    margin: var(--ritmo-grupo) 0 0;
+    color: var(--tinta-suave);
+  }
+
+  /* Lista, no tarjetas: son 86 señales y en fichas sueltas la página se vuelve
+     un muro de cajas con huecos muertos. En filas se recorre como un índice.
+     `auto-fill` y no `auto-fit`, para que una fila incompleta no estire las
+     columnas al doble de ancho. */
+  .senales__lista {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(21rem, 1fr));
+    gap: var(--e-2) var(--e-7);
+    margin: var(--ritmo-bloque) 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .senal {
+    display: flex;
+    gap: var(--e-4);
+    align-items: center;
+    padding: var(--e-3) 0;
+    border-bottom: 1px solid var(--borde);
+    scroll-margin-top: calc(var(--alto-cabecera) + var(--respiro-ancla));
+  }
+
+  /* Columna de ancho fijo y alto fijo: es lo que alinea todos los nombres,
+     aunque una señal sea vertical y la otra apaisada. */
+  .senal__dibujo {
+    display: flex;
+    flex: 0 0 4.5rem;
+    height: 4.5rem;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .senal__dibujo :global(svg) {
+    height: 100%;
+    width: auto;
+    max-width: 100%;
+  }
+
+  .senal__texto {
+    min-width: 0;
+  }
+
+  /* Geist y peso 500, como `.plan__nombre`: en la landing los nombres son de
+     la fuente de titular, no Nunito en negrita. */
+  .senal__nombre {
+    font-family: var(--fuente-titular);
+    font-size: 1.0625rem;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    color: var(--tinta);
+    margin: 0;
+    text-wrap: balance;
+  }
+
+  .senal__significado {
+    margin: 2px 0 0;
+    color: var(--tinta-suave);
+    font-size: 0.9375rem;
+    line-height: 1.45;
+  }
+
+  .senales__cierre {
+    margin-top: var(--ritmo-seccion);
+    padding: var(--e-7) var(--e-5);
+    border: 2px solid var(--borde);
+    border-radius: 1.25rem;
+    background: var(--tarjeta);
+    text-align: center;
+  }
+
+  .senales__cierre-titulo {
+    font-family: var(--fuente-titular);
+    font-size: clamp(1.25rem, 2.5vw, 1.75rem);
+    font-weight: 500;
+    letter-spacing: -0.02em;
+    color: var(--tinta);
+    margin: 0;
+    text-wrap: balance;
+  }
+
+  .senales__cierre-texto {
+    max-width: 34rem;
+    margin: var(--ritmo-grupo) auto 0;
+    color: var(--tinta-suave);
+  }
+
+  .senales__tiendas {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--e-3);
+    margin-top: var(--ritmo-bloque);
+  }
+
+  @media (max-width: 520px) {
+    .senales__tiendas {
+      flex-wrap: nowrap;
+      gap: var(--e-2);
+    }
+  }
+
+  /* En teléfono la fila se mantiene: apilarla dejaría el dibujo solo en una
+     línea y la lista perdería el barrido vertical que la hace legible. */
+  @media (max-width: 30rem) {
+    .senal__dibujo {
+      flex-basis: 3.75rem;
+      height: 3.75rem;
+    }
+  }
+</style>
