@@ -26,8 +26,10 @@ export const COPY = {
   // gente busca. Este nombra los tres exámenes, que es lo que se teclea en
   // Google.
   titulo: 'Kodi — practicá para el COSEVI, admisión y Pruebas Nacionales',
+  // 160 caracteres es lo que Google llega a mostrar. La anterior tenía 194 y
+  // se cortaba justo antes de "Gratis", que es el gancho.
   descripcion:
-    'Practicá tu examen con preguntas hechas desde el material oficial: COSEVI auto y moto, admisión UCR · UNA · TEC y Pruebas Nacionales. Cada error viene con su explicación. Gratis en Android.',
+    'COSEVI auto y moto, admisión UCR · UNA · TEC y Pruebas Nacionales: practicá con preguntas del material oficial. Cada error con su explicación. Gratis.',
 
   // ─── Cabecera ─────────────────────────────────────────────────────────────
   nav: {

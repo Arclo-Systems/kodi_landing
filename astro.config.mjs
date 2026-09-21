@@ -6,7 +6,12 @@ import react from '@astrojs/react';
 
 import tailwindcss from '@tailwindcss/vite';
 
+import { lastmodDe } from './src/data/actualizaciones';
+
 const FUERA_DEL_SITEMAP = new Set(['/og', '/invitacion', '/invitacion-perfil']);
+
+/** `/bases/` y `/bases` son la misma entrada; `/` no puede quedar en cadena vacía. */
+const rutaDe = (url) => new URL(url).pathname.replace(/\/$/, '') || '/';
 
 export default defineConfig({
   site: 'https://holakodi.com',
@@ -23,6 +28,14 @@ export default defineConfig({
       // Se normaliza la barra final: con `trailingSlash: 'never'` las rutas
       // llegan sin ella, pero el filtro no puede depender de eso.
       filter: (page) => !FUERA_DEL_SITEMAP.has(new URL(page).pathname.replace(/\/$/, '')),
+
+      // Sin `lastmod` el sitemap no dice nada que la propia URL no dijera ya.
+      // Las fechas salen de `ULTIMA_ACTUALIZACION`, no del build, para que
+      // moverse signifique de verdad que el contenido cambió.
+      serialize: (item) => {
+        const lastmod = lastmodDe(rutaDe(item.url));
+        return lastmod ? { ...item, lastmod } : item;
+      },
     }),
     react(),
   ],
