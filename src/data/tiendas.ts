@@ -5,12 +5,8 @@
  * ve, pero no lleva a ninguna parte. Es a propósito — un botón que cae en un
  * 404 de la tienda es peor que uno que dice "muy pronto".
  *
- * Android salió primero (agosto 2026). iPhone todavía no: su tarjeta sigue en
- * `null` y la home ofrece la lista de espera. EL DÍA QUE SALGA iOS se pega la
- * URL acá y listo — ninguna página se toca, el rótulo cambia solo de
- * "Muy pronto en" a "Descargala en".
- *
- *   App Store    https://apps.apple.com/cr/app/<slug>/id<ID_NUMERICO>
+ * Android salió primero (agosto 2026) e iPhone después (septiembre 2026). Con
+ * la URL puesta, el rótulo cambia solo de "Muy pronto en" a "Descargala en".
  */
 interface Tienda {
   /** Nombre del icono en `components/Icono.astro`. */
@@ -25,7 +21,11 @@ export const TIENDAS: readonly Tienda[] = [
     nombre: 'Google Play',
     url: 'https://play.google.com/store/apps/details?id=com.holakodi.app',
   },
-  { icono: 'appstore', nombre: 'App Store', url: null },
+  {
+    icono: 'appstore',
+    nombre: 'App Store',
+    url: 'https://apps.apple.com/cr/app/kodi-estudi%C3%A1-y-aprob%C3%A1/id6812542626',
+  },
 ];
 
 const ROTULO_DISPONIBLE = 'Descargala en';
