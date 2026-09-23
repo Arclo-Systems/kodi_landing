@@ -1,6 +1,5 @@
 ---
 import { COPY } from '../../data/copy';
-import ListaEspera from '../ListaEspera.astro';
 import Tarjeta from '../Tarjeta.astro';
 import { TIENDAS, rotuloDeTienda } from '../../data/tiendas';
 import CampoOrbitas from '../islas/CampoOrbitas';
@@ -20,12 +19,6 @@ import CampoOrbitas from '../islas/CampoOrbitas';
   <div class="hero__centro">
     <h1 class="hero__titular">{COPY.titular}</h1>
     <p class="hero__bajada">{COPY.bajada}</p>
-
-    {/* Va ARRIBA de las tarjetas y no abajo por pedido del founder. En sobrio,
-        que es lo que lo deja funcionar ahí: quien tiene Android baja la vista
-        una línea y encuentra Google Play; quien tiene iPhone ya leyó la salida
-        que le toca antes de llegar a una tarjeta que no puede tocar. */}
-    <ListaEspera class="hero__lista" variante="sobria" />
 
     {/* La tarjeta de tienda en vez de un botón inventado: es el badge que ya
         usa el sitio, con el ícono de Play, el rótulo chico arriba y el nombre
@@ -110,12 +103,6 @@ import CampoOrbitas from '../islas/CampoOrbitas';
     line-height: 1.55;
     color: var(--tinta-suave);
     text-wrap: pretty;
-  }
-
-  /* Separación de grupo y no de bloque: la promesa de iPhone y las tarjetas
-     son la misma decisión (por dónde bajo la app), no dos temas distintos. */
-  .hero__lista {
-    margin-top: var(--ritmo-grupo);
   }
 
   .hero__tiendas {
