@@ -37,14 +37,6 @@ export const FAQ: readonly ItemFaq[] = [
       'El equipo de contenido de Kodi, a partir del material oficial de cada examen: los manuales del COSEVI, el material que publica el MEP para las Pruebas Nacionales, y el temario de la UCR, la UNA y el TEC. Las universidades publican temario y no preguntas, así que las de admisión las escribimos nosotros desde ese temario. Cada una lleva su explicación.',
   },
   {
-    id: 'iphone',
-    pregunta: '¿Cuándo sale para iPhone?',
-    // ⚠️ Vence el 30 de setiembre de 2026. Si ese día la app no salió, esta
-    // línea se cambia el mismo día.
-    respuesta:
-      'A finales de este mes. Dejanos tu correo en la sección de descarga y te escribimos el día que salga.',
-  },
-  {
     id: 'auto-moto',
     pregunta: 'Si ya tengo licencia de auto, ¿me sirve para moto?',
     respuesta:
