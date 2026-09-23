@@ -12,6 +12,33 @@
       "has": [{ "type": "host", "value": "www.holakodi.com" }],
       "destination": "https://holakodi.com/:path*",
       "permanent": true
+    },
+    {
+      "source": "/android",
+      "destination": "https://play.google.com/store/apps/details?id=com.holakodi.app",
+      "permanent": false
+    },
+    {
+      "source": "/ios",
+      "destination": "https://apps.apple.com/cr/app/kodi-estudi%C3%A1-y-aprob%C3%A1/id6812542626",
+      "permanent": false
+    },
+    {
+      "source": "/app",
+      "has": [{ "type": "header", "key": "user-agent", "value": ".*(iPhone|iPad|iPod).*" }],
+      "destination": "https://apps.apple.com/cr/app/kodi-estudi%C3%A1-y-aprob%C3%A1/id6812542626",
+      "permanent": false
+    },
+    {
+      "source": "/app",
+      "has": [{ "type": "header", "key": "user-agent", "value": ".*Android.*" }],
+      "destination": "https://play.google.com/store/apps/details?id=com.holakodi.app",
+      "permanent": false
+    },
+    {
+      "source": "/app",
+      "destination": "/",
+      "permanent": false
     }
   ],
   "rewrites": [
