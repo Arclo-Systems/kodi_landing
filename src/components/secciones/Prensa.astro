@@ -1,0 +1,124 @@
+---
+import { COPY } from '../../data/copy';
+import { fechaLegible, notasOrdenadas } from '../../data/prensa';
+
+// Solo texto: medio, titular literal y fecha. Sin logos ni fotos de los medios,
+// que son de ellos. Cada nota entera es un único enlace a la publicación
+// original; el aviso de pestaña nueva va oculto dentro del enlace y no en un
+// `aria-label`, que taparía el texto visible.
+const { prensa } = COPY;
+const notas = notasOrdenadas();
+---
+
+{
+  notas.length > 0 && (
+    <section class="prensa" id="prensa">
+      <h2 class="titular-seccion">{prensa.titular}</h2>
+
+      <ul class="prensa__lista" role="list">
+        {notas.map((nota) => (
+          <li class="prensa__item">
+            <a
+              class="prensa__enlace pulsable pulsable--texto"
+              href={nota.url}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <span class="prensa__medio">{nota.medio}</span>
+              <span class="prensa__titular">{nota.titular}</span>
+              <time class="prensa__fecha" datetime={nota.fecha}>
+                {fechaLegible(nota.fecha)}
+              </time>{' '}
+              <span class="oculto">{prensa.pestanaNueva}</span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </section>
+  )
+}
+
+<style>
+  .prensa {
+    max-width: var(--caja);
+    margin-inline: auto;
+    padding-inline: var(--pad-seccion);
+    padding-bottom: var(--aire-seccion);
+  }
+
+  /* Una línea entre nota y nota, como las columnas de Fuentes y las preguntas:
+     son entradas de una misma lista, no tarjetas. */
+  .prensa__lista {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    margin-top: var(--ritmo-bloque);
+    margin-inline: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .prensa__item {
+    border-top: 1px solid var(--borde);
+  }
+
+  .prensa__item:last-of-type {
+    border-bottom: 1px solid var(--borde);
+  }
+
+  .prensa__enlace {
+    display: grid;
+    gap: var(--e-2);
+    min-height: 44px;
+    padding-block: var(--ritmo-bloque);
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .prensa__medio {
+    color: var(--tinta-suave);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .prensa__titular {
+    max-width: 48rem;
+    color: var(--tinta);
+    font-family: var(--fuente-titular);
+    font-size: clamp(1.125rem, 2vw, 1.375rem);
+    font-weight: 600;
+    line-height: 1.3;
+    letter-spacing: -0.02em;
+    text-wrap: pretty;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.2em;
+  }
+
+  .prensa__fecha {
+    color: var(--tinta-suave);
+    font-size: 0.875rem;
+  }
+
+  /* El subrayado del titular avisa que la fila entera es un enlace. Solo con
+     puntero fino: en el teléfono, un toque dejaría la línea pegada. */
+  @media (hover: hover) and (pointer: fine) {
+    .prensa__enlace:hover .prensa__titular {
+      text-decoration-line: underline;
+    }
+  }
+
+  /* Dos notas por fila en pantallas anchas. La línea de cierre va solo en la
+     última fila: el último ítem y, si el total es par, también el penúltimo. */
+  @media (min-width: 768px) {
+    .prensa__lista {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      column-gap: var(--e-7);
+    }
+
+    .prensa__item:last-child,
+    .prensa__item:nth-last-child(2):nth-child(odd) {
+      border-bottom: 1px solid var(--borde);
+    }
+  }
+</style>

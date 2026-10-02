@@ -1,7 +1,8 @@
 ---
-// La landing. Diez secciones, de arriba abajo: el hero con el campo de
-// órbitas, el manifiesto, los cinco exámenes, de dónde sale el material, cómo
-// funciona, los países, los planes, las preguntas y el cierre de descarga.
+// La landing. Once secciones, de arriba abajo: el hero con el campo de
+// órbitas, el manifiesto, las notas de prensa, los cinco exámenes, de dónde
+// sale el material, cómo funciona, los países, los planes, las preguntas y el
+// cierre de descarga.
 //
 // Se construyó aparte, en una página de andamio, y ocupó este lugar cuando
 // estuvo entera. La versión anterior era una sola pantalla con la lista de
@@ -17,6 +18,7 @@ import Manifiesto from '../components/secciones/Manifiesto.astro';
 import Pie from '../components/Pie.astro';
 import Pasos from '../components/secciones/Pasos.astro';
 import Planes from '../components/secciones/Planes.astro';
+import Prensa from '../components/secciones/Prensa.astro';
 import Preguntas from '../components/secciones/Preguntas.astro';
 import Descarga from '../components/secciones/Descarga.astro';
 import Paises from '../components/secciones/Paises.astro';
@@ -31,6 +33,7 @@ import { COPY } from '../data/copy';
     <Hero />
     <Video />
     <Manifiesto />
+    <Prensa />
     <Examenes />
     <Fuentes />
     <Pasos />

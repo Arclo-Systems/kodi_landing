@@ -70,6 +70,15 @@ export const COPY = {
   manifiesto:
     'Prepararse bien casi siempre cuesta: cursos, tutores, material. Y un examen puede decidir lo que viene después. Kodi nació para cambiar eso: que aprobar dependa de cuántas ganas le ponés, no de cuánto podés pagar.',
 
+  // ─── Prensa ────────────────────────────────────────────────────────────────
+  // Las notas viven en `prensa.ts`. `pestanaNueva` va sin espacio inicial: el
+  // espacio lo pone la plantilla, para que el nombre accesible del enlace no
+  // quede pegado a la fecha.
+  prensa: {
+    titular: 'Kodi en las noticias',
+    pestanaNueva: '(se abre en una pestaña nueva)',
+  },
+
   // ─── Planes ────────────────────────────────────────────────────────────────
   // ⚠️ TODOS los montos salen de producción (tablas `subscription_prices` y
   // `promo_offer_prices`), leídos el 2026-09-15. Son los de Costa Rica para UN
